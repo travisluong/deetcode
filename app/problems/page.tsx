@@ -7,7 +7,10 @@ export default async function Page() {
 
   return (
     <div className="max-w-3xl m-auto flex flex-col gap-5">
-      <h1 className="font-brand">Problems</h1>
+      <h1 className="font-brand text-center">Problems</h1>
+      <h2 className="text-muted-foreground text-center">
+        The Blind 75 Debugged and Visualized
+      </h2>
       <DataTable columns={columns} data={problemsRes} />
     </div>
   );

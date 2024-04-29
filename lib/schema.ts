@@ -1,4 +1,5 @@
 import {
+  int,
   mysqlEnum,
   mysqlTable,
   serial,
@@ -11,7 +12,7 @@ export const problems = mysqlTable("problems", {
   name: varchar("name", { length: 256 }),
   slug: varchar("slug", { length: 256 }).unique().notNull(),
   category: varchar("category", { length: 256 }),
-  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]),
+  difficulty: int("difficulty"),
   leetcode_url: varchar("leetcode_url", { length: 256 }),
   youtube_url: varchar("youtube_url", { length: 256 }),
   github_url: varchar("github_url", { length: 256 }),

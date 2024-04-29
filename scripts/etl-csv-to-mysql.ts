@@ -28,9 +28,9 @@ async function loadDataFromCSV() {
       const lastSubpath = pathSegments[pathSegments.length - 1]; // Get the last subpath
 
       const difficultyMap = {
-        e: "easy",
-        m: "medium",
-        h: "hard",
+        e: 1,
+        m: 2,
+        h: 3,
       };
 
       const data = {
