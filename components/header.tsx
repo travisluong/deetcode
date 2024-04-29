@@ -11,7 +11,9 @@ export default function Header() {
 
       <div className="flex gap-5 items-center">
         <nav>
-          <Link href="/problems">Problems</Link>
+          <Link href="/problems" className="hover:text-primary">
+            Problems
+          </Link>
         </nav>
         <ModeToggle />
       </div>
