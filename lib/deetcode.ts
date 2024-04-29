@@ -23,6 +23,7 @@ export class DeetSet {
   }
 
   add(obj: any) {
+    debugger;
     const div = document.createElement("div");
     div.innerHTML = obj;
     dc.element?.appendChild(div);
