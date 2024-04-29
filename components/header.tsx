@@ -8,7 +8,13 @@ export default function Header() {
       <Link href="/">
         <LightningBoltIcon className="text-primary w-7 h-7 hover:text-yellow-300" />
       </Link>
-      <ModeToggle />
+
+      <div className="flex gap-5 items-center">
+        <nav>
+          <Link href="/problems">Problems</Link>
+        </nav>
+        <ModeToggle />
+      </div>
     </header>
   );
 }
