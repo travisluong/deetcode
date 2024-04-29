@@ -9,7 +9,7 @@ import {
 export const problems = mysqlTable("problems", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }),
-  slug: varchar("slug", { length: 256 }),
+  slug: varchar("slug", { length: 256 }).unique(),
   category: varchar("category", { length: 256 }),
   difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]),
   leetcode_url: varchar("leetcode_url", { length: 256 }),

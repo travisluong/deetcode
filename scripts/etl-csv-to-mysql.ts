@@ -27,6 +27,12 @@ async function loadDataFromCSV() {
         .filter((segment: string) => segment !== ""); // Split path and remove empty segments
       const lastSubpath = pathSegments[pathSegments.length - 1]; // Get the last subpath
 
+      const difficultyMap = {
+        e: "easy",
+        m: "medium",
+        h: "hard",
+      };
+
       const data = {
         neetcode_url: row["Video Solution"],
         category: row["Category"],
@@ -34,6 +40,8 @@ async function loadDataFromCSV() {
         leetcode_url: row["Link"],
         notes: row["Notes"],
         slug: lastSubpath,
+        //@ts-ignore
+        difficulty: difficultyMap[row["Difficulty"]],
       };
 
       console.log(data);
@@ -41,7 +49,7 @@ async function loadDataFromCSV() {
       try {
         // Insert data into MySQL table
         const [results, fields] = await pool.query(
-          "INSERT INTO problems SET ?",
+          "INSERT INTO problems SET ? ON DUPLICATE KEY UPDATE difficulty=difficulty",
           data
         );
         console.log("Data inserted successfully");
