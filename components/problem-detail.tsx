@@ -2,8 +2,8 @@
 
 import { Problem } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
-import { useEffect, useRef } from "react";
-import dc from "@/lib/deetcode";
+import { MouseEvent, useEffect, useRef } from "react";
+import dc, { DeetSet } from "@/lib/deetcode";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -19,8 +19,8 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       dc.configure({ selector: "#deetcode" });
-      // @ts-ignore
       window.dc = dc;
+      window.DeetSet = dc.DeetSet;
     }
   }, []);
 
@@ -28,16 +28,14 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
     editorRef.current = editor;
   }
 
-  // @ts-ignore
-  function handleSubmit(e) {
-    debugger;
+  function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     // @ts-ignore
     const code = editorRef.current.getValue();
     console.log(code);
-    dc.monkeyPatch(window);
+    DeetSet.monkeyPatch();
     eval(code);
-    dc.undoMonkeyPatch(window);
+    DeetSet.undoMonkeyPatch();
   }
 
   return (
@@ -54,7 +52,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={50}>
           <div className="p-6">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5">
               <Editor
                 height="50vh"
                 width="100%"
@@ -64,9 +62,9 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
                 theme={theme === "dark" ? "vs-dark" : "vs-light"}
               />
               <div>
-                <Button type="submit">submit</Button>
+                <Button onClick={handleSubmit}>submit</Button>
               </div>
-            </form>
+            </div>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>

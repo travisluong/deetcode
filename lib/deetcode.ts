@@ -4,67 +4,75 @@ interface DeetCode {
   DeetSet: typeof DeetSet;
   configure: (config: { selector: string }) => void;
   element?: Element | null;
-  monkeyPatch: (window: any) => void;
-  originalAdd?: (value: any) => Set<any>;
-  undoMonkeyPatch: (window: any) => void;
 }
 
-export class DeetSet {
-  set: Set<any>;
+declare global {
+  interface Window {
+    dc: DeetCode;
+    DeetSet: typeof DeetSet;
+  }
+}
 
-  constructor(objs?: any[]) {
-    this.set = new Set(objs);
+export class DeetSet extends Set {
+  id: string;
+  static originalSet?: SetConstructor;
+
+  constructor(...args: any) {
+    super(...args);
+    this.id = crypto.randomUUID();
   }
 
-  has(obj: any) {
-    console.log("adding to deetset");
-
-    return this.set.has(obj);
+  has(value: any): boolean {
+    return super.has(value);
   }
 
-  add(obj: any) {
-    debugger;
-    const div = document.createElement("div");
-    div.innerHTML = obj;
-    dc.element?.appendChild(div);
-    return this.set.add(obj);
+  add(value: any): any {
+    this.renderValue(value);
+    return super.add(value);
+  }
+
+  delete(value: any): any {
+    this.removeValue(value);
+    return super.delete(value);
+  }
+
+  private renderValue(value: any) {
+    if (window.dc.element) {
+      const div = document.createElement("div");
+      div.dataset.id = this.id;
+      div.innerHTML = value;
+      dc.element?.appendChild(div);
+    }
+  }
+
+  private removeValue(value: any) {
+    if (window.dc.element) {
+      const div = document.querySelector(`[data-id="${this.id}"]`);
+      div?.remove();
+      return true;
+    }
+  }
+
+  static monkeyPatch() {
+    if (this.originalSet === undefined) {
+      this.originalSet = Set;
+    }
+
+    Set = DeetSet;
+  }
+
+  static undoMonkeyPatch() {
+    Set = this.originalSet!;
   }
 }
 
 const dc: DeetCode = {
   DeetSet: DeetSet,
   configure,
-  monkeyPatch,
-  undoMonkeyPatch,
 };
 
 function configure(config: { selector: string }) {
   dc.element = document.querySelector(config.selector);
-}
-
-function monkeyPatch(window) {
-  debugger;
-  if (dc.originalAdd === undefined) {
-    dc.originalAdd = Set.prototype.add;
-  }
-
-  Set.prototype.add = function (value) {
-    // Call the original add method to ensure normal functionality
-    dc.originalAdd?.call(this, value);
-    if (window.dc.element) {
-      const div = document.createElement("div");
-      div.innerHTML = value;
-      dc.element?.appendChild(div);
-    }
-
-    return this;
-  };
-}
-
-function undoMonkeyPatch(window) {
-  if (dc.originalAdd) {
-    Set.prototype.add = dc.originalAdd;
-  }
 }
 
 export default dc;
