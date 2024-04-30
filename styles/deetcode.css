@@ -1,6 +1,7 @@
 .deetcode {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .deetset {
@@ -26,71 +27,25 @@
   flex-wrap: wrap;
 }
 
-.deetmap {
+.deettable {
   color: black;
   margin: 10px;
   border-spacing: 2px;
   border-collapse: separate;
 }
 
-.deetmap tr {
-  display: flex;
-  gap: 2px;
-}
-
-.deetmap th {
+.deettable th {
   background-color: darkgray;
   padding: 5px;
   min-width: 50px;
   min-height: 50px;
   font-weight: normal;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-.deetmap td {
+.deettable td {
   padding: 5px;
   background-color: lightgray;
   text-align: center;
   min-width: 50px;
   min-height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.deetarray {
-  display: flex;
-  gap: 2px;
-  margin: 10px;
-}
-
-.deetarray-item {
-  display: flex;
-  flex-direction: column;
-  color: black;
-  min-width: 50px;
-  min-height: 50px;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-}
-
-.deetarray-index {
-  display: flex;
-  background-color: darkgray;
-  min-width: 50px;
-  min-height: 50px;
-  align-items: center;
-  justify-content: center;
-}
-
-.deetarray-value {
-  display: flex;
-  background-color: lightgray;
-  min-width: 50px;
-  min-height: 50px;
-  align-items: center;
-  justify-content: center;
 }
