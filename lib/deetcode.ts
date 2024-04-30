@@ -15,11 +15,13 @@ declare global {
 
 export class DeetSet extends Set {
   id: string;
+  container?: HTMLDivElement;
   static originalSet?: SetConstructor;
 
   constructor(...args: any) {
     super(...args);
     this.id = crypto.randomUUID();
+    this.renderContainer();
   }
 
   has(value: any): boolean {
@@ -36,18 +38,36 @@ export class DeetSet extends Set {
     return super.delete(value);
   }
 
+  renderContainer() {
+    const div = document.createElement("div");
+    div.dataset.id = this.id;
+    div.style.display = "flex";
+    div.style.alignContent = "flex-start";
+    div.style.flexWrap = "wrap";
+    div.style.padding = "5px";
+    div.style.border = "2px solid lightgray";
+    div.style.margin = "5px";
+    div.style.aspectRatio = "1 / 1";
+    this.container = div;
+    window.dc.element?.appendChild(div);
+  }
+
   private renderValue(value: any) {
     if (window.dc.element) {
       const div = document.createElement("div");
-      div.dataset.id = this.id;
+      div.style.backgroundColor = "lightgray";
+      div.style.padding = "5px";
+      div.style.margin = "5px";
+      div.style.color = "black";
+      div.dataset.id = this.id + value;
       div.innerHTML = value;
-      dc.element?.appendChild(div);
+      this.container?.appendChild(div);
     }
   }
 
   private removeValue(value: any) {
     if (window.dc.element) {
-      const div = document.querySelector(`[data-id="${this.id}"]`);
+      const div = document.querySelector(`[data-id="${this.id}${value}"]`);
       div?.remove();
       return true;
     }
