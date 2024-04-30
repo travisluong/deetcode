@@ -3,20 +3,45 @@
   flex-wrap: wrap;
 }
 
+.deetset {
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  padding: 5px;
+  border: 2px solid lightgray;
+  margin: 5px;
+}
+
+.deetset-value {
+  background-color: lightgray;
+  padding: 5px;
+  margin: 5px;
+  color: black;
+  min-width: 50px;
+  min-height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .deetcode-table {
   color: black;
   margin: 10px;
+  border-spacing: 2px;
+  border-collapse: separate;
 }
 
 .deetcode-table th {
   background-color: darkgray;
   padding: 5px;
-  border: 2px solid gray;
+  min-width: 50px;
+  min-height: 50px;
 }
 
 .deetcode-table td {
   padding: 5px;
   background-color: lightgray;
-  border: 2px solid gray;
   text-align: center;
+  min-width: 50px;
+  min-height: 50px;
 }

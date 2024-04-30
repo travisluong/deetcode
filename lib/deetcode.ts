@@ -42,14 +42,8 @@ export class DeetSet extends Set {
 
   renderContainer() {
     const div = document.createElement("div");
+    div.classList.add("deetset");
     div.dataset.id = this.id;
-    div.style.display = "flex";
-    div.style.alignContent = "flex-start";
-    div.style.flexWrap = "wrap";
-    div.style.padding = "5px";
-    div.style.border = "2px solid lightgray";
-    div.style.margin = "5px";
-    div.style.aspectRatio = "1 / 1";
     this.container = div;
     window.dc.element?.appendChild(div);
   }
@@ -57,10 +51,7 @@ export class DeetSet extends Set {
   private renderValue(value: any) {
     if (window.dc.element) {
       const div = document.createElement("div");
-      div.style.backgroundColor = "lightgray";
-      div.style.padding = "5px";
-      div.style.margin = "5px";
-      div.style.color = "black";
+      div.classList.add("deetset-value");
       div.dataset.id = this.id + value;
       div.innerHTML = value;
       this.container?.appendChild(div);
