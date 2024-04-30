@@ -1,0 +1,22 @@
+.deetcode {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.deetcode-table {
+  color: black;
+  margin: 10px;
+}
+
+.deetcode-table th {
+  background-color: darkgray;
+  padding: 5px;
+  border: 2px solid gray;
+}
+
+.deetcode-table td {
+  padding: 5px;
+  background-color: lightgray;
+  border: 2px solid gray;
+  text-align: center;
+}

@@ -3,7 +3,7 @@
 import { Problem } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
 import { MouseEvent, useEffect, useRef } from "react";
-import dc, { DeetSet } from "@/lib/deetcode";
+import dc from "@/lib/deetcode";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/resizable";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
+import "@/styles/deetcode.css";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
@@ -21,6 +22,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       dc.configure({ selector: "#deetcode" });
       window.dc = dc;
       window.DeetSet = dc.DeetSet;
+      window.DeetMap = dc.DeetMap;
     }
   }, []);
 
@@ -33,9 +35,11 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
     // @ts-ignore
     const code = editorRef.current.getValue();
     console.log(code);
-    DeetSet.monkeyPatch();
+    dc.DeetSet.monkeyPatch();
+    dc.DeetMap.monkeyPatch();
     eval(code);
-    DeetSet.undoMonkeyPatch();
+    dc.DeetSet.undoMonkeyPatch();
+    dc.DeetMap.undoMonkeyPatch();
   }
 
   return (
