@@ -7,16 +7,52 @@
   display: flex;
   align-content: flex-start;
   flex-wrap: wrap;
-  padding: 5px;
-  border: 2px solid lightgray;
+  padding: 2px;
+  border: 2px solid darkgray;
   margin: 5px;
+  gap: 2px;
+  height: auto;
 }
 
 .deetset-value {
   background-color: lightgray;
-  padding: 5px;
-  margin: 5px;
   color: black;
+  min-width: 50px;
+  min-height: 50px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.deetmap {
+  color: black;
+  margin: 10px;
+  border-spacing: 2px;
+  border-collapse: separate;
+}
+
+.deetmap tr {
+  display: flex;
+  gap: 2px;
+}
+
+.deetmap th {
+  background-color: darkgray;
+  padding: 5px;
+  min-width: 50px;
+  min-height: 50px;
+  font-weight: normal;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.deetmap td {
+  padding: 5px;
+  background-color: lightgray;
+  text-align: center;
   min-width: 50px;
   min-height: 50px;
   display: flex;
@@ -24,24 +60,37 @@
   align-items: center;
 }
 
-.deetcode-table {
-  color: black;
+.deetarray {
+  display: flex;
+  gap: 2px;
   margin: 10px;
-  border-spacing: 2px;
-  border-collapse: separate;
 }
 
-.deetcode-table th {
+.deetarray-item {
+  display: flex;
+  flex-direction: column;
+  color: black;
+  min-width: 50px;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.deetarray-index {
+  display: flex;
   background-color: darkgray;
-  padding: 5px;
   min-width: 50px;
   min-height: 50px;
+  align-items: center;
+  justify-content: center;
 }
 
-.deetcode-table td {
-  padding: 5px;
+.deetarray-value {
+  display: flex;
   background-color: lightgray;
-  text-align: center;
   min-width: 50px;
   min-height: 50px;
+  align-items: center;
+  justify-content: center;
 }

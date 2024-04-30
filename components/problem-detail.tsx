@@ -37,9 +37,11 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
     console.log(code);
     dc.DeetSet.monkeyPatch();
     dc.DeetMap.monkeyPatch();
+    dc.DeetArray.monkeyPatch();
     eval(code);
     dc.DeetSet.undoMonkeyPatch();
     dc.DeetMap.undoMonkeyPatch();
+    dc.DeetArray.undoMonkeyPatch();
   }
 
   return (

@@ -3,6 +3,7 @@
 interface DeetCode {
   DeetSet: typeof DeetSet;
   DeetMap: typeof DeetMap;
+  DeetArray: typeof DeetArray;
   configure: (config: { selector: string }) => void;
   element?: Element | null;
 }
@@ -12,6 +13,7 @@ declare global {
     dc: DeetCode;
     DeetSet: typeof DeetSet;
     DeetMap: typeof DeetMap;
+    DeetArray: typeof DeetArray;
   }
 }
 
@@ -106,7 +108,7 @@ export class DeetMap<K, V> extends Map<K, V> {
 
   renderContainer() {
     const table = document.createElement("table");
-    table.classList.add("deetcode-table");
+    table.classList.add("deetmap");
     const thead = document.createElement("thead");
     const tr = document.createElement("tr");
     const th = document.createElement("th");
@@ -162,9 +164,72 @@ export class DeetMap<K, V> extends Map<K, V> {
   }
 }
 
+export class DeetArray extends Array {
+  id: string;
+  curIdx: number;
+  container?: HTMLDivElement;
+  static originalArray?: ArrayConstructor;
+
+  constructor(...args: any) {
+    super(...args);
+    this.id = crypto.randomUUID();
+    this.curIdx = 0;
+    this.renderContainer();
+  }
+
+  push(value: any): number {
+    this.renderValue(value);
+    return super.push(value);
+  }
+
+  renderContainer() {
+    const div = document.createElement("div");
+    div.classList.add("deetarray");
+    div.dataset.id = this.id;
+    this.container = div;
+    window.dc.element?.appendChild(div);
+  }
+
+  private renderValue(value: any) {
+    // create els
+    const itemDiv = document.createElement("div");
+    const indexDiv = document.createElement("div");
+    const valueDiv = document.createElement("div");
+
+    // classes
+    itemDiv.classList.add("deetarray-item");
+    indexDiv.classList.add("deetarray-index");
+    valueDiv.classList.add("deetarray-value");
+
+    // inner html
+    indexDiv.innerHTML = this.curIdx.toString();
+    valueDiv.innerHTML = value;
+
+    // build tree
+    itemDiv.appendChild(indexDiv);
+    itemDiv.appendChild(valueDiv);
+    itemDiv.dataset.id = this.id + value;
+    this.container?.appendChild(itemDiv);
+    this.curIdx++;
+  }
+
+  static monkeyPatch() {
+    if (this.originalArray === undefined) {
+      this.originalArray = Array;
+    }
+
+    Array = DeetArray;
+  }
+
+  static undoMonkeyPatch() {
+    Array = this.originalArray;
+  }
+}
+
 const dc: DeetCode = {
   DeetSet: DeetSet,
   DeetMap: DeetMap,
+  DeetArray: DeetArray,
   configure,
 };
 
