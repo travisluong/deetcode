@@ -195,6 +195,12 @@ export class DeetArray extends Array {
     return res;
   }
 
+  sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
+    const res = super.sort(compareFn);
+    this.render();
+    return res;
+  }
+
   renderContainer() {
     const table = document.createElement("table");
     table.classList.add("deettable");
@@ -207,6 +213,14 @@ export class DeetArray extends Array {
     if (this.container) {
       this.container.innerHTML = "";
     }
+    if (this.is2DArray(this)) {
+      this.render2d();
+    } else {
+      this.render1d();
+    }
+  }
+
+  render1d() {
     const thead = document.createElement("thead");
     const tbody = document.createElement("tbody");
     const indexRow = document.createElement("tr");
@@ -223,6 +237,63 @@ export class DeetArray extends Array {
     tbody.appendChild(valueRow);
     this.container?.appendChild(thead);
     this.container?.appendChild(tbody);
+  }
+
+  render2d() {
+    debugger;
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+    const theadTr = document.createElement("tr");
+    const th = document.createElement("th");
+    theadTr.appendChild(th);
+
+    for (let i = 0; i < this.getLengthOfLongestArray(); i++) {
+      const th = document.createElement("th");
+      th.innerHTML = i.toString();
+      theadTr.appendChild(th);
+    }
+    thead.appendChild(theadTr);
+
+    for (let i = 0; i < this.length; i++) {
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      th.innerHTML = i.toString();
+      tr.appendChild(th);
+      for (let j = 0; j < this[i].length; j++) {
+        const td = document.createElement("td");
+        td.innerHTML = this[i][j];
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    this.container?.appendChild(thead);
+    this.container?.appendChild(tbody);
+  }
+
+  getLengthOfLongestArray() {
+    let max = Number.MIN_VALUE;
+    for (const arr of this) {
+      max = Math.max(max, arr.length);
+    }
+    return max;
+  }
+
+  is2DArray(arr: any) {
+    // Check if arr is an array
+    if (!Array.isArray(arr)) {
+      return false;
+    }
+
+    // Check if all elements of arr are arrays
+    for (let i = 0; i < arr.length; i++) {
+      if (!Array.isArray(arr[i])) {
+        return false;
+      }
+    }
+
+    // If all elements are arrays, it's a 2D array
+    return true;
   }
 
   static monkeyPatch() {
