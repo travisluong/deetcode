@@ -195,6 +195,12 @@ export class DeetArray extends Array {
     return res;
   }
 
+  pop() {
+    const res = super.pop();
+    this.render();
+    return res;
+  }
+
   sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
     const res = super.sort(compareFn);
     this.render();
