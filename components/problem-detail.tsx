@@ -12,6 +12,10 @@ import {
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
+import {
+  MinPriorityQueue,
+  MaxPriorityQueue,
+} from "@datastructures-js/priority-queue";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
@@ -23,6 +27,8 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       window.dc = dc;
       window.DeetSet = dc.DeetSet;
       window.DeetMap = dc.DeetMap;
+      window.MinPriorityQueue = MinPriorityQueue;
+      window.MaxPriorityQueue = MaxPriorityQueue;
     }
   }, []);
 
@@ -51,13 +57,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
         className="min-h-[200px] rounded-lg border"
       >
         <ResizablePanel defaultSize={50}>
-          <div className="flex h-full items-center justify-center p-6">
-            <div id="deetcode"></div>
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={50}>
-          <div className="p-6">
+          <div className="p-6 bg-[#1E1E1E]">
             <div className="flex flex-col gap-5">
               <Editor
                 height="50vh"
@@ -71,6 +71,12 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
                 <Button onClick={handleSubmit}>submit</Button>
               </div>
             </div>
+          </div>
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={50}>
+          <div className="flex h-full items-center justify-center p-6">
+            <div id="deetcode"></div>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>

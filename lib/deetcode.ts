@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  MaxPriorityQueue,
+  MinPriorityQueue,
+} from "@datastructures-js/priority-queue";
+
 interface DeetCode {
   DeetSet: typeof DeetSet;
   DeetMap: typeof DeetMap;
@@ -14,6 +19,8 @@ declare global {
     DeetSet: typeof DeetSet;
     DeetMap: typeof DeetMap;
     DeetArray: typeof DeetArray;
+    MinPriorityQueue: typeof MinPriorityQueue;
+    MaxPriorityQueue: typeof MaxPriorityQueue;
   }
 }
 
