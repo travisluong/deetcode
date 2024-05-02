@@ -79,7 +79,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
                 defaultLanguage="javascript"
                 defaultValue={problem.solution ?? undefined}
                 onMount={handleEditorDidMount}
-                theme={theme === "dark" ? "vs-dark" : "vs-light"}
+                theme={theme === "light" ? "vs-light" : "vs-dark"}
               />
               <div className="p-5">
                 <Button className="cursor-pointer" onClick={handleSubmit}>
