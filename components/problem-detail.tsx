@@ -12,7 +12,10 @@ import {
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
-import { MinPriorityQueue } from "@datastructures-js/priority-queue";
+import {
+  MinPriorityQueue,
+  MaxPriorityQueue,
+} from "@datastructures-js/priority-queue";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
@@ -25,8 +28,9 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       window.DeetSet = dc.DeetSet;
       window.DeetMap = dc.DeetMap;
       window.DeetMinPriorityQueue = dc.DeetMinPriorityQueue;
+      window.DeetMaxPriorityQueue = dc.DeetMaxPriorityQueue;
       window.MinPriorityQueue = MinPriorityQueue;
-      // window.MaxPriorityQueue = MaxPriorityQueue;
+      window.MaxPriorityQueue = MaxPriorityQueue;
     }
   }, []);
 
@@ -44,6 +48,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       dc.DeetMap.monkeyPatch();
       dc.DeetArray.monkeyPatch();
       dc.DeetMinPriorityQueue.monkeyPatch();
+      dc.DeetMaxPriorityQueue.monkeyPatch();
       eval(code);
     } catch (error) {
       console.error(error);
@@ -52,6 +57,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       dc.DeetMap.undoMonkeyPatch();
       dc.DeetArray.undoMonkeyPatch();
       dc.DeetMinPriorityQueue.undoMonkeyPatch();
+      dc.DeetMaxPriorityQueue.undoMonkeyPatch();
     }
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  MaxPriorityQueue,
+  MaxPriorityQueue as MaxPriorityQueueB,
   MinPriorityQueue as MinPriorityQueueB,
 } from "@datastructures-js/priority-queue";
 
@@ -10,6 +10,7 @@ interface DeetCode {
   DeetMap: typeof DeetMap;
   DeetArray: typeof DeetArray;
   DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
+  DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
   configure: (config: { selector: string }) => void;
   element?: Element | null;
 }
@@ -21,7 +22,9 @@ declare global {
     DeetMap: typeof DeetMap;
     DeetArray: typeof DeetArray;
     DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
+    DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
     MinPriorityQueue: typeof MinPriorityQueueB;
+    MaxPriorityQueue: typeof MaxPriorityQueueB;
     // DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
   }
 }
@@ -386,11 +389,72 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
   }
 }
 
+class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
+  id: string;
+  container?: HTMLDivElement;
+  static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
+
+  constructor(...args: any) {
+    super(...args);
+    this.id = crypto.randomUUID();
+    this.renderTable();
+  }
+
+  renderTable() {
+    const container = document.createElement("div");
+    container.classList.add("deetlist");
+    container.dataset.id = this.id;
+    this.container = container;
+    window.dc.element?.appendChild(container);
+  }
+
+  enqueue(value: any) {
+    const res = super.enqueue(value);
+    this.render();
+    return res;
+  }
+
+  dequeue() {
+    const res = super.dequeue();
+    this.render();
+    return res;
+  }
+
+  render() {
+    debugger;
+    if (this.container) {
+      this.container.innerHTML = "";
+    }
+    const arr = super.toArray();
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      li.innerHTML = item.toString();
+      ul.appendChild(li);
+    }
+    this.container?.appendChild(ul);
+  }
+
+  static monkeyPatch() {
+    if (this.originalMaxPriorityQueue === undefined) {
+      this.originalMaxPriorityQueue = MaxPriorityQueueB;
+    }
+
+    window.MaxPriorityQueue = DeetMaxPriorityQueue;
+  }
+
+  static undoMonkeyPatch() {
+    //@ts-ignore
+    window.MaxPriorityQueue = this.originalMaxPriorityQueue;
+  }
+}
+
 const dc: DeetCode = {
   DeetSet: DeetSet,
   DeetMap: DeetMap,
   DeetArray: DeetArray,
   DeetMinPriorityQueue: DeetMinPriorityQueue,
+  DeetMaxPriorityQueue: DeetMaxPriorityQueue,
   configure,
 };
 
