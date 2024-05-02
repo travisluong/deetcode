@@ -52,3 +52,26 @@
   min-width: 50px;
   min-height: 50px;
 }
+
+.deetlist {
+  border: 2px solid darkgray;
+  padding: 2px;
+  margin: 10px;
+}
+
+.deetlist ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.deetlist li {
+  display: flex;
+  padding: 5px;
+  min-width: 50px;
+  max-width: 50px;
+  background-color: lightgray;
+  color: black;
+  justify-content: center;
+  align-items: center;
+}

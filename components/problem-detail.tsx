@@ -12,10 +12,7 @@ import {
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
-import {
-  MinPriorityQueue,
-  MaxPriorityQueue,
-} from "@datastructures-js/priority-queue";
+import { MinPriorityQueue } from "@datastructures-js/priority-queue";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
@@ -27,8 +24,9 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       window.dc = dc;
       window.DeetSet = dc.DeetSet;
       window.DeetMap = dc.DeetMap;
+      window.DeetMinPriorityQueue = dc.DeetMinPriorityQueue;
       window.MinPriorityQueue = MinPriorityQueue;
-      window.MaxPriorityQueue = MaxPriorityQueue;
+      // window.MaxPriorityQueue = MaxPriorityQueue;
     }
   }, []);
 
@@ -41,13 +39,20 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
     // @ts-ignore
     const code = editorRef.current.getValue();
     console.log(code);
-    dc.DeetSet.monkeyPatch();
-    dc.DeetMap.monkeyPatch();
-    dc.DeetArray.monkeyPatch();
-    eval(code);
-    dc.DeetSet.undoMonkeyPatch();
-    dc.DeetMap.undoMonkeyPatch();
-    dc.DeetArray.undoMonkeyPatch();
+    try {
+      dc.DeetSet.monkeyPatch();
+      dc.DeetMap.monkeyPatch();
+      dc.DeetArray.monkeyPatch();
+      dc.DeetMinPriorityQueue.monkeyPatch();
+      eval(code);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      dc.DeetSet.undoMonkeyPatch();
+      dc.DeetMap.undoMonkeyPatch();
+      dc.DeetArray.undoMonkeyPatch();
+      dc.DeetMinPriorityQueue.undoMonkeyPatch();
+    }
   }
 
   return (
@@ -57,7 +62,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
         className="min-h-[200px] rounded-lg border"
       >
         <ResizablePanel defaultSize={50}>
-          <div className="p-6 bg-[#1E1E1E]">
+          <div className="dark:bg-[#1E1E1E]">
             <div className="flex flex-col gap-5">
               <Editor
                 height="50vh"
@@ -67,8 +72,10 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
                 onMount={handleEditorDidMount}
                 theme={theme === "dark" ? "vs-dark" : "vs-light"}
               />
-              <div>
-                <Button onClick={handleSubmit}>submit</Button>
+              <div className="p-5">
+                <Button className="cursor-pointer" onClick={handleSubmit}>
+                  Submit
+                </Button>
               </div>
             </div>
           </div>

@@ -2,13 +2,14 @@
 
 import {
   MaxPriorityQueue,
-  MinPriorityQueue,
+  MinPriorityQueue as MinPriorityQueueB,
 } from "@datastructures-js/priority-queue";
 
 interface DeetCode {
   DeetSet: typeof DeetSet;
   DeetMap: typeof DeetMap;
   DeetArray: typeof DeetArray;
+  DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
   configure: (config: { selector: string }) => void;
   element?: Element | null;
 }
@@ -19,8 +20,9 @@ declare global {
     DeetSet: typeof DeetSet;
     DeetMap: typeof DeetMap;
     DeetArray: typeof DeetArray;
-    MinPriorityQueue: typeof MinPriorityQueue;
-    MaxPriorityQueue: typeof MaxPriorityQueue;
+    DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
+    MinPriorityQueue: typeof MinPriorityQueueB;
+    // DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
   }
 }
 
@@ -175,7 +177,7 @@ export class DeetMap<K, V> extends Map<K, V> {
 
 export class DeetArray extends Array {
   id: string;
-  container?: HTMLDivElement;
+  container?: HTMLTableElement;
   static originalArray?: ArrayConstructor;
 
   constructor(...args: any) {
@@ -324,10 +326,71 @@ export class DeetArray extends Array {
   }
 }
 
+class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
+  id: string;
+  container?: HTMLDivElement;
+  static originalMinPriorityQueue?: typeof MinPriorityQueueB;
+
+  constructor(...args: any) {
+    super(...args);
+    this.id = crypto.randomUUID();
+    this.renderTable();
+  }
+
+  renderTable() {
+    const container = document.createElement("div");
+    container.classList.add("deetlist");
+    container.dataset.id = this.id;
+    this.container = container;
+    window.dc.element?.appendChild(container);
+  }
+
+  enqueue(value: any) {
+    const res = super.enqueue(value);
+    this.render();
+    return res;
+  }
+
+  dequeue() {
+    const res = super.dequeue();
+    this.render();
+    return res;
+  }
+
+  render() {
+    debugger;
+    if (this.container) {
+      this.container.innerHTML = "";
+    }
+    const arr = super.toArray();
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      li.innerHTML = item.toString();
+      ul.appendChild(li);
+    }
+    this.container?.appendChild(ul);
+  }
+
+  static monkeyPatch() {
+    if (this.originalMinPriorityQueue === undefined) {
+      this.originalMinPriorityQueue = MinPriorityQueueB;
+    }
+
+    window.MinPriorityQueue = DeetMinPriorityQueue;
+  }
+
+  static undoMonkeyPatch() {
+    //@ts-ignore
+    window.MinPriorityQueue = this.originalMinPriorityQueue;
+  }
+}
+
 const dc: DeetCode = {
   DeetSet: DeetSet,
   DeetMap: DeetMap,
   DeetArray: DeetArray,
+  DeetMinPriorityQueue: DeetMinPriorityQueue,
   configure,
 };
 
