@@ -27,6 +27,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       window.dc = dc;
       window.DeetSet = dc.DeetSet;
       window.DeetMap = dc.DeetMap;
+      window.DeetArray = dc.DeetArray;
       window.DeetMinPriorityQueue = dc.DeetMinPriorityQueue;
       window.DeetMaxPriorityQueue = dc.DeetMaxPriorityQueue;
       window.DeetPriorityQueue = dc.DeetPriorityQueue;
