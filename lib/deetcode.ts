@@ -201,6 +201,13 @@ export class DeetArray extends Array {
     super(...args);
     this.id = crypto.randomUUID();
     this.renderContainer();
+    return new Proxy(this, {
+      set: (target, prop, value) => {
+        this[Number(prop)] = value;
+        this.render();
+        return true;
+      },
+    });
   }
 
   push(value: any): number {
@@ -272,7 +279,6 @@ export class DeetArray extends Array {
   }
 
   render2d() {
-    debugger;
     const thead = document.createElement("thead");
     const tbody = document.createElement("tbody");
     const theadTr = document.createElement("tr");
@@ -375,7 +381,6 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
   }
 
   render() {
-    debugger;
     if (this.container) {
       this.container.innerHTML = "";
     }
