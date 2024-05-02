@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  ICompare,
   MaxPriorityQueue as MaxPriorityQueueB,
   MinPriorityQueue as MinPriorityQueueB,
+  PriorityQueue as PriorityQueueB,
 } from "@datastructures-js/priority-queue";
 
 interface DeetCode {
@@ -11,6 +13,7 @@ interface DeetCode {
   DeetArray: typeof DeetArray;
   DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
   DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
+  DeetPriorityQueue: typeof DeetPriorityQueue;
   configure: (config: { selector: string }) => void;
   element?: Element | null;
 }
@@ -23,9 +26,10 @@ declare global {
     DeetArray: typeof DeetArray;
     DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
     DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
+    DeetPriorityQueue: typeof DeetPriorityQueue;
     MinPriorityQueue: typeof MinPriorityQueueB;
     MaxPriorityQueue: typeof MaxPriorityQueueB;
-    // DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
+    PriorityQueue: typeof PriorityQueueB;
   }
 }
 
@@ -421,7 +425,6 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
   }
 
   render() {
-    debugger;
     if (this.container) {
       this.container.innerHTML = "";
     }
@@ -444,8 +447,69 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
   }
 
   static undoMonkeyPatch() {
-    //@ts-ignore
-    window.MaxPriorityQueue = this.originalMaxPriorityQueue;
+    window.MaxPriorityQueue = this.originalMaxPriorityQueue!;
+  }
+}
+
+class DeetPriorityQueue extends PriorityQueueB<any> {
+  id: string;
+  container?: HTMLDivElement;
+  static originalPriorityQueue?: typeof PriorityQueueB;
+
+  constructor(compare: ICompare<any>, values?: any[] | undefined) {
+    super(compare, values);
+    this.id = crypto.randomUUID();
+    this.renderContainer();
+  }
+
+  renderContainer() {
+    const container = document.createElement("div");
+    container.classList.add("deetlist");
+    container.dataset.id = this.id;
+    this.container = container;
+    window.dc.element?.appendChild(container);
+  }
+
+  enqueue(value: any) {
+    const res = super.enqueue(value);
+    this.render();
+    return res;
+  }
+
+  dequeue() {
+    const res = super.dequeue();
+    this.render();
+    return res;
+  }
+
+  render() {
+    if (this.container) {
+      this.container.innerHTML = "";
+    }
+    const arr = super.toArray();
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      let html = "";
+      for (const [key, value] of Object.entries(item)) {
+        html += `${key}: ${value}<br>`;
+      }
+      li.innerHTML = html;
+      ul.appendChild(li);
+    }
+    this.container?.appendChild(ul);
+  }
+
+  static monkeyPatch() {
+    if (this.originalPriorityQueue === undefined) {
+      this.originalPriorityQueue = PriorityQueueB;
+    }
+
+    window.PriorityQueue = DeetPriorityQueue;
+  }
+
+  static undoMonkeyPatch() {
+    window.PriorityQueue = this.originalPriorityQueue!;
   }
 }
 
@@ -455,6 +519,7 @@ const dc: DeetCode = {
   DeetArray: DeetArray,
   DeetMinPriorityQueue: DeetMinPriorityQueue,
   DeetMaxPriorityQueue: DeetMaxPriorityQueue,
+  DeetPriorityQueue: DeetPriorityQueue,
   configure,
 };
 

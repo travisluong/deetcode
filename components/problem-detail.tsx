@@ -29,6 +29,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       window.DeetMap = dc.DeetMap;
       window.DeetMinPriorityQueue = dc.DeetMinPriorityQueue;
       window.DeetMaxPriorityQueue = dc.DeetMaxPriorityQueue;
+      window.DeetPriorityQueue = dc.DeetPriorityQueue;
       window.MinPriorityQueue = MinPriorityQueue;
       window.MaxPriorityQueue = MaxPriorityQueue;
     }
@@ -49,6 +50,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       dc.DeetArray.monkeyPatch();
       dc.DeetMinPriorityQueue.monkeyPatch();
       dc.DeetMaxPriorityQueue.monkeyPatch();
+      dc.DeetPriorityQueue.monkeyPatch();
       eval(code);
     } catch (error) {
       console.error(error);
@@ -58,6 +60,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       dc.DeetArray.undoMonkeyPatch();
       dc.DeetMinPriorityQueue.undoMonkeyPatch();
       dc.DeetMaxPriorityQueue.undoMonkeyPatch();
+      dc.DeetPriorityQueue.undoMonkeyPatch();
     }
   }
 
