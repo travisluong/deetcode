@@ -194,13 +194,15 @@ export class DeetMap<K, V> extends Map<K, V> {
 
 export class DeetArray extends Array {
   id: string;
-  container?: HTMLTableElement;
+  container?: HTMLDivElement;
+  table?: HTMLTableElement;
   static originalArray?: ArrayConstructor;
 
   constructor(...args: any) {
     super(...args);
     this.id = crypto.randomUUID();
     this.renderContainer();
+    this.render();
     return new Proxy(this, {
       set: (target, prop, value) => {
         this[Number(prop)] = value;
@@ -241,16 +243,20 @@ export class DeetArray extends Array {
   }
 
   renderContainer() {
+    const div = document.createElement("div");
     const table = document.createElement("table");
+    div.classList.add("deet-container");
     table.classList.add("deet-table");
-    table.dataset.id = this.id;
-    this.container = table;
-    window.dc.element?.appendChild(table);
+    div.appendChild(table);
+    div.dataset.id = this.id;
+    this.container = div;
+    this.table = table;
+    window.dc.element?.appendChild(div);
   }
 
   render() {
-    if (this.container) {
-      this.container.innerHTML = "";
+    if (this.table) {
+      this.table.innerHTML = "";
     }
     if (this.is2DArray(this)) {
       this.render2d();
@@ -274,8 +280,8 @@ export class DeetArray extends Array {
     }
     thead.appendChild(indexRow);
     tbody.appendChild(valueRow);
-    this.container?.appendChild(thead);
-    this.container?.appendChild(tbody);
+    this.table?.appendChild(thead);
+    this.table?.appendChild(tbody);
   }
 
   render2d() {
@@ -305,8 +311,8 @@ export class DeetArray extends Array {
       tbody.appendChild(tr);
     }
 
-    this.container?.appendChild(thead);
-    this.container?.appendChild(tbody);
+    this.table?.appendChild(thead);
+    this.table?.appendChild(tbody);
   }
 
   getLengthOfLongestArray() {
