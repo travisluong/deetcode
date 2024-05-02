@@ -4,6 +4,12 @@
   align-items: flex-start;
 }
 
+.deet-container {
+  border: 2px solid darkgray;
+  display: flex;
+  margin: 10px;
+}
+
 .deetset {
   display: flex;
   align-content: flex-start;
@@ -29,17 +35,16 @@
   flex-wrap: wrap;
 }
 
-.deettable {
+.deet-table {
   color: black;
   margin: 10px;
   border-spacing: 2px;
   border-collapse: separate;
-  border: 2px solid darkgray;
   min-height: 50px;
   min-width: 50px;
 }
 
-.deettable th {
+.deet-table th {
   background-color: darkgray;
   padding: 5px;
   min-width: 50px;
@@ -47,7 +52,7 @@
   font-weight: normal;
 }
 
-.deettable td {
+.deet-table td {
   padding: 5px;
   background-color: lightgray;
   text-align: center;
@@ -55,18 +60,18 @@
   min-height: 50px;
 }
 
-.deetlist {
+.deet-list {
   border: 2px solid darkgray;
   padding: 2px;
   margin: 10px;
 }
 
-.deetlist ul {
+.deet-list ul {
   display: flex;
   gap: 2px;
 }
 
-.deetlist li {
+.deet-list li {
   display: flex;
   padding: 5px;
   min-width: 50px;
