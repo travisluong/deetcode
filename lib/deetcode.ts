@@ -49,39 +49,36 @@ export class DeetSet extends Set {
   }
 
   add(value: any): any {
-    this.renderValue(value);
-    return super.add(value);
+    const res = super.add(value);
+    this.render();
+    return res;
   }
 
   delete(value: any): any {
-    this.removeValue(value);
-    return super.delete(value);
+    const res = super.delete(value);
+    this.render();
+    return res;
   }
 
-  renderContainer() {
+  private renderContainer() {
     const div = document.createElement("div");
-    div.classList.add("deetset");
+    div.classList.add("deet-container");
     div.dataset.id = this.id;
     this.container = div;
     window.dc.element?.appendChild(div);
   }
 
-  private renderValue(value: any) {
-    if (window.dc.element) {
-      const div = document.createElement("div");
-      div.classList.add("deetset-value");
-      div.dataset.id = this.id + value;
-      div.innerHTML = value;
-      this.container?.appendChild(div);
+  private render() {
+    if (this.container) {
+      this.container.innerHTML = "";
     }
-  }
-
-  private removeValue(value: any) {
-    if (window.dc.element) {
-      const div = document.querySelector(`[data-id="${this.id}${value}"]`);
-      div?.remove();
-      return true;
+    const ul = document.createElement("ul");
+    for (const item of this) {
+      const li = document.createElement("li");
+      li.innerHTML = item;
+      ul.appendChild(li);
     }
+    this.container?.appendChild(ul);
   }
 
   static monkeyPatch() {
@@ -114,19 +111,15 @@ export class DeetMap<K, V> extends Map<K, V> {
   }
 
   set(key: any, value: any): any {
-    const tr = document.querySelector(`[data-id="${this.id}-${key}"]`);
-    if (tr) {
-      const nodes = tr.querySelectorAll("td");
-      nodes[1].innerHTML = value;
-    } else {
-      this.renderKeyValue(key, value);
-    }
-    return super.set(key, value);
+    const res = super.set(key, value);
+    this.render();
+    return res;
   }
 
   delete(key: any): any {
-    this.deleteKey(key);
-    return super.delete(key);
+    const res = super.delete(key);
+    this.render();
+    return res;
   }
 
   renderContainer() {
@@ -139,7 +132,6 @@ export class DeetMap<K, V> extends Map<K, V> {
     const tbody = document.createElement("tbody");
 
     div.classList.add("deet-container");
-    table.classList.add("deet-table");
     this.container = div;
     th.innerHTML = "key";
     th2.innerHTML = "value";
@@ -156,25 +148,19 @@ export class DeetMap<K, V> extends Map<K, V> {
     window.dc.element?.appendChild(div);
   }
 
-  private renderKeyValue(key: any, value: any) {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    const td2 = document.createElement("td");
-
-    td.innerHTML = key;
-    td2.innerHTML = value;
-    tr.appendChild(td);
-    tr.appendChild(td2);
-    tr.dataset.id = this.id + "-" + key;
-
-    this.tbody?.appendChild(tr);
-  }
-
-  private deleteKey(key: any) {
-    if (window.dc.element) {
-      const tr = document.querySelector(`[data-id="${this.id}-${key}"]`);
-      tr?.remove();
-      return true;
+  render() {
+    if (this.tbody) {
+      this.tbody.innerHTML = "";
+    }
+    for (const [key, value] of this.entries()) {
+      const tr = document.createElement("tr");
+      const tdKey = document.createElement("td");
+      const tdVal = document.createElement("td");
+      tdKey.innerHTML = String(key);
+      tdVal.innerHTML = String(value);
+      tr.appendChild(tdKey);
+      tr.appendChild(tdVal);
+      this.tbody?.appendChild(tr);
     }
   }
 
@@ -207,7 +193,7 @@ export class DeetArray extends Array {
       set: (target, prop, value) => {
         this[Number(prop)] = value;
         this.render();
-        return true;
+        return Reflect.set(target, prop, value);
       },
     });
   }
@@ -246,7 +232,6 @@ export class DeetArray extends Array {
     const div = document.createElement("div");
     const table = document.createElement("table");
     div.classList.add("deet-container");
-    table.classList.add("deet-table");
     div.appendChild(table);
     div.dataset.id = this.id;
     this.container = div;
@@ -270,7 +255,7 @@ export class DeetArray extends Array {
     const tbody = document.createElement("tbody");
     const indexRow = document.createElement("tr");
     const valueRow = document.createElement("tr");
-    for (const [index, value] of super.entries()) {
+    for (const [index, value] of this.entries()) {
       const th = document.createElement("th");
       th.innerHTML = index.toString();
       indexRow.appendChild(th);
@@ -368,7 +353,7 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
 
   renderTable() {
     const container = document.createElement("div");
-    container.classList.add("deet-list");
+    container.classList.add("deet-container");
     container.dataset.id = this.id;
     this.container = container;
     window.dc.element?.appendChild(container);
@@ -427,7 +412,7 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
 
   renderTable() {
     const container = document.createElement("div");
-    container.classList.add("deet-list");
+    container.classList.add("deet-container");
     container.dataset.id = this.id;
     this.container = container;
     window.dc.element?.appendChild(container);
@@ -485,7 +470,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
 
   renderContainer() {
     const container = document.createElement("div");
-    container.classList.add("deet-list");
+    container.classList.add("deet-container");
     container.dataset.id = this.id;
     this.container = container;
     window.dc.element?.appendChild(container);

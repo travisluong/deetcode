@@ -8,43 +8,18 @@
   border: 2px solid darkgray;
   display: flex;
   margin: 10px;
+  padding: 10px;
 }
 
-.deetset {
-  display: flex;
-  align-content: flex-start;
-  flex-wrap: wrap;
-  padding: 2px;
-  border: 2px solid darkgray;
-  margin: 5px;
-  gap: 2px;
-  height: auto;
-  min-width: 57px;
-  min-height: 57px;
-}
-
-.deetset-value {
-  background-color: lightgray;
+.deet-container table {
   color: black;
-  min-width: 50px;
-  min-height: 50px;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.deet-table {
-  color: black;
-  margin: 10px;
   border-spacing: 2px;
   border-collapse: separate;
   min-height: 50px;
   min-width: 50px;
 }
 
-.deet-table th {
+.deet-container table th {
   background-color: darkgray;
   padding: 5px;
   min-width: 50px;
@@ -52,7 +27,7 @@
   font-weight: normal;
 }
 
-.deet-table td {
+.deet-container table td {
   padding: 5px;
   background-color: lightgray;
   text-align: center;
@@ -60,18 +35,12 @@
   min-height: 50px;
 }
 
-.deet-list {
-  border: 2px solid darkgray;
-  padding: 2px;
-  margin: 10px;
-}
-
-.deet-list ul {
+.deet-container ul {
   display: flex;
   gap: 2px;
 }
 
-.deet-list li {
+.deet-container li {
   display: flex;
   padding: 5px;
   min-width: 50px;
