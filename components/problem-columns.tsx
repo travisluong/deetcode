@@ -6,6 +6,7 @@ import { CaretSortIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
+import DifficultyBadge from "./difficulty-badge";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -15,30 +16,6 @@ export type Problem = {
   difficulty: number | null;
   category: string | null;
   slug: string;
-};
-
-type ColorMap = {
-  1: string;
-  2: string;
-  3: string;
-};
-
-const colormap: ColorMap = {
-  1: "bg-green-600 dark:bg-green-400",
-  2: "bg-yellow-600 dark:bg-yellow-400",
-  3: "bg-red-600 dark:bg-red-400",
-};
-
-type DisplayMap = {
-  1: string;
-  2: string;
-  3: string;
-};
-
-const displaymap: DisplayMap = {
-  1: "Easy",
-  2: "Medium",
-  3: "Hard",
 };
 
 export const columns: ColumnDef<Problem>[] = [
@@ -96,11 +73,7 @@ export const columns: ColumnDef<Problem>[] = [
       if (!original.difficulty) {
         return "";
       }
-      return (
-        <Badge className={cn(colormap[original.difficulty as keyof ColorMap])}>
-          {displaymap[original.difficulty as keyof DisplayMap]}
-        </Badge>
-      );
+      return <DifficultyBadge difficulty={original.difficulty} />;
     },
   },
 ];
