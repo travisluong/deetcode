@@ -17,7 +17,6 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
   return (
     <div className="p-5">
-      <h1 className="font-brand mb-5">{problem.name}</h1>
       <div>
         <ProblemDetail problem={problem} />
       </div>

@@ -1,6 +1,9 @@
 import ProblemNav from "@/components/problem-nav";
+import { Badge } from "@/components/ui/badge";
+import { getProblem } from "@/lib/data";
+import { notFound } from "next/navigation";
 
-export default function Layout({
+export default async function Layout({
   children,
   params,
 }: {
@@ -9,9 +12,22 @@ export default function Layout({
 }) {
   const { slug } = params;
 
+  const problem = await getProblem(slug);
+
+  if (!problem) {
+    notFound();
+  }
+
   return (
     <section>
-      <ProblemNav slug={slug} />
+      <div className="flex items-center mx-5 mb-5 gap-10">
+        <h1 className="font-sans font-bold text-xl">{problem.name}</h1>
+        <div>{problem.category}</div>
+        <div>
+          <Badge>{problem.difficulty}</Badge>
+        </div>
+      </div>
+      <ProblemNav problem={problem} />
       {children}
     </section>
   );
