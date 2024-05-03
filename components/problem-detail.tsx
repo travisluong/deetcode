@@ -81,6 +81,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
                 defaultValue={problem.solution ?? undefined}
                 onMount={handleEditorDidMount}
                 theme={theme === "light" ? "vs-light" : "vs-dark"}
+                options={{ minimap: { enabled: false } }}
               />
               <div className="p-5">
                 <Button className="cursor-pointer" onClick={handleSubmit}>
