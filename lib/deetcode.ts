@@ -39,14 +39,9 @@ interface RenderObject {
 }
 
 abstract class DeetEngine {
-  abstract renderFork(instance: any, container: HTMLElement): void;
   abstract animateRender(instance: any, container: HTMLElement): void;
-  abstract debugRender(instance: any, container: HTMLElement): void;
   abstract render(instance: any, container: HTMLElement): void;
   abstract renderContainer(instance: any): void;
-}
-
-class DeetSetEngine extends DeetEngine {
   renderFork(instance: any, container: HTMLElement) {
     switch (window.dcInstance.config.renderMode) {
       case "animate":
@@ -59,7 +54,12 @@ class DeetSetEngine extends DeetEngine {
         break;
     }
   }
+  debugRender(instance: any, container: HTMLElement) {
+    this.render(instance, container);
+  }
+}
 
+class DeetSetEngine extends DeetEngine {
   animateRender(instance: any, container: HTMLElement) {
     let copy;
     if (DeetSet.originalSet) {
@@ -69,10 +69,6 @@ class DeetSetEngine extends DeetEngine {
     }
     const fn = () => this.render(copy, container);
     DeetCode.enqueue(fn);
-  }
-
-  debugRender(instance: any, container: HTMLElement) {
-    this.render(container, instance);
   }
 
   renderContainer(instance: any) {
