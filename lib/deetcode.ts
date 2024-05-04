@@ -54,13 +54,23 @@ class DeetSet extends Set {
 
   add(value: any): any {
     const res = super.add(value);
-    if (!DeetSet.originalSet) {
-      throw new Error("original set not found");
+    switch (window.dcInstance.config.renderMode) {
+      case "animation":
+        let rawData;
+        if (DeetSet.originalSet) {
+          rawData = new DeetSet.originalSet([...this.values()]);
+        } else {
+          rawData = new Set([...this.values()]);
+        }
+        const fn = () =>
+          DeetSet.render({ container: this.container!, data: rawData });
+        window.dcInstance.renderQueue.push(fn);
+        break;
+      case "debug":
+        DeetSet.render({ container: this.container!, data: this });
+      default:
+        break;
     }
-    const rawData = new DeetSet.originalSet([...this.values()]);
-    const fn = () =>
-      DeetSet.render({ container: this.container!, data: rawData });
-    window.dcInstance.renderQueue.push(fn);
     return res;
   }
 
@@ -75,21 +85,6 @@ class DeetSet extends Set {
     div.dataset.id = this.id;
     this.container = div;
     window.dcInstance.el?.appendChild(div);
-  }
-
-  private render() {
-    console.log("rendering set");
-
-    if (this.container) {
-      this.container.innerHTML = "";
-    }
-    const ul = document.createElement("ul");
-    for (const item of this) {
-      const li = document.createElement("li");
-      li.innerHTML = item;
-      ul.appendChild(li);
-    }
-    this.container?.appendChild(ul);
   }
 
   static render(obj: RenderObject) {
@@ -545,13 +540,16 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
 
 interface DeetConfig {
   selector: string;
+  renderMode: "animation" | "debug";
 }
 
 class DeetCode {
   el: Element;
   renderQueue: Array<Function>;
+  config: DeetConfig;
 
   constructor(config: DeetConfig) {
+    this.config = config;
     const el = document.querySelector(config.selector);
 
     if (!el) {

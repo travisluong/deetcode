@@ -23,7 +23,10 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const dcInstance = new dc.DeetCode({ selector: "#deetcode" });
+      const dcInstance = new dc.DeetCode({
+        selector: "#deetcode",
+        renderMode: "debug",
+      });
       dcInstance.startRenderLoop();
       window.dcInstance = dcInstance;
 
