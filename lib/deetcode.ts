@@ -39,14 +39,14 @@ interface RenderObject {
 
 abstract class DeetEngine {
   abstract renderFork(instance: any, container: HTMLElement): void;
-  abstract animateRender(data: any, container: HTMLElement): void;
-  abstract debugRender(data: any, container: HTMLElement): void;
-  abstract render(obj: RenderObject): void;
+  abstract animateRender(instance: any, container: HTMLElement): void;
+  abstract debugRender(instance: any, container: HTMLElement): void;
+  abstract render(instance: any, container: HTMLElement): void;
   abstract renderContainer(obj: any): void;
 }
 
 class DeetSetEngine extends DeetEngine {
-  renderFork(instance: any, container: any) {
+  renderFork(instance: any, container: HTMLElement) {
     switch (window.dcInstance.config.renderMode) {
       case "animate":
         this.animateRender(instance, container);
@@ -59,19 +59,19 @@ class DeetSetEngine extends DeetEngine {
     }
   }
 
-  animateRender(instance: any, container: any) {
-    let rawData;
+  animateRender(instance: any, container: HTMLElement) {
+    let copy;
     if (DeetSet.originalSet) {
-      rawData = new DeetSet.originalSet([...instance.values()]);
+      copy = new DeetSet.originalSet([...instance.values()]);
     } else {
-      rawData = new Set([...instance.values()]);
+      copy = new Set([...instance.values()]);
     }
-    const fn = () => this.render({ container: container!, data: rawData });
+    const fn = () => this.render(copy, container);
     DeetCode.enqueue(fn);
   }
 
-  debugRender(instance: any, container: any) {
-    this.render({ container: container, data: instance });
+  debugRender(instance: any, container: HTMLElement) {
+    this.render(container, instance);
   }
 
   renderContainer(instance: any) {
@@ -82,17 +82,17 @@ class DeetSetEngine extends DeetEngine {
     window.dcInstance.el?.appendChild(div);
   }
 
-  render(obj: RenderObject) {
-    if (obj.container) {
-      obj.container.innerHTML = "";
+  render(instance: any, container: HTMLElement) {
+    if (container) {
+      container.innerHTML = "";
     }
     const ul = document.createElement("ul");
-    for (const item of obj.data) {
+    for (const item of instance) {
       const li = document.createElement("li");
       li.innerHTML = item;
       ul.appendChild(li);
     }
-    obj.container?.appendChild(ul);
+    container.appendChild(ul);
   }
 }
 
