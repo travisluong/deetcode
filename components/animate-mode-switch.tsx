@@ -24,7 +24,7 @@ export default function AnimateModeSwitch() {
     const newVal = !checked;
     setChecked(newVal);
     if (newVal) {
-      window.dcInstance.changeRenderMode("animation");
+      window.dcInstance.changeRenderMode("animate");
       localStorage.setItem("deetcode-render-mode", "animate");
     } else {
       window.dcInstance.changeRenderMode("debug");

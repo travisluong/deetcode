@@ -66,7 +66,7 @@ class DeetSet extends Set {
 
   private renderFork() {
     switch (window.dcInstance.config.renderMode) {
-      case "animation":
+      case "animate":
         this.animate();
         break;
       case "debug":
@@ -155,7 +155,6 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   set(key: any, value: any): any {
-    debugger;
     const res = super.set(key, value);
     this.renderFork();
     return res;
@@ -168,7 +167,6 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   renderContainer() {
-    debugger;
     const div = document.createElement("div");
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -196,7 +194,7 @@ class DeetMap<K, V> extends Map<K, V> {
 
   private renderFork() {
     switch (window.dcInstance.config.renderMode) {
-      case "animation":
+      case "animate":
         this.animate();
         break;
       case "debug":
@@ -208,7 +206,6 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   private animate() {
-    debugger;
     let rawData;
     if (DeetMap.originalMap) {
       rawData = new DeetMap.originalMap([...this.entries()]);
@@ -221,12 +218,10 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   private debug() {
-    debugger;
     DeetMap.render({ container: this.container!, data: this });
   }
 
   static render(obj: RenderObject) {
-    debugger;
     const tbody = obj.container.querySelector("tbody");
     if (tbody) {
       tbody.innerHTML = "";
@@ -598,7 +593,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
   }
 }
 
-type RenderMode = "animation" | "debug";
+type RenderMode = "animate" | "debug";
 
 interface DeetConfig {
   selector: string;
@@ -617,7 +612,7 @@ class DeetCode {
 
     switch (renderModeStr) {
       case "animate":
-        renderMode = "animation";
+        renderMode = "animate";
         break;
       case "debug":
         renderMode = "debug";
