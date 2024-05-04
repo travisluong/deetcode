@@ -25,7 +25,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
     if (typeof window !== "undefined") {
       const dcInstance = new dc.DeetCode({
         selector: "#deetcode",
-        renderMode: "debug",
+        renderMode: "animation",
       });
       dcInstance.startRenderLoop();
       window.dcInstance = dcInstance;

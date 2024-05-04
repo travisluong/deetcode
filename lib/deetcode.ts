@@ -54,29 +54,43 @@ class DeetSet extends Set {
 
   add(value: any): any {
     const res = super.add(value);
-    switch (window.dcInstance.config.renderMode) {
-      case "animation":
-        let rawData;
-        if (DeetSet.originalSet) {
-          rawData = new DeetSet.originalSet([...this.values()]);
-        } else {
-          rawData = new Set([...this.values()]);
-        }
-        const fn = () =>
-          DeetSet.render({ container: this.container!, data: rawData });
-        window.dcInstance.renderQueue.push(fn);
-        break;
-      case "debug":
-        DeetSet.render({ container: this.container!, data: this });
-      default:
-        break;
-    }
+    this.renderFork();
     return res;
   }
 
   delete(value: any): any {
     const res = super.delete(value);
+    this.renderFork();
     return res;
+  }
+
+  private renderFork() {
+    switch (window.dcInstance.config.renderMode) {
+      case "animation":
+        this.animate();
+        break;
+      case "debug":
+        this.debug();
+        break;
+      default:
+        break;
+    }
+  }
+
+  private animate() {
+    let rawData;
+    if (DeetSet.originalSet) {
+      rawData = new DeetSet.originalSet([...this.values()]);
+    } else {
+      rawData = new Set([...this.values()]);
+    }
+    const fn = () =>
+      DeetSet.render({ container: this.container!, data: rawData });
+    DeetCode.enqueue(fn);
+  }
+
+  private debug() {
+    DeetSet.render({ container: this.container!, data: this });
   }
 
   private renderContainer() {
@@ -131,13 +145,13 @@ class DeetMap<K, V> extends Map<K, V> {
 
   set(key: any, value: any): any {
     const res = super.set(key, value);
-    this.render();
+    this.renderFork();
     return res;
   }
 
   delete(key: any): any {
     const res = super.delete(key);
-    this.render();
+    this.renderFork();
     return res;
   }
 
@@ -167,11 +181,41 @@ class DeetMap<K, V> extends Map<K, V> {
     window.dcInstance.el?.appendChild(div);
   }
 
-  render() {
-    if (this.tbody) {
-      this.tbody.innerHTML = "";
+  private renderFork() {
+    switch (window.dcInstance.config.renderMode) {
+      case "animation":
+        this.animate();
+        break;
+      case "debug":
+        this.debug();
+        break;
+      default:
+        break;
     }
-    for (const [key, value] of this.entries()) {
+  }
+
+  private animate() {
+    let rawData;
+    if (DeetMap.originalMap) {
+      rawData = new DeetMap.originalMap([...this.entries()]);
+    } else {
+      rawData = new Map([...this.entries()]);
+    }
+    const fn = () =>
+      DeetMap.render({ container: this.container!, data: rawData });
+    DeetCode.enqueue(fn);
+  }
+
+  private debug() {
+    DeetMap.render({ container: this.container!, data: this });
+  }
+
+  static render(obj: RenderObject) {
+    const tbody = obj.container.querySelector("tbody");
+    if (tbody) {
+      tbody.innerHTML = "";
+    }
+    for (const [key, value] of obj.data.entries()) {
       const tr = document.createElement("tr");
       const tdKey = document.createElement("td");
       const tdVal = document.createElement("td");
@@ -179,7 +223,7 @@ class DeetMap<K, V> extends Map<K, V> {
       tdVal.innerHTML = String(value);
       tr.appendChild(tdKey);
       tr.appendChild(tdVal);
-      this.tbody?.appendChild(tr);
+      tbody?.appendChild(tr);
     }
   }
 
@@ -568,6 +612,10 @@ class DeetCode {
       console.log(fn);
       fn();
     }, 1000);
+  }
+
+  static enqueue(fn: Function) {
+    window.dcInstance.renderQueue.push(fn);
   }
 }
 
