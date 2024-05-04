@@ -7,21 +7,19 @@ import {
   PriorityQueue as PriorityQueueB,
 } from "@datastructures-js/priority-queue";
 
-interface DeetCode {
+interface DC {
   DeetSet: typeof DeetSet;
   DeetMap: typeof DeetMap;
   DeetArray: typeof DeetArray;
   DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
   DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
   DeetPriorityQueue: typeof DeetPriorityQueue;
-  configure: (config: { selector: string }) => void;
-  element?: Element | null;
-  renderQueue: Array<Function>;
+  DeetCode: typeof DeetCode;
 }
 
 declare global {
   interface Window {
-    dc: DeetCode;
+    dcInstance: DeetCode;
     DeetSet: typeof DeetSet;
     DeetMap: typeof DeetMap;
     DeetArray: typeof DeetArray;
@@ -39,7 +37,7 @@ interface RenderObject {
   data: any;
 }
 
-export class DeetSet extends Set {
+class DeetSet extends Set {
   id: string;
   container?: HTMLDivElement;
   static originalSet?: SetConstructor;
@@ -62,7 +60,7 @@ export class DeetSet extends Set {
     const rawData = new DeetSet.originalSet([...this.values()]);
     const fn = () =>
       DeetSet.render({ container: this.container!, data: rawData });
-    dc.renderQueue.push(fn);
+    window.dcInstance.renderQueue.push(fn);
     return res;
   }
 
@@ -76,7 +74,7 @@ export class DeetSet extends Set {
     div.classList.add("deet-container");
     div.dataset.id = this.id;
     this.container = div;
-    window.dc.element?.appendChild(div);
+    window.dcInstance.el?.appendChild(div);
   }
 
   private render() {
@@ -120,7 +118,7 @@ export class DeetSet extends Set {
   }
 }
 
-export class DeetMap<K, V> extends Map<K, V> {
+class DeetMap<K, V> extends Map<K, V> {
   id: string;
   container?: HTMLDivElement;
   tbody?: HTMLTableSectionElement;
@@ -171,7 +169,7 @@ export class DeetMap<K, V> extends Map<K, V> {
     table.dataset.id = this.id;
     this.container = div;
     this.tbody = tbody;
-    window.dc.element?.appendChild(div);
+    window.dcInstance.el?.appendChild(div);
   }
 
   render() {
@@ -204,7 +202,7 @@ export class DeetMap<K, V> extends Map<K, V> {
   }
 }
 
-export class DeetArray extends Array {
+class DeetArray extends Array {
   id: string;
   container?: HTMLDivElement;
   table?: HTMLTableElement;
@@ -262,7 +260,7 @@ export class DeetArray extends Array {
     div.dataset.id = this.id;
     this.container = div;
     this.table = table;
-    window.dc.element?.appendChild(div);
+    window.dcInstance.el?.appendChild(div);
   }
 
   render() {
@@ -382,7 +380,7 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
     container.classList.add("deet-container");
     container.dataset.id = this.id;
     this.container = container;
-    window.dc.element?.appendChild(container);
+    window.dcInstance.el?.appendChild(container);
   }
 
   enqueue(value: any) {
@@ -441,7 +439,7 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
     container.classList.add("deet-container");
     container.dataset.id = this.id;
     this.container = container;
-    window.dc.element?.appendChild(container);
+    window.dcInstance.el?.appendChild(container);
   }
 
   enqueue(value: any) {
@@ -499,7 +497,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
     container.classList.add("deet-container");
     container.dataset.id = this.id;
     this.container = container;
-    window.dc.element?.appendChild(container);
+    window.dcInstance.el?.appendChild(container);
   }
 
   enqueue(value: any) {
@@ -545,31 +543,44 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
   }
 }
 
-const dc: DeetCode = {
+interface DeetConfig {
+  selector: string;
+}
+
+class DeetCode {
+  el: Element;
+  renderQueue: Array<Function>;
+
+  constructor(config: DeetConfig) {
+    const el = document.querySelector(config.selector);
+
+    if (!el) {
+      throw new Error("deetcode container element not found");
+    }
+
+    this.el = el;
+    this.el.classList.add("deetcode");
+    this.renderQueue = new Array();
+  }
+
+  startRenderLoop() {
+    setInterval(() => {
+      const fn = this.renderQueue.shift();
+      if (!fn) return;
+      console.log(fn);
+      fn();
+    }, 1000);
+  }
+}
+
+const dc: DC = {
   DeetSet: DeetSet,
   DeetMap: DeetMap,
   DeetArray: DeetArray,
   DeetMinPriorityQueue: DeetMinPriorityQueue,
   DeetMaxPriorityQueue: DeetMaxPriorityQueue,
   DeetPriorityQueue: DeetPriorityQueue,
-  configure,
-  renderQueue: new Array(),
+  DeetCode: DeetCode,
 };
-
-function configure(config: { selector: string }) {
-  if (dc.element) {
-    // prevent running configure twice in dev
-    return;
-  }
-  dc.element = document.querySelector(config.selector);
-  dc.element?.classList.add("deetcode");
-  setInterval(() => {
-    const fn = dc.renderQueue.shift();
-    if (!fn) return;
-    console.log(fn);
-
-    fn();
-  }, 1000);
-}
 
 export default dc;

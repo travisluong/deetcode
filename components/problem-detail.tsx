@@ -23,8 +23,11 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      dc.configure({ selector: "#deetcode" });
-      window.dc = dc;
+      const dcInstance = new dc.DeetCode({ selector: "#deetcode" });
+      dcInstance.startRenderLoop();
+      window.dcInstance = dcInstance;
+
+      // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = dc.DeetSet;
       window.DeetMap = dc.DeetMap;
       window.DeetArray = dc.DeetArray;
