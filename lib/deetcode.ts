@@ -39,28 +39,28 @@ interface RenderObject {
 }
 
 abstract class DeetEngine {
-  abstract animateRender(instance: any, container: HTMLElement): void;
+  abstract renderForkAnimate(instance: any, container: HTMLElement): void;
   abstract render(instance: any, container: HTMLElement): void;
   abstract renderContainer(instance: any): void;
   renderFork(instance: any, container: HTMLElement) {
     switch (window.dcInstance.config.renderMode) {
       case "animate":
-        this.animateRender(instance, container);
+        this.renderForkAnimate(instance, container);
         break;
       case "debug":
-        this.debugRender(instance, container);
+        this.renderForkDebug(instance, container);
         break;
       default:
         break;
     }
   }
-  debugRender(instance: any, container: HTMLElement) {
+  renderForkDebug(instance: any, container: HTMLElement) {
     this.render(instance, container);
   }
 }
 
 class DeetSetEngine extends DeetEngine {
-  animateRender(instance: any, container: HTMLElement) {
+  renderForkAnimate(instance: any, container: HTMLElement) {
     let copy;
     if (DeetSet.originalSet) {
       copy = new DeetSet.originalSet([...instance.values()]);
