@@ -15,6 +15,7 @@ interface DC {
   DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
   DeetPriorityQueue: typeof DeetPriorityQueue;
   DeetCode: typeof DeetCode;
+  DeetSetEngine: typeof DeetSetEngine;
 }
 
 declare global {
@@ -42,7 +43,7 @@ abstract class DeetEngine {
   abstract animateRender(instance: any, container: HTMLElement): void;
   abstract debugRender(instance: any, container: HTMLElement): void;
   abstract render(instance: any, container: HTMLElement): void;
-  abstract renderContainer(obj: any): void;
+  abstract renderContainer(instance: any): void;
 }
 
 class DeetSetEngine extends DeetEngine {
@@ -110,8 +111,10 @@ class DeetSet extends Set {
     }
     this.engine = window.dcInstance.config.setEngine;
     this.engine.renderContainer(this);
-    for (const item of iterable) {
-      this.add(item);
+    if (iterable) {
+      for (const item of iterable) {
+        this.add(item);
+      }
     }
   }
 
@@ -681,6 +684,7 @@ const dc: DC = {
   DeetMaxPriorityQueue: DeetMaxPriorityQueue,
   DeetPriorityQueue: DeetPriorityQueue,
   DeetCode: DeetCode,
+  DeetSetEngine: DeetSetEngine,
 };
 
 export default dc;

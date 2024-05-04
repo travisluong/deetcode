@@ -16,7 +16,6 @@ import {
   MinPriorityQueue,
   MaxPriorityQueue,
 } from "@datastructures-js/priority-queue";
-import { Switch } from "./ui/switch";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
