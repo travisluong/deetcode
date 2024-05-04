@@ -133,10 +133,21 @@ class DeetMap<K, V> extends Map<K, V> {
   tbody?: HTMLTableSectionElement;
   static originalMap?: MapConstructor;
 
+  /**
+   * passing iterable into super doesn't work
+   * since we need the container to be rendered
+   * before setting and rendering the key and values
+   * @param iterable
+   */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
-    super(iterable);
-    this.id = crypto.randomUUID();
+    super();
     this.renderContainer();
+    if (iterable) {
+      for (const [key, value] of iterable) {
+        this.set(key, value);
+      }
+    }
+    this.id = crypto.randomUUID();
   }
 
   has(value: any): boolean {
@@ -144,6 +155,7 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   set(key: any, value: any): any {
+    debugger;
     const res = super.set(key, value);
     this.renderFork();
     return res;
@@ -156,6 +168,7 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   renderContainer() {
+    debugger;
     const div = document.createElement("div");
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -195,6 +208,7 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   private animate() {
+    debugger;
     let rawData;
     if (DeetMap.originalMap) {
       rawData = new DeetMap.originalMap([...this.entries()]);
@@ -207,10 +221,12 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 
   private debug() {
+    debugger;
     DeetMap.render({ container: this.container!, data: this });
   }
 
   static render(obj: RenderObject) {
+    debugger;
     const tbody = obj.container.querySelector("tbody");
     if (tbody) {
       tbody.innerHTML = "";
@@ -582,9 +598,11 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
   }
 }
 
+type RenderMode = "animation" | "debug";
+
 interface DeetConfig {
   selector: string;
-  renderMode: "animation" | "debug";
+  renderMode?: RenderMode;
 }
 
 class DeetCode {
@@ -592,9 +610,24 @@ class DeetCode {
   renderQueue: Array<Function>;
   config: DeetConfig;
 
-  constructor(config: DeetConfig) {
-    this.config = config;
-    const el = document.querySelector(config.selector);
+  constructor(init: DeetConfig) {
+    const renderModeStr = localStorage.getItem("deetcode-render-mode");
+
+    let renderMode: RenderMode = "debug";
+
+    switch (renderModeStr) {
+      case "animate":
+        renderMode = "animation";
+        break;
+      case "debug":
+        renderMode = "debug";
+        break;
+      default:
+        break;
+    }
+
+    this.config = { ...init, renderMode: renderMode };
+    const el = document.querySelector(init.selector);
 
     if (!el) {
       throw new Error("deetcode container element not found");
@@ -612,6 +645,10 @@ class DeetCode {
       console.log(fn);
       fn();
     }, 1000);
+  }
+
+  changeRenderMode(mode: RenderMode) {
+    this.config.renderMode = mode;
   }
 
   static enqueue(fn: Function) {

@@ -16,6 +16,7 @@ import {
   MinPriorityQueue,
   MaxPriorityQueue,
 } from "@datastructures-js/priority-queue";
+import { Switch } from "./ui/switch";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
@@ -25,7 +26,6 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
     if (typeof window !== "undefined") {
       const dcInstance = new dc.DeetCode({
         selector: "#deetcode",
-        renderMode: "animation",
       });
       dcInstance.startRenderLoop();
       window.dcInstance = dcInstance;
