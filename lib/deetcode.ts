@@ -37,71 +37,52 @@ interface RenderObject {
   data: any;
 }
 
-class DeetSet extends Set {
-  id: string;
-  container?: HTMLDivElement;
-  static originalSet?: SetConstructor;
+abstract class DeetEngine {
+  abstract renderFork(instance: any, container: HTMLElement): void;
+  abstract animateRender(data: any, container: HTMLElement): void;
+  abstract debugRender(data: any, container: HTMLElement): void;
+  abstract render(obj: RenderObject): void;
+  abstract renderContainer(obj: any): void;
+}
 
-  constructor(...args: any) {
-    super(...args);
-    this.id = crypto.randomUUID();
-    this.renderContainer();
-  }
-
-  has(value: any): boolean {
-    return super.has(value);
-  }
-
-  add(value: any): any {
-    const res = super.add(value);
-    this.renderFork();
-    return res;
-  }
-
-  delete(value: any): any {
-    const res = super.delete(value);
-    this.renderFork();
-    return res;
-  }
-
-  private renderFork() {
+class DeetSetEngine extends DeetEngine {
+  renderFork(instance: any, container: any) {
     switch (window.dcInstance.config.renderMode) {
       case "animate":
-        this.animate();
+        this.animateRender(instance, container);
         break;
       case "debug":
-        this.debug();
+        this.debugRender(instance, container);
         break;
       default:
         break;
     }
   }
 
-  private animate() {
+  animateRender(instance: any, container: any) {
     let rawData;
     if (DeetSet.originalSet) {
-      rawData = new DeetSet.originalSet([...this.values()]);
+      rawData = new DeetSet.originalSet([...instance.values()]);
     } else {
-      rawData = new Set([...this.values()]);
+      rawData = new Set([...instance.values()]);
     }
-    const fn = () =>
-      DeetSet.render({ container: this.container!, data: rawData });
+    const fn = () => this.render({ container: container!, data: rawData });
     DeetCode.enqueue(fn);
   }
 
-  private debug() {
-    DeetSet.render({ container: this.container!, data: this });
+  debugRender(instance: any, container: any) {
+    this.render({ container: container, data: instance });
   }
 
-  private renderContainer() {
+  renderContainer(instance: any) {
     const div = document.createElement("div");
     div.classList.add("deet-container");
-    div.dataset.id = this.id;
-    this.container = div;
+    div.dataset.id = instance.id;
+    instance.container = div;
     window.dcInstance.el?.appendChild(div);
   }
 
-  static render(obj: RenderObject) {
+  render(obj: RenderObject) {
     if (obj.container) {
       obj.container.innerHTML = "";
     }
@@ -112,6 +93,42 @@ class DeetSet extends Set {
       ul.appendChild(li);
     }
     obj.container?.appendChild(ul);
+  }
+}
+
+class DeetSet extends Set {
+  id: string;
+  container?: HTMLElement;
+  engine: DeetSetEngine;
+  static originalSet?: SetConstructor;
+
+  constructor(iterable: any) {
+    super();
+    this.id = crypto.randomUUID();
+    if (!window.dcInstance.config.setEngine) {
+      throw new Error("set engine not found");
+    }
+    this.engine = window.dcInstance.config.setEngine;
+    this.engine.renderContainer(this);
+    for (const item of iterable) {
+      this.add(item);
+    }
+  }
+
+  has(value: any): boolean {
+    return super.has(value);
+  }
+
+  add(value: any): any {
+    const res = super.add(value);
+    this.engine.renderFork(this, this.container!);
+    return res;
+  }
+
+  delete(value: any): any {
+    const res = super.delete(value);
+    this.engine.renderFork(this, this.container!);
+    return res;
   }
 
   static monkeyPatch() {
@@ -598,6 +615,7 @@ type RenderMode = "animate" | "debug";
 interface DeetConfig {
   selector: string;
   renderMode?: RenderMode;
+  setEngine?: DeetSetEngine;
 }
 
 class DeetCode {
@@ -605,7 +623,7 @@ class DeetCode {
   renderQueue: Array<Function>;
   config: DeetConfig;
 
-  constructor(init: DeetConfig) {
+  constructor(config: DeetConfig) {
     const renderModeStr = localStorage.getItem("deetcode-render-mode");
 
     let renderMode: RenderMode = "debug";
@@ -621,8 +639,12 @@ class DeetCode {
         break;
     }
 
-    this.config = { ...init, renderMode: renderMode };
-    const el = document.querySelector(init.selector);
+    this.config = {
+      renderMode: renderMode,
+      setEngine: new DeetSetEngine(),
+      ...config,
+    };
+    const el = document.querySelector(config.selector);
 
     if (!el) {
       throw new Error("deetcode container element not found");
