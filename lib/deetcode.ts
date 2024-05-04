@@ -16,6 +16,7 @@ interface DeetCode {
   DeetPriorityQueue: typeof DeetPriorityQueue;
   configure: (config: { selector: string }) => void;
   element?: Element | null;
+  renderQueue: Array<Function>;
 }
 
 declare global {
@@ -31,6 +32,11 @@ declare global {
     MaxPriorityQueue: typeof MaxPriorityQueueB;
     PriorityQueue: typeof PriorityQueueB;
   }
+}
+
+interface RenderObject {
+  container: HTMLDivElement;
+  data: any;
 }
 
 export class DeetSet extends Set {
@@ -50,13 +56,18 @@ export class DeetSet extends Set {
 
   add(value: any): any {
     const res = super.add(value);
-    this.render();
+    if (!DeetSet.originalSet) {
+      throw new Error("original set not found");
+    }
+    const rawData = new DeetSet.originalSet([...this.values()]);
+    const fn = () =>
+      DeetSet.render({ container: this.container!, data: rawData });
+    dc.renderQueue.push(fn);
     return res;
   }
 
   delete(value: any): any {
     const res = super.delete(value);
-    this.render();
     return res;
   }
 
@@ -69,6 +80,8 @@ export class DeetSet extends Set {
   }
 
   private render() {
+    console.log("rendering set");
+
     if (this.container) {
       this.container.innerHTML = "";
     }
@@ -79,6 +92,19 @@ export class DeetSet extends Set {
       ul.appendChild(li);
     }
     this.container?.appendChild(ul);
+  }
+
+  static render(obj: RenderObject) {
+    if (obj.container) {
+      obj.container.innerHTML = "";
+    }
+    const ul = document.createElement("ul");
+    for (const item of obj.data) {
+      const li = document.createElement("li");
+      li.innerHTML = item;
+      ul.appendChild(li);
+    }
+    obj.container?.appendChild(ul);
   }
 
   static monkeyPatch() {
@@ -527,11 +553,23 @@ const dc: DeetCode = {
   DeetMaxPriorityQueue: DeetMaxPriorityQueue,
   DeetPriorityQueue: DeetPriorityQueue,
   configure,
+  renderQueue: new Array(),
 };
 
 function configure(config: { selector: string }) {
+  if (dc.element) {
+    // prevent running configure twice in dev
+    return;
+  }
   dc.element = document.querySelector(config.selector);
   dc.element?.classList.add("deetcode");
+  setInterval(() => {
+    const fn = dc.renderQueue.shift();
+    if (!fn) return;
+    console.log(fn);
+
+    fn();
+  }, 1000);
 }
 
 export default dc;
