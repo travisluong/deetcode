@@ -41,7 +41,6 @@ interface RenderObject {
 abstract class DeetEngine {
   abstract renderForkAnimate(instance: any, container: HTMLElement): void;
   abstract render(instance: any, container: HTMLElement): void;
-  abstract renderContainer(instance: any): void;
   renderFork(instance: any, container: HTMLElement) {
     switch (window.dcInstance.config.renderMode) {
       case "animate":
@@ -57,6 +56,13 @@ abstract class DeetEngine {
   renderForkDebug(instance: any, container: HTMLElement) {
     this.render(instance, container);
   }
+  renderContainer(instance: any): HTMLElement {
+    const div = document.createElement("div");
+    div.classList.add("deet-container");
+    instance.container = div;
+    window.dcInstance.el?.appendChild(div);
+    return div;
+  }
 }
 
 class DeetSetEngine extends DeetEngine {
@@ -71,18 +77,8 @@ class DeetSetEngine extends DeetEngine {
     DeetCode.enqueue(fn);
   }
 
-  renderContainer(instance: any) {
-    const div = document.createElement("div");
-    div.classList.add("deet-container");
-    div.dataset.id = instance.id;
-    instance.container = div;
-    window.dcInstance.el?.appendChild(div);
-  }
-
   render(instance: any, container: HTMLElement) {
-    if (container) {
-      container.innerHTML = "";
-    }
+    container.innerHTML = "";
     const ul = document.createElement("ul");
     for (const item of instance) {
       const li = document.createElement("li");
@@ -94,19 +90,14 @@ class DeetSetEngine extends DeetEngine {
 }
 
 class DeetSet extends Set {
-  id: string;
-  container?: HTMLElement;
+  container: HTMLElement;
   engine: DeetSetEngine;
   static originalSet?: SetConstructor;
 
   constructor(iterable: any) {
     super();
-    this.id = crypto.randomUUID();
-    if (!window.dcInstance.config.setEngine) {
-      throw new Error("set engine not found");
-    }
     this.engine = window.dcInstance.config.setEngine;
-    this.engine.renderContainer(this);
+    this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const item of iterable) {
         this.add(item);
@@ -120,13 +111,13 @@ class DeetSet extends Set {
 
   add(value: any): any {
     const res = super.add(value);
-    this.engine.renderFork(this, this.container!);
+    this.engine.renderFork(this, this.container);
     return res;
   }
 
   delete(value: any): any {
     const res = super.delete(value);
-    this.engine.renderFork(this, this.container!);
+    this.engine.renderFork(this, this.container);
     return res;
   }
 
@@ -143,10 +134,52 @@ class DeetSet extends Set {
   }
 }
 
+class DeetMapEngine extends DeetEngine {
+  renderForkAnimate(instance: any, container: HTMLElement): void {
+    let copy;
+    if (DeetMap.originalMap) {
+      copy = new DeetMap.originalMap([...instance.entries()]);
+    } else {
+      copy = new Map([...instance.entries()]);
+    }
+    const fn = () => this.render(copy, container);
+    DeetCode.enqueue(fn);
+  }
+  render(instance: any, container: HTMLElement): void {
+    container.innerHTML = "";
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tr = document.createElement("tr");
+    const thKey = document.createElement("th");
+    const thVal = document.createElement("th");
+    const tbody = document.createElement("tbody");
+
+    table.append(thead);
+    thead.append(tr);
+    tr.append(thKey, thVal);
+    table.append(tbody);
+
+    thKey.innerHTML = "key";
+    thVal.innerHTML = "value";
+
+    for (const [key, value] of instance.entries()) {
+      const tr = document.createElement("tr");
+      const tdKey = document.createElement("td");
+      const tdVal = document.createElement("td");
+      tdKey.innerHTML = String(key);
+      tdVal.innerHTML = String(value);
+      tr.appendChild(tdKey);
+      tr.appendChild(tdVal);
+      tbody.appendChild(tr);
+    }
+
+    container.append(table);
+  }
+}
+
 class DeetMap<K, V> extends Map<K, V> {
-  id: string;
-  container?: HTMLDivElement;
-  tbody?: HTMLTableSectionElement;
+  container: HTMLElement;
+  engine: DeetMapEngine;
   static originalMap?: MapConstructor;
 
   /**
@@ -157,13 +190,13 @@ class DeetMap<K, V> extends Map<K, V> {
    */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
-    this.renderContainer();
+    this.engine = window.dcInstance.config.mapEngine;
+    this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const [key, value] of iterable) {
         this.set(key, value);
       }
     }
-    this.id = crypto.randomUUID();
   }
 
   has(value: any): boolean {
@@ -172,86 +205,14 @@ class DeetMap<K, V> extends Map<K, V> {
 
   set(key: any, value: any): any {
     const res = super.set(key, value);
-    this.renderFork();
+    this.engine.renderFork(this, this.container);
     return res;
   }
 
   delete(key: any): any {
     const res = super.delete(key);
-    this.renderFork();
+    this.engine.renderFork(this, this.container);
     return res;
-  }
-
-  renderContainer() {
-    const div = document.createElement("div");
-    const table = document.createElement("table");
-    const thead = document.createElement("thead");
-    const tr = document.createElement("tr");
-    const th = document.createElement("th");
-    const th2 = document.createElement("th");
-    const tbody = document.createElement("tbody");
-
-    div.classList.add("deet-container");
-    this.container = div;
-    th.innerHTML = "key";
-    th2.innerHTML = "value";
-    tr.appendChild(th);
-    tr.appendChild(th2);
-    thead.appendChild(tr);
-    table.appendChild(thead);
-    table.appendChild(tbody);
-    div.appendChild(table);
-
-    table.dataset.id = this.id;
-    this.container = div;
-    this.tbody = tbody;
-    window.dcInstance.el?.appendChild(div);
-  }
-
-  private renderFork() {
-    switch (window.dcInstance.config.renderMode) {
-      case "animate":
-        this.animate();
-        break;
-      case "debug":
-        this.debug();
-        break;
-      default:
-        break;
-    }
-  }
-
-  private animate() {
-    let rawData;
-    if (DeetMap.originalMap) {
-      rawData = new DeetMap.originalMap([...this.entries()]);
-    } else {
-      rawData = new Map([...this.entries()]);
-    }
-    const fn = () =>
-      DeetMap.render({ container: this.container!, data: rawData });
-    DeetCode.enqueue(fn);
-  }
-
-  private debug() {
-    DeetMap.render({ container: this.container!, data: this });
-  }
-
-  static render(obj: RenderObject) {
-    const tbody = obj.container.querySelector("tbody");
-    if (tbody) {
-      tbody.innerHTML = "";
-    }
-    for (const [key, value] of obj.data.entries()) {
-      const tr = document.createElement("tr");
-      const tdKey = document.createElement("td");
-      const tdVal = document.createElement("td");
-      tdKey.innerHTML = String(key);
-      tdVal.innerHTML = String(value);
-      tr.appendChild(tdKey);
-      tr.appendChild(tdVal);
-      tbody?.appendChild(tr);
-    }
   }
 
   static monkeyPatch() {
@@ -611,10 +572,18 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
 
 type RenderMode = "animate" | "debug";
 
-interface DeetConfig {
+interface DeetConfigInit {
   selector: string;
   renderMode?: RenderMode;
   setEngine?: DeetSetEngine;
+  mapEngine?: DeetMapEngine;
+}
+
+interface DeetConfig {
+  selector: string;
+  renderMode: RenderMode;
+  setEngine: DeetSetEngine;
+  mapEngine: DeetMapEngine;
 }
 
 class DeetCode {
@@ -622,7 +591,7 @@ class DeetCode {
   renderQueue: Array<Function>;
   config: DeetConfig;
 
-  constructor(config: DeetConfig) {
+  constructor(config: DeetConfigInit) {
     const renderModeStr = localStorage.getItem("deetcode-render-mode");
 
     let renderMode: RenderMode = "debug";
@@ -641,6 +610,7 @@ class DeetCode {
     this.config = {
       renderMode: renderMode,
       setEngine: new DeetSetEngine(),
+      mapEngine: new DeetMapEngine(),
       ...config,
     };
     const el = document.querySelector(config.selector);

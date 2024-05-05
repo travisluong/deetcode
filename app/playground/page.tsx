@@ -8,14 +8,6 @@ map.has(1);
 map.get(1);
 map.delete(3);
 map.set(3, 3);
-`;
-
-// const code = `
-// const map = new Map([[1, 1], [2, 2], [3, 3]]);
-// map.has(1);
-// map.get(1);
-// map.delete(3);
-// map.set(3, 3);
 
 // const numSet = new Set([1, 2, 3]);
 // numSet.has(1);
@@ -54,20 +46,7 @@ map.set(3, 3);
 // pq.enqueue({name: "baz", rank: 3});
 // pq.dequeue();
 // pq.front();
-// `;
-
-// const code = `
-// const numSet = new Set();
-// numSet.add(1);
-// numSet.add(2);
-// numSet.add(3);
-// numSet.add(4);
-// numSet.add(5);
-// numSet.add(6);
-// numSet.add(7);
-// numSet.add(8);
-// numSet.add(9);
-// `;
+`;
 
 export default function Page() {
   const problem: Problem = {
