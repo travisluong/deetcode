@@ -9,10 +9,10 @@ map.get(1);
 map.delete(3);
 map.set(3, 3);
 
-// const numSet = new Set([1, 2, 3]);
-// numSet.has(1);
-// numSet.delete(3);
-// numSet.add(3);
+const numSet = new Set([1, 2, 3]);
+numSet.has(1);
+numSet.delete(3);
+numSet.add(3);
 
 // const arr = new Array(...[1,2,3]);
 // arr.pop();

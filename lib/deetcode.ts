@@ -38,25 +38,28 @@ interface RenderObject {
   data: any;
 }
 
+type NativeDataStructure = Set<any> | Map<any, any>;
+type DeetDataStructure = DeetSet | DeetMap<any, any>;
+
 abstract class DeetEngine {
-  abstract renderForkAnimate(instance: any, container: HTMLElement): void;
-  abstract render(instance: any, container: HTMLElement): void;
-  renderFork(instance: any, container: HTMLElement) {
+  abstract renderForkAnimate(instance: DeetDataStructure): void;
+  abstract render(instance: NativeDataStructure, container: HTMLElement): void;
+  renderFork(instance: DeetDataStructure) {
     switch (window.dcInstance.config.renderMode) {
       case "animate":
-        this.renderForkAnimate(instance, container);
+        this.renderForkAnimate(instance);
         break;
       case "debug":
-        this.renderForkDebug(instance, container);
+        this.renderForkDebug(instance);
         break;
       default:
         break;
     }
   }
-  renderForkDebug(instance: any, container: HTMLElement) {
-    this.render(instance, container);
+  renderForkDebug(instance: DeetDataStructure) {
+    this.render(instance, instance.container);
   }
-  renderContainer(instance: any): HTMLElement {
+  renderContainer(instance: DeetDataStructure): HTMLElement {
     const div = document.createElement("div");
     div.classList.add("deet-container");
     instance.container = div;
@@ -66,21 +69,21 @@ abstract class DeetEngine {
 }
 
 class DeetSetEngine extends DeetEngine {
-  renderForkAnimate(instance: any, container: HTMLElement) {
+  renderForkAnimate(instance: DeetSet) {
     let copy;
     if (DeetSet.originalSet) {
       copy = new DeetSet.originalSet([...instance.values()]);
     } else {
       copy = new Set([...instance.values()]);
     }
-    const fn = () => this.render(copy, container);
+    const fn = () => this.render(copy, instance.container);
     DeetCode.enqueue(fn);
   }
 
-  render(instance: any, container: HTMLElement) {
+  render(nativeInstance: Set<any>, container: HTMLElement) {
     container.innerHTML = "";
     const ul = document.createElement("ul");
-    for (const item of instance) {
+    for (const item of nativeInstance) {
       const li = document.createElement("li");
       li.innerHTML = item;
       ul.appendChild(li);
@@ -111,13 +114,13 @@ class DeetSet extends Set {
 
   add(value: any): any {
     const res = super.add(value);
-    this.engine.renderFork(this, this.container);
+    this.engine.renderFork(this);
     return res;
   }
 
   delete(value: any): any {
     const res = super.delete(value);
-    this.engine.renderFork(this, this.container);
+    this.engine.renderFork(this);
     return res;
   }
 
@@ -135,17 +138,17 @@ class DeetSet extends Set {
 }
 
 class DeetMapEngine extends DeetEngine {
-  renderForkAnimate(instance: any, container: HTMLElement): void {
+  renderForkAnimate(instance: DeetMap<any, any>): void {
     let copy;
     if (DeetMap.originalMap) {
       copy = new DeetMap.originalMap([...instance.entries()]);
     } else {
       copy = new Map([...instance.entries()]);
     }
-    const fn = () => this.render(copy, container);
+    const fn = () => this.render(copy, instance.container);
     DeetCode.enqueue(fn);
   }
-  render(instance: any, container: HTMLElement): void {
+  render(nativeInstance: Map<any, any>, container: HTMLElement): void {
     container.innerHTML = "";
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -162,7 +165,7 @@ class DeetMapEngine extends DeetEngine {
     thKey.innerHTML = "key";
     thVal.innerHTML = "value";
 
-    for (const [key, value] of instance.entries()) {
+    for (const [key, value] of nativeInstance.entries()) {
       const tr = document.createElement("tr");
       const tdKey = document.createElement("td");
       const tdVal = document.createElement("td");
@@ -205,13 +208,13 @@ class DeetMap<K, V> extends Map<K, V> {
 
   set(key: any, value: any): any {
     const res = super.set(key, value);
-    this.engine.renderFork(this, this.container);
+    this.engine.renderFork(this);
     return res;
   }
 
   delete(key: any): any {
     const res = super.delete(key);
-    this.engine.renderFork(this, this.container);
+    this.engine.renderFork(this);
     return res;
   }
 
