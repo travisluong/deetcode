@@ -233,6 +233,20 @@ class DeetMap<K, V> extends Map<K, V> {
 }
 
 class DeetArrayEngine extends DeetEngine {
+  lastArrayRendered?: Array<any>;
+
+  renderFork(instance: DeetArray) {
+    switch (window.dcInstance.config.renderMode) {
+      case "animate":
+        this.renderForkAnimate(instance);
+        break;
+      case "debug":
+        this.renderForkDebug(instance);
+        break;
+      default:
+        break;
+    }
+  }
   renderForkAnimate(instance: DeetArray): void {
     let copy;
     if (DeetArray.originalArray) {
@@ -243,11 +257,22 @@ class DeetArrayEngine extends DeetEngine {
     for (const item of instance) {
       copy.push(item);
     }
+    // no need to re-render the exact same values
+    if (this.lastArrayRendered) {
+      const isSame = this.shallowCompareArrays(copy, this.lastArrayRendered);
+      if (isSame) {
+        return;
+      }
+    }
+    this.lastArrayRendered = copy;
     const fn = () => this.render(copy, instance.container);
     DeetCode.enqueue(fn);
   }
   render(nativeArr: Array<any>, container: HTMLElement): void {
     container.innerHTML = "";
+    if (nativeArr.length === 0) {
+      return;
+    }
     if (this.is2DArray(nativeArr)) {
       container.append(this.render2d(nativeArr));
     } else {
@@ -331,6 +356,16 @@ class DeetArrayEngine extends DeetEngine {
     }
     return max;
   }
+
+  shallowCompareArrays<T>(arr1: T[], arr2: T[]): boolean {
+    // If arrays have different lengths, they're not equal
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+
+    // Check if every element in arr1 is equal to the corresponding element in arr2
+    return arr1.every((value, index) => value === arr2[index]);
+  }
 }
 
 class DeetArray extends Array {
@@ -348,53 +383,56 @@ class DeetArray extends Array {
     return new Proxy(this, {
       set: (target, prop, value) => {
         console.log(target, prop, value);
-
+        const res = Reflect.set(target, prop, value);
         if (this.renderEnabled) {
           this.engine.renderFork(this);
         }
-        // if (/^\d+$/.test(prop.toString())) {
-        //   this[Number(prop)] = value;
-        //   this.renderEnabled = false;
-        //   this.engine.renderFork(this);
-        //   // problem: this gets run multiple times when something is popped or shifted
-        //   // we only want it to run when the setting is done
-        // } else if (prop.toString() === "length") {
-        //   this.renderEnabled = true;
-        // }
-        return Reflect.set(target, prop, value);
+        return res;
       },
     });
   }
 
   push(value: any): number {
+    console.log("push", value);
+    this.renderEnabled = false;
     const res = super.push(value);
     this.engine.renderFork(this);
+    this.renderEnabled = true;
     return res;
   }
 
   unshift(value: any): number {
+    console.log("unshift", value);
+    this.renderEnabled = false;
     const res = super.unshift(value);
     this.engine.renderFork(this);
+    this.renderEnabled = true;
     return res;
   }
 
   shift(): number {
-    const res = super.shift();
+    console.log("shift");
     this.renderEnabled = false;
+    const res = super.shift();
     this.engine.renderFork(this);
+    this.renderEnabled = true;
     return res;
   }
 
   pop() {
-    const res = super.pop();
+    console.log("pop");
     this.renderEnabled = false;
+    const res = super.pop();
     this.engine.renderFork(this);
+    this.renderEnabled = true;
     return res;
   }
 
   sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
+    this.renderEnabled = false;
     const res = super.sort(compareFn);
     this.engine.renderFork(this);
+    this.renderEnabled = true;
     return res;
   }
 
