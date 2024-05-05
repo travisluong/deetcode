@@ -38,8 +38,8 @@ interface RenderObject {
   data: any;
 }
 
-type NativeDataStructure = Set<any> | Map<any, any>;
-type DeetDataStructure = DeetSet | DeetMap<any, any>;
+type NativeDataStructure = Set<any> | Map<any, any> | Array<any>;
+type DeetDataStructure = DeetSet | DeetMap<any, any> | DeetArray;
 
 abstract class DeetEngine {
   abstract renderForkAnimate(instance: DeetDataStructure): void;
@@ -232,134 +232,27 @@ class DeetMap<K, V> extends Map<K, V> {
   }
 }
 
-class DeetArray extends Array {
-  id: string;
-  container?: HTMLDivElement;
-  table?: HTMLTableElement;
-  static originalArray?: ArrayConstructor;
-
-  constructor(...args: any) {
-    super(...args);
-    this.id = crypto.randomUUID();
-    this.renderContainer();
-    this.render();
-    return new Proxy(this, {
-      set: (target, prop, value) => {
-        this[Number(prop)] = value;
-        this.render();
-        return Reflect.set(target, prop, value);
-      },
-    });
-  }
-
-  push(value: any): number {
-    const res = super.push(value);
-    this.render();
-    return res;
-  }
-
-  unshift(value: any): number {
-    const res = super.unshift(value);
-    this.render();
-    return res;
-  }
-
-  shift(): number {
-    const res = super.shift();
-    this.render();
-    return res;
-  }
-
-  pop() {
-    const res = super.pop();
-    this.render();
-    return res;
-  }
-
-  sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
-    const res = super.sort(compareFn);
-    this.render();
-    return res;
-  }
-
-  renderContainer() {
-    const div = document.createElement("div");
-    const table = document.createElement("table");
-    div.classList.add("deet-container");
-    div.appendChild(table);
-    div.dataset.id = this.id;
-    this.container = div;
-    this.table = table;
-    window.dcInstance.el?.appendChild(div);
-  }
-
-  render() {
-    if (this.table) {
-      this.table.innerHTML = "";
-    }
-    if (this.is2DArray(this)) {
-      this.render2d();
+class DeetArrayEngine extends DeetEngine {
+  renderForkAnimate(instance: DeetArray): void {
+    let copy;
+    if (DeetArray.originalArray) {
+      copy = new DeetArray.originalArray();
     } else {
-      this.render1d();
+      copy = new Array();
     }
+    for (const item of instance) {
+      copy.push(item);
+    }
+    const fn = () => this.render(copy, instance.container);
+    DeetCode.enqueue(fn);
   }
-
-  render1d() {
-    const thead = document.createElement("thead");
-    const tbody = document.createElement("tbody");
-    const indexRow = document.createElement("tr");
-    const valueRow = document.createElement("tr");
-    for (const [index, value] of this.entries()) {
-      const th = document.createElement("th");
-      th.innerHTML = index.toString();
-      indexRow.appendChild(th);
-      const td = document.createElement("td");
-      td.innerHTML = value;
-      valueRow.appendChild(td);
+  render(nativeArr: Array<any>, container: HTMLElement): void {
+    container.innerHTML = "";
+    if (this.is2DArray(nativeArr)) {
+      container.append(this.render2d(nativeArr));
+    } else {
+      container.append(this.render1d(nativeArr));
     }
-    thead.appendChild(indexRow);
-    tbody.appendChild(valueRow);
-    this.table?.appendChild(thead);
-    this.table?.appendChild(tbody);
-  }
-
-  render2d() {
-    const thead = document.createElement("thead");
-    const tbody = document.createElement("tbody");
-    const theadTr = document.createElement("tr");
-    const th = document.createElement("th");
-    theadTr.appendChild(th);
-
-    for (let i = 0; i < this.getLengthOfLongestArray(); i++) {
-      const th = document.createElement("th");
-      th.innerHTML = i.toString();
-      theadTr.appendChild(th);
-    }
-    thead.appendChild(theadTr);
-
-    for (let i = 0; i < this.length; i++) {
-      const tr = document.createElement("tr");
-      const th = document.createElement("th");
-      th.innerHTML = i.toString();
-      tr.appendChild(th);
-      for (let j = 0; j < this[i].length; j++) {
-        const td = document.createElement("td");
-        td.innerHTML = this[i][j];
-        tr.appendChild(td);
-      }
-      tbody.appendChild(tr);
-    }
-
-    this.table?.appendChild(thead);
-    this.table?.appendChild(tbody);
-  }
-
-  getLengthOfLongestArray() {
-    let max = Number.MIN_VALUE;
-    for (const arr of this) {
-      max = Math.max(max, arr.length);
-    }
-    return max;
   }
 
   is2DArray(arr: any) {
@@ -377,6 +270,132 @@ class DeetArray extends Array {
 
     // If all elements are arrays, it's a 2D array
     return true;
+  }
+
+  render1d(arr: Array<any>) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+    const tbody = document.createElement("tbody");
+    const trBody = document.createElement("tr");
+    table.append(thead, tbody);
+    thead.append(trHead);
+    tbody.append(trBody);
+    for (const [index, value] of arr.entries()) {
+      const th = document.createElement("th");
+      const td = document.createElement("td");
+      th.innerHTML = index.toString();
+      td.innerHTML = value;
+      trHead.append(th);
+      trBody.append(td);
+    }
+    return table;
+  }
+
+  render2d(arr: Array<Array<any>>) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+    const theadTr = document.createElement("tr");
+    const th = document.createElement("th");
+    theadTr.appendChild(th);
+    table.append(thead, tbody);
+
+    for (let i = 0; i < this.getLengthOfLongestArray(arr); i++) {
+      const th = document.createElement("th");
+      th.innerHTML = i.toString();
+      theadTr.appendChild(th);
+    }
+    thead.appendChild(theadTr);
+
+    for (let i = 0; i < arr.length; i++) {
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      th.innerHTML = i.toString();
+      tr.appendChild(th);
+      for (let j = 0; j < arr[i].length; j++) {
+        const td = document.createElement("td");
+        td.innerHTML = arr[i][j];
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    return table;
+  }
+
+  getLengthOfLongestArray(arr: Array<Array<any>>) {
+    let max = Number.MIN_VALUE;
+    for (const a of arr) {
+      max = Math.max(max, a.length);
+    }
+    return max;
+  }
+}
+
+class DeetArray extends Array {
+  container: HTMLElement;
+  engine: DeetArrayEngine;
+  renderEnabled: boolean = false;
+  static originalArray?: ArrayConstructor;
+
+  constructor(...args: any) {
+    super(...args);
+    this.engine = window.dcInstance.config.arrayEngine;
+    this.container = this.engine.renderContainer(this);
+    this.engine.renderFork(this);
+    this.renderEnabled = true;
+    return new Proxy(this, {
+      set: (target, prop, value) => {
+        console.log(target, prop, value);
+
+        if (this.renderEnabled) {
+          this.engine.renderFork(this);
+        }
+        // if (/^\d+$/.test(prop.toString())) {
+        //   this[Number(prop)] = value;
+        //   this.renderEnabled = false;
+        //   this.engine.renderFork(this);
+        //   // problem: this gets run multiple times when something is popped or shifted
+        //   // we only want it to run when the setting is done
+        // } else if (prop.toString() === "length") {
+        //   this.renderEnabled = true;
+        // }
+        return Reflect.set(target, prop, value);
+      },
+    });
+  }
+
+  push(value: any): number {
+    const res = super.push(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  unshift(value: any): number {
+    const res = super.unshift(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  shift(): number {
+    const res = super.shift();
+    this.renderEnabled = false;
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  pop() {
+    const res = super.pop();
+    this.renderEnabled = false;
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
+    const res = super.sort(compareFn);
+    this.engine.renderFork(this);
+    return res;
   }
 
   static monkeyPatch() {
@@ -580,6 +599,7 @@ interface DeetConfigInit {
   renderMode?: RenderMode;
   setEngine?: DeetSetEngine;
   mapEngine?: DeetMapEngine;
+  arrayEngine?: DeetArrayEngine;
 }
 
 interface DeetConfig {
@@ -587,6 +607,7 @@ interface DeetConfig {
   renderMode: RenderMode;
   setEngine: DeetSetEngine;
   mapEngine: DeetMapEngine;
+  arrayEngine: DeetArrayEngine;
 }
 
 class DeetCode {
@@ -614,6 +635,7 @@ class DeetCode {
       renderMode: renderMode,
       setEngine: new DeetSetEngine(),
       mapEngine: new DeetMapEngine(),
+      arrayEngine: new DeetArrayEngine(),
       ...config,
     };
     const el = document.querySelector(config.selector);
@@ -633,7 +655,7 @@ class DeetCode {
       if (!fn) return;
       console.log(fn);
       fn();
-    }, 1000);
+    }, 3000);
   }
 
   changeRenderMode(mode: RenderMode) {
