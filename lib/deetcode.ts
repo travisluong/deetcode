@@ -284,10 +284,6 @@ class DeetArrayEngine extends DeetEngine {
   }
   render(nativeArr: Array<any>, container: HTMLElement): void {
     console.log(nativeArr, container);
-    debugger;
-    // if (container.__isProxy) {
-    //   return;
-    // }
     container.innerHTML = "";
 
     if (nativeArr.length === 0) {
