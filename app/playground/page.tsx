@@ -24,10 +24,11 @@ arr.push(3);
 arr.unshift(1);
 arr[0] = 8;
 
-// const arr2 = new Array();
-// arr2.push([1,2,3]);
-// arr2.push([4,5,6]);
-// arr2.push([7,8,9]);
+const arr2 = new Array();
+arr2.push([1,2,3]);
+arr2.push([4,5,6]);
+arr2.push([7,8,9]);
+arr2[1][1] = 88;
 
 // const minheap = new MinPriorityQueue();
 // minheap.enqueue(1);

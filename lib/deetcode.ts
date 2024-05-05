@@ -247,15 +247,29 @@ class DeetArrayEngine extends DeetEngine {
         break;
     }
   }
+  getOriginalArrayConstructor() {
+    if (DeetArray.originalArray) {
+      return DeetArray.originalArray;
+    } else {
+      return Array;
+    }
+  }
   renderForkAnimate(instance: DeetArray): void {
     let copy;
-    if (DeetArray.originalArray) {
-      copy = new DeetArray.originalArray();
-    } else {
-      copy = new Array();
-    }
+    const arrayConstructor = this.getOriginalArrayConstructor();
+    copy = new arrayConstructor();
     for (const item of instance) {
-      copy.push(item);
+      if (Array.isArray(item)) {
+        // handle 2d arrays
+        const newArr = new arrayConstructor();
+        for (const it of item) {
+          newArr.push(it);
+        }
+        copy.push(newArr);
+      } else {
+        // handle 1d arrays
+        copy.push(item);
+      }
     }
     // no need to re-render the exact same values
     if (this.lastArrayRendered) {
@@ -269,14 +283,22 @@ class DeetArrayEngine extends DeetEngine {
     DeetCode.enqueue(fn);
   }
   render(nativeArr: Array<any>, container: HTMLElement): void {
+    console.log(nativeArr, container);
+    debugger;
+    // if (container.__isProxy) {
+    //   return;
+    // }
     container.innerHTML = "";
+
     if (nativeArr.length === 0) {
       return;
     }
     if (this.is2DArray(nativeArr)) {
-      container.append(this.render2d(nativeArr));
+      const el = this.render2d(nativeArr);
+      container.innerHTML = el.outerHTML;
     } else {
-      container.append(this.render1d(nativeArr));
+      const el = this.render1d(nativeArr);
+      container.innerHTML = el.outerHTML;
     }
   }
 
@@ -381,6 +403,15 @@ class DeetArray extends Array {
     this.engine.renderFork(this);
     this.renderEnabled = true;
     return new Proxy(this, {
+      get(target, key: any) {
+        if (key === "__isProxy") {
+          return true;
+        } else if (typeof target[key] === "object") {
+          return new Proxy(target[key], this);
+        } else {
+          return target[key];
+        }
+      },
       set: (target, prop, value) => {
         console.log(target, prop, value);
         const res = Reflect.set(target, prop, value);
@@ -693,7 +724,7 @@ class DeetCode {
       if (!fn) return;
       console.log(fn);
       fn();
-    }, 3000);
+    }, 1000);
   }
 
   changeRenderMode(mode: RenderMode) {
