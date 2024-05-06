@@ -1,6 +1,7 @@
 import AnimateModeToggle from "@/components/animate-mode-toggle";
 import DirectionModeToggle from "@/components/direction-mode-toggle";
 import ProblemDetail from "@/components/problem-detail";
+import Toolbar from "@/components/toolbar";
 import { Problem } from "@/lib/types";
 
 const code = `
@@ -72,14 +73,7 @@ export default function Page() {
     <div className="flex flex-col gap-5 px-5">
       <div className="flex justify-between">
         <h1 className="font-brand">Playground</h1>
-        <div className="flex gap-2 justify-end">
-          <div>
-            <AnimateModeToggle />
-          </div>
-          <div>
-            <DirectionModeToggle />
-          </div>
-        </div>
+        <Toolbar />
       </div>
       <ProblemDetail problem={problem} />
     </div>

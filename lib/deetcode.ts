@@ -492,6 +492,10 @@ class DeetMinPriorityQueueEngine extends DeetEngine {
     const fn = () => this.render(arr, instance.container);
     DeetCode.enqueue(fn);
   }
+  renderForDebug(instance: DeetMinPriorityQueue): void {
+    const arr = instance.toArray();
+    this.render(arr, instance.container);
+  }
   render(arr: Array<any>, container: HTMLElement): void {
     if (container) {
       container.innerHTML = "";
@@ -550,6 +554,10 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
     const fn = () => this.render(arr, instance.container);
     DeetCode.enqueue(fn);
   }
+  renderForDebug(instance: DeetMaxPriorityQueue): void {
+    const arr = instance.toArray();
+    this.render(arr, instance.container);
+  }
   render(arr: NativeDataStructure, container: HTMLElement): void {
     if (container) {
       container.innerHTML = "";
@@ -605,6 +613,10 @@ class DeetPriorityQueueEngine extends DeetEngine {
     const arr = instance.toArray();
     const fn = () => this.render(arr, instance.container);
     DeetCode.enqueue(fn);
+  }
+  renderForDebug(instance: DeetPriorityQueue): void {
+    const arr = instance.toArray();
+    this.render(arr, instance.container);
   }
   render(arr: NativeDataStructure, container: HTMLElement): void {
     if (container) {
