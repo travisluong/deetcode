@@ -679,6 +679,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
 }
 
 type RenderMode = "animate" | "debug";
+type DirectionMode = "row" | "column";
 
 interface DeetConfig {
   selector: string;
@@ -689,6 +690,7 @@ interface DeetConfig {
   minPriorityQueueEngine?: DeetMinPriorityQueueEngine;
   maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
   priorityQueueEngine?: DeetPriorityQueueEngine;
+  directionMode?: DirectionMode;
 }
 
 class DeetCode {
@@ -702,6 +704,7 @@ class DeetCode {
   minPriorityQueueEngine: DeetMinPriorityQueueEngine;
   maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   priorityQueueEngine: DeetPriorityQueueEngine;
+  directionMode: DirectionMode;
 
   static instance: DeetCode;
 
@@ -717,6 +720,7 @@ class DeetCode {
       config.maxPriorityQueueEngine || new DeetMaxPriorityQueueEngine();
     this.priorityQueueEngine =
       config.priorityQueueEngine || new DeetPriorityQueueEngine();
+    this.directionMode = config.directionMode || "row";
 
     const el = document.querySelector(config.selector);
 
@@ -740,6 +744,15 @@ class DeetCode {
 
   changeRenderMode(mode: RenderMode) {
     this.renderMode = mode;
+  }
+
+  changeDirectionMode(mode: DirectionMode) {
+    if (mode === "column") {
+      this.el.classList.add("flex-col");
+    } else if (mode === "row") {
+      this.el.classList.remove("flex-col");
+    }
+    this.directionMode = mode;
   }
 
   static enqueue(fn: Function) {

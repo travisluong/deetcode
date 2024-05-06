@@ -53,10 +53,10 @@ export default function AnimateModeSwitch() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handleClick("animate")}>
-          Animate Mode
+          <PlayIcon className="h-[1.2rem] w-[1.2rem] mr-2" /> Animate Mode
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleClick("debug")}>
-          Debug Mode
+          <Crosshair2Icon className="h-[1.2rem] w-[1.2rem] mr-2" /> Debug Mode
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

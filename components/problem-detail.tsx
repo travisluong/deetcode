@@ -16,7 +16,9 @@ import {
   MinPriorityQueue,
   MaxPriorityQueue,
 } from "@datastructures-js/priority-queue";
+import { cn } from "@/lib/utils";
 
+// TODO: MOVE SHARED TYPES INTO PROPER FILE
 type RenderMode = "animate" | "debug";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
