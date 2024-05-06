@@ -43,8 +43,8 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
         selector: "#deetcode",
         renderMode: renderMode,
       });
-      dcInstance.startRenderLoop();
-      window.dcInstance = dcInstance;
+      dc.DeetCode.setInstance(dcInstance);
+      dc.DeetCode.instance.startRenderLoop();
 
       // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = dc.DeetSet;

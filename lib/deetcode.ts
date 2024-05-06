@@ -52,7 +52,7 @@ abstract class DeetEngine {
   abstract renderForAnimate(instance: DeetDataStructure): void;
   abstract render(instance: NativeDataStructure, container: HTMLElement): void;
   renderFork(instance: DeetDataStructure) {
-    switch (window.dcInstance.renderMode) {
+    switch (DeetCode.instance.renderMode) {
       case "animate":
         this.renderForAnimate(instance);
         break;
@@ -71,7 +71,7 @@ abstract class DeetEngine {
     div.classList.add("deet-container");
     // TODO: POSSIBLY REMOVE THIS ASSIGNMENT
     instance.container = div;
-    window.dcInstance.el?.appendChild(div);
+    DeetCode.instance.el?.appendChild(div);
     return div;
   }
 }
@@ -107,7 +107,7 @@ class DeetSet extends Set {
 
   constructor(iterable: any) {
     super();
-    this.engine = window.dcInstance.setEngine;
+    this.engine = DeetCode.instance.setEngine;
     this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const item of iterable) {
@@ -201,7 +201,7 @@ class DeetMap<K, V> extends Map<K, V> {
    */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
-    this.engine = window.dcInstance.mapEngine;
+    this.engine = DeetCode.instance.mapEngine;
     this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const [key, value] of iterable) {
@@ -244,7 +244,7 @@ class DeetArrayEngine extends DeetEngine {
   lastArrayRendered?: Array<any>;
 
   renderFork(instance: DeetArray) {
-    switch (window.dcInstance.renderMode) {
+    switch (DeetCode.instance.renderMode) {
       case "animate":
         this.renderForAnimate(instance);
         break;
@@ -402,7 +402,7 @@ class DeetArray extends Array {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = window.dcInstance.arrayEngine;
+    this.engine = DeetCode.instance.arrayEngine;
     this.container = this.engine.renderContainer(this);
     this.engine.renderFork(this);
     this.renderEnabled = true;
@@ -513,7 +513,7 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = window.dcInstance.minPriorityQueueEngine;
+    this.engine = DeetCode.instance.minPriorityQueueEngine;
     this.container = this.engine.renderContainer(this);
     this.engine.renderFork(this);
   }
@@ -571,7 +571,7 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = window.dcInstance.maxPriorityQueueEngine;
+    this.engine = DeetCode.instance.maxPriorityQueueEngine;
     this.container = this.engine.renderContainer(this);
   }
 
@@ -631,7 +631,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
 
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
-    this.engine = window.dcInstance.priorityQueueEngine;
+    this.engine = DeetCode.instance.priorityQueueEngine;
     this.container = this.engine.renderContainer(this);
   }
 
@@ -703,6 +703,8 @@ class DeetCode {
   maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   priorityQueueEngine: DeetPriorityQueueEngine;
 
+  static instance: DeetCode;
+
   constructor(config: DeetConfig) {
     this.selector = config.selector;
     this.renderMode = config.renderMode || "debug";
@@ -741,7 +743,7 @@ class DeetCode {
   }
 
   static enqueue(fn: Function) {
-    window.dcInstance.renderQueue.push(fn);
+    DeetCode.instance.renderQueue.push(fn);
   }
 
   static monkeyPatchAll() {
@@ -760,6 +762,10 @@ class DeetCode {
     DeetMinPriorityQueue.undoMonkeyPatch();
     DeetMaxPriorityQueue.undoMonkeyPatch();
     DeetPriorityQueue.undoMonkeyPatch();
+  }
+
+  static setInstance(deetcode: DeetCode) {
+    DeetCode.instance = deetcode;
   }
 }
 

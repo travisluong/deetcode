@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Switch } from "./ui/switch";
+import dc from "@/lib/deetcode";
 
 export default function AnimateModeSwitch() {
   const [checked, setChecked] = useState(false);
@@ -24,10 +25,10 @@ export default function AnimateModeSwitch() {
     const newVal = !checked;
     setChecked(newVal);
     if (newVal) {
-      window.dcInstance.changeRenderMode("animate");
+      dc.DeetCode.instance.changeRenderMode("animate");
       localStorage.setItem("deetcode-render-mode", "animate");
     } else {
-      window.dcInstance.changeRenderMode("debug");
+      dc.DeetCode.instance.changeRenderMode("debug");
       localStorage.setItem("deetcode-render-mode", "debug");
     }
   }
