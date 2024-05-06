@@ -265,18 +265,6 @@ class DeetArrayEngine extends DeetEngine {
     return copy;
   }
 
-  renderFork(instance: DeetArray) {
-    switch (DeetCode.instance.renderMode) {
-      case "animate":
-        this.renderDelayed(instance);
-        break;
-      case "debug":
-        this.renderNow(instance);
-        break;
-      default:
-        break;
-    }
-  }
   getOriginalArrayConstructor() {
     if (DeetArray.originalArray) {
       return DeetArray.originalArray;
@@ -284,10 +272,9 @@ class DeetArrayEngine extends DeetEngine {
       return Array;
     }
   }
-  render(nativeArr: Array<any>, container: HTMLElement): void {
-    console.log(nativeArr, container);
-    container.innerHTML = "";
 
+  render(nativeArr: Array<any>, container: HTMLElement): void {
+    container.innerHTML = "";
     if (nativeArr.length === 0) {
       return;
     }
@@ -375,16 +362,6 @@ class DeetArrayEngine extends DeetEngine {
       max = Math.max(max, a.length);
     }
     return max;
-  }
-
-  shallowCompareArrays<T>(arr1: T[], arr2: T[]): boolean {
-    // If arrays have different lengths, they're not equal
-    if (arr1.length !== arr2.length) {
-      return false;
-    }
-
-    // Check if every element in arr1 is equal to the corresponding element in arr2
-    return arr1.every((value, index) => value === arr2[index]);
   }
 }
 
@@ -743,7 +720,7 @@ class DeetCode {
       if (!fn) return;
       console.log(fn);
       fn();
-    }, 1000);
+    }, 100);
   }
 
   changeRenderMode(mode: RenderMode) {
