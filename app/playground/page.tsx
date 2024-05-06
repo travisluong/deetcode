@@ -30,19 +30,19 @@ const code = `
 // arr2.push([7,8,9]);
 // arr2[1][1] = 88;
 
-const minheap = new MinPriorityQueue();
-minheap.enqueue(1);
-minheap.enqueue(2);
-minheap.enqueue(3);
-minheap.dequeue();
-minheap.front();
+// const minheap = new MinPriorityQueue();
+// minheap.enqueue(1);
+// minheap.enqueue(2);
+// minheap.enqueue(3);
+// minheap.dequeue();
+// minheap.front();
 
-// const maxheap = new MaxPriorityQueue();
-// maxheap.enqueue(1);
-// maxheap.enqueue(2);
-// maxheap.enqueue(3);
-// maxheap.dequeue();
-// maxheap.front();
+const maxheap = new MaxPriorityQueue();
+maxheap.enqueue(1);
+maxheap.enqueue(2);
+maxheap.enqueue(3);
+maxheap.dequeue();
+maxheap.front();
 
 // const pq = new PriorityQueue((a, b) => b.rank - a.rank);
 // pq.enqueue({name: "foo", rank: 1});

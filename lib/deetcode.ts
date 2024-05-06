@@ -42,12 +42,16 @@ type NativeDataStructure =
   | Set<any>
   | Map<any, any>
   | Array<any>
-  | MinPriorityQueueB<any>;
+  | MinPriorityQueueB<any>
+  | MaxPriorityQueueB<any>
+  | PriorityQueueB<any>;
 type DeetDataStructure =
   | DeetSet
   | DeetMap<any, any>
   | DeetArray
-  | DeetMinPriorityQueue;
+  | DeetMinPriorityQueue
+  | DeetMaxPriorityQueue
+  | DeetPriorityQueue;
 
 abstract class DeetEngine {
   // TODO: RENAME THIS TO renderAnimateFork
@@ -67,11 +71,12 @@ abstract class DeetEngine {
   }
   // TODO: RENAME THIS TO renderDebugFork
   renderForkDebug(instance: DeetDataStructure) {
-    this.render(instance, instance.container);
+    this.render(instance, instance.container!);
   }
   renderContainer(instance: DeetDataStructure): HTMLElement {
     const div = document.createElement("div");
     div.classList.add("deet-container");
+    // TODO: POSSIBLY REMOVE THIS ASSIGNMENT
     instance.container = div;
     window.dcInstance.el?.appendChild(div);
     return div;
@@ -546,49 +551,47 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
   }
 }
 
-class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
-  id: string;
-  container?: HTMLDivElement;
-  static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
-
-  constructor(...args: any) {
-    super(...args);
-    this.id = crypto.randomUUID();
-    this.renderTable();
+class DeetMaxPriorityQueueEngine extends DeetEngine {
+  renderForkAnimate(instance: DeetMaxPriorityQueue): void {
+    const arr = instance.toArray();
+    const fn = () => this.render(arr, instance.container);
+    DeetCode.enqueue(fn);
   }
-
-  renderTable() {
-    const container = document.createElement("div");
-    container.classList.add("deet-container");
-    container.dataset.id = this.id;
-    this.container = container;
-    window.dcInstance.el?.appendChild(container);
-  }
-
-  enqueue(value: any) {
-    const res = super.enqueue(value);
-    this.render();
-    return res;
-  }
-
-  dequeue() {
-    const res = super.dequeue();
-    this.render();
-    return res;
-  }
-
-  render() {
-    if (this.container) {
-      this.container.innerHTML = "";
+  render(arr: NativeDataStructure, container: HTMLElement): void {
+    if (container) {
+      container.innerHTML = "";
     }
-    const arr = super.toArray();
     const ul = document.createElement("ul");
     for (const item of arr) {
       const li = document.createElement("li");
       li.innerHTML = item.toString();
       ul.appendChild(li);
     }
-    this.container?.appendChild(ul);
+    container.appendChild(ul);
+  }
+}
+
+class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
+  engine: DeetMaxPriorityQueueEngine;
+  container: HTMLElement;
+  static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
+
+  constructor(...args: any) {
+    super(...args);
+    this.engine = window.dcInstance.config.maxPriorityQueueEngine;
+    this.container = this.engine.renderContainer(this);
+  }
+
+  enqueue(value: any) {
+    const res = super.enqueue(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  dequeue() {
+    const res = super.dequeue();
+    this.engine.renderFork(this);
+    return res;
   }
 
   static monkeyPatch() {
@@ -675,6 +678,7 @@ interface DeetConfigInit {
   mapEngine?: DeetMapEngine;
   arrayEngine?: DeetArrayEngine;
   minPriorityQueueEngine?: DeetMinPriorityQueueEngine;
+  maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
 }
 
 // TODO: STORE THIS ON DEETCODE PROPERTIES INSTEAD
@@ -685,6 +689,7 @@ interface DeetConfig {
   mapEngine: DeetMapEngine;
   arrayEngine: DeetArrayEngine;
   minPriorityQueueEngine: DeetMinPriorityQueueEngine;
+  maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
 }
 
 class DeetCode {
@@ -714,6 +719,7 @@ class DeetCode {
       mapEngine: new DeetMapEngine(),
       arrayEngine: new DeetArrayEngine(),
       minPriorityQueueEngine: new DeetMinPriorityQueueEngine(),
+      maxPriorityQueueEngine: new DeetMaxPriorityQueueEngine(),
       ...config,
     };
     const el = document.querySelector(config.selector);
