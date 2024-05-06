@@ -14,28 +14,28 @@ const code = `
 // numSet.delete(3);
 // numSet.add(3);
 
-const arr = new Array();
-arr.push(1);
-arr.push(2);
-arr.push(3);
-arr.pop();
-arr.shift();
-arr.push(3);
-arr.unshift(1);
-arr[0] = 8;
+// const arr = new Array();
+// arr.push(1);
+// arr.push(2);
+// arr.push(3);
+// arr.pop();
+// arr.shift();
+// arr.push(3);
+// arr.unshift(1);
+// arr[0] = 8;
 
-const arr2 = new Array();
-arr2.push([1,2,3]);
-arr2.push([4,5,6]);
-arr2.push([7,8,9]);
-arr2[1][1] = 88;
+// const arr2 = new Array();
+// arr2.push([1,2,3]);
+// arr2.push([4,5,6]);
+// arr2.push([7,8,9]);
+// arr2[1][1] = 88;
 
-// const minheap = new MinPriorityQueue();
-// minheap.enqueue(1);
-// minheap.enqueue(2);
-// minheap.enqueue(3);
-// minheap.dequeue();
-// minheap.front();
+const minheap = new MinPriorityQueue();
+minheap.enqueue(1);
+minheap.enqueue(2);
+minheap.enqueue(3);
+minheap.dequeue();
+minheap.front();
 
 // const maxheap = new MaxPriorityQueue();
 // maxheap.enqueue(1);
