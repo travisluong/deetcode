@@ -607,34 +607,50 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
   }
 }
 
+class DeetPriorityQueueEngine extends DeetEngine {
+  renderForkAnimate(instance: DeetPriorityQueue): void {
+    const arr = instance.toArray();
+    const fn = () => this.render(arr, instance.container);
+    DeetCode.enqueue(fn);
+  }
+  render(arr: NativeDataStructure, container: HTMLElement): void {
+    if (container) {
+      container.innerHTML = "";
+    }
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      let html = "";
+      for (const [key, value] of Object.entries(item)) {
+        html += `${key}: ${value}<br>`;
+      }
+      li.innerHTML = html;
+      ul.appendChild(li);
+    }
+    container.appendChild(ul);
+  }
+}
+
 class DeetPriorityQueue extends PriorityQueueB<any> {
-  id: string;
-  container?: HTMLDivElement;
+  engine: DeetPriorityQueueEngine;
+  container: HTMLElement;
   static originalPriorityQueue?: typeof PriorityQueueB;
 
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
-    this.id = crypto.randomUUID();
-    this.renderContainer();
-  }
-
-  renderContainer() {
-    const container = document.createElement("div");
-    container.classList.add("deet-container");
-    container.dataset.id = this.id;
-    this.container = container;
-    window.dcInstance.el?.appendChild(container);
+    this.engine = window.dcInstance.config.priorityQueueEngine;
+    this.container = this.engine.renderContainer(this);
   }
 
   enqueue(value: any) {
     const res = super.enqueue(value);
-    this.render();
+    this.engine.renderFork(this);
     return res;
   }
 
   dequeue() {
     const res = super.dequeue();
-    this.render();
+    this.engine.renderFork(this);
     return res;
   }
 
@@ -679,6 +695,7 @@ interface DeetConfigInit {
   arrayEngine?: DeetArrayEngine;
   minPriorityQueueEngine?: DeetMinPriorityQueueEngine;
   maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
+  priorityQueueEngine?: DeetPriorityQueueEngine;
 }
 
 // TODO: STORE THIS ON DEETCODE PROPERTIES INSTEAD
@@ -690,6 +707,7 @@ interface DeetConfig {
   arrayEngine: DeetArrayEngine;
   minPriorityQueueEngine: DeetMinPriorityQueueEngine;
   maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
+  priorityQueueEngine: DeetPriorityQueueEngine;
 }
 
 class DeetCode {
@@ -720,6 +738,7 @@ class DeetCode {
       arrayEngine: new DeetArrayEngine(),
       minPriorityQueueEngine: new DeetMinPriorityQueueEngine(),
       maxPriorityQueueEngine: new DeetMaxPriorityQueueEngine(),
+      priorityQueueEngine: new DeetPriorityQueueEngine(),
       ...config,
     };
     const el = document.querySelector(config.selector);

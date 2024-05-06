@@ -37,19 +37,19 @@ const code = `
 // minheap.dequeue();
 // minheap.front();
 
-const maxheap = new MaxPriorityQueue();
-maxheap.enqueue(1);
-maxheap.enqueue(2);
-maxheap.enqueue(3);
-maxheap.dequeue();
-maxheap.front();
+// const maxheap = new MaxPriorityQueue();
+// maxheap.enqueue(1);
+// maxheap.enqueue(2);
+// maxheap.enqueue(3);
+// maxheap.dequeue();
+// maxheap.front();
 
-// const pq = new PriorityQueue((a, b) => b.rank - a.rank);
-// pq.enqueue({name: "foo", rank: 1});
-// pq.enqueue({name: "bar", rank: 2});
-// pq.enqueue({name: "baz", rank: 3});
-// pq.dequeue();
-// pq.front();
+const pq = new PriorityQueue((a, b) => b.rank - a.rank);
+pq.enqueue({name: "foo", rank: 1});
+pq.enqueue({name: "bar", rank: 2});
+pq.enqueue({name: "baz", rank: 3});
+pq.dequeue();
+pq.front();
 `;
 
 export default function Page() {
