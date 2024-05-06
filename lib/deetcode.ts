@@ -33,11 +33,6 @@ declare global {
   }
 }
 
-interface RenderObject {
-  container: HTMLDivElement;
-  data: any;
-}
-
 type NativeDataStructure =
   | Set<any>
   | Map<any, any>
@@ -54,24 +49,22 @@ type DeetDataStructure =
   | DeetPriorityQueue;
 
 abstract class DeetEngine {
-  // TODO: RENAME THIS TO renderAnimateFork
-  abstract renderForkAnimate(instance: DeetDataStructure): void;
+  abstract renderForAnimate(instance: DeetDataStructure): void;
   abstract render(instance: NativeDataStructure, container: HTMLElement): void;
   renderFork(instance: DeetDataStructure) {
-    switch (window.dcInstance.config.renderMode) {
+    switch (window.dcInstance.renderMode) {
       case "animate":
-        this.renderForkAnimate(instance);
+        this.renderForAnimate(instance);
         break;
       case "debug":
-        this.renderForkDebug(instance);
+        this.renderForDebug(instance);
         break;
       default:
         break;
     }
   }
-  // TODO: RENAME THIS TO renderDebugFork
-  renderForkDebug(instance: DeetDataStructure) {
-    this.render(instance, instance.container!);
+  renderForDebug(instance: DeetDataStructure) {
+    this.render(instance, instance.container);
   }
   renderContainer(instance: DeetDataStructure): HTMLElement {
     const div = document.createElement("div");
@@ -84,7 +77,7 @@ abstract class DeetEngine {
 }
 
 class DeetSetEngine extends DeetEngine {
-  renderForkAnimate(instance: DeetSet) {
+  renderForAnimate(instance: DeetSet) {
     let copy;
     if (DeetSet.originalSet) {
       copy = new DeetSet.originalSet([...instance.values()]);
@@ -114,7 +107,7 @@ class DeetSet extends Set {
 
   constructor(iterable: any) {
     super();
-    this.engine = window.dcInstance.config.setEngine;
+    this.engine = window.dcInstance.setEngine;
     this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const item of iterable) {
@@ -153,7 +146,7 @@ class DeetSet extends Set {
 }
 
 class DeetMapEngine extends DeetEngine {
-  renderForkAnimate(instance: DeetMap<any, any>): void {
+  renderForAnimate(instance: DeetMap<any, any>): void {
     let copy;
     if (DeetMap.originalMap) {
       copy = new DeetMap.originalMap([...instance.entries()]);
@@ -208,7 +201,7 @@ class DeetMap<K, V> extends Map<K, V> {
    */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
-    this.engine = window.dcInstance.config.mapEngine;
+    this.engine = window.dcInstance.mapEngine;
     this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const [key, value] of iterable) {
@@ -251,12 +244,12 @@ class DeetArrayEngine extends DeetEngine {
   lastArrayRendered?: Array<any>;
 
   renderFork(instance: DeetArray) {
-    switch (window.dcInstance.config.renderMode) {
+    switch (window.dcInstance.renderMode) {
       case "animate":
-        this.renderForkAnimate(instance);
+        this.renderForAnimate(instance);
         break;
       case "debug":
-        this.renderForkDebug(instance);
+        this.renderForDebug(instance);
         break;
       default:
         break;
@@ -269,7 +262,7 @@ class DeetArrayEngine extends DeetEngine {
       return Array;
     }
   }
-  renderForkAnimate(instance: DeetArray): void {
+  renderForAnimate(instance: DeetArray): void {
     let copy;
     const arrayConstructor = this.getOriginalArrayConstructor();
     copy = new arrayConstructor();
@@ -409,7 +402,7 @@ class DeetArray extends Array {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = window.dcInstance.config.arrayEngine;
+    this.engine = window.dcInstance.arrayEngine;
     this.container = this.engine.renderContainer(this);
     this.engine.renderFork(this);
     this.renderEnabled = true;
@@ -494,7 +487,7 @@ class DeetArray extends Array {
 }
 
 class DeetMinPriorityQueueEngine extends DeetEngine {
-  renderForkAnimate(instance: DeetMinPriorityQueue): void {
+  renderForAnimate(instance: DeetMinPriorityQueue): void {
     const arr = instance.toArray();
     const fn = () => this.render(arr, instance.container);
     DeetCode.enqueue(fn);
@@ -520,7 +513,7 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = window.dcInstance.config.minPriorityQueueEngine;
+    this.engine = window.dcInstance.minPriorityQueueEngine;
     this.container = this.engine.renderContainer(this);
     this.engine.renderFork(this);
   }
@@ -552,7 +545,7 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
 }
 
 class DeetMaxPriorityQueueEngine extends DeetEngine {
-  renderForkAnimate(instance: DeetMaxPriorityQueue): void {
+  renderForAnimate(instance: DeetMaxPriorityQueue): void {
     const arr = instance.toArray();
     const fn = () => this.render(arr, instance.container);
     DeetCode.enqueue(fn);
@@ -578,7 +571,7 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = window.dcInstance.config.maxPriorityQueueEngine;
+    this.engine = window.dcInstance.maxPriorityQueueEngine;
     this.container = this.engine.renderContainer(this);
   }
 
@@ -608,7 +601,7 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
 }
 
 class DeetPriorityQueueEngine extends DeetEngine {
-  renderForkAnimate(instance: DeetPriorityQueue): void {
+  renderForAnimate(instance: DeetPriorityQueue): void {
     const arr = instance.toArray();
     const fn = () => this.render(arr, instance.container);
     DeetCode.enqueue(fn);
@@ -638,7 +631,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
 
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
-    this.engine = window.dcInstance.config.priorityQueueEngine;
+    this.engine = window.dcInstance.priorityQueueEngine;
     this.container = this.engine.renderContainer(this);
   }
 
@@ -687,7 +680,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
 
 type RenderMode = "animate" | "debug";
 
-interface DeetConfigInit {
+interface DeetConfig {
   selector: string;
   renderMode?: RenderMode;
   setEngine?: DeetSetEngine;
@@ -698,8 +691,9 @@ interface DeetConfigInit {
   priorityQueueEngine?: DeetPriorityQueueEngine;
 }
 
-// TODO: STORE THIS ON DEETCODE PROPERTIES INSTEAD
-interface DeetConfig {
+class DeetCode {
+  el: Element;
+  renderQueue: Array<Function>;
   selector: string;
   renderMode: RenderMode;
   setEngine: DeetSetEngine;
@@ -708,39 +702,20 @@ interface DeetConfig {
   minPriorityQueueEngine: DeetMinPriorityQueueEngine;
   maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   priorityQueueEngine: DeetPriorityQueueEngine;
-}
 
-class DeetCode {
-  el: Element;
-  renderQueue: Array<Function>;
-  config: DeetConfig;
+  constructor(config: DeetConfig) {
+    this.selector = config.selector;
+    this.renderMode = config.renderMode || "debug";
+    this.setEngine = config.setEngine || new DeetSetEngine();
+    this.mapEngine = config.mapEngine || new DeetMapEngine();
+    this.arrayEngine = config.arrayEngine || new DeetArrayEngine();
+    this.minPriorityQueueEngine =
+      config.minPriorityQueueEngine || new DeetMinPriorityQueueEngine();
+    this.maxPriorityQueueEngine =
+      config.maxPriorityQueueEngine || new DeetMaxPriorityQueueEngine();
+    this.priorityQueueEngine =
+      config.priorityQueueEngine || new DeetPriorityQueueEngine();
 
-  constructor(config: DeetConfigInit) {
-    const renderModeStr = localStorage.getItem("deetcode-render-mode");
-
-    let renderMode: RenderMode = "debug";
-
-    switch (renderModeStr) {
-      case "animate":
-        renderMode = "animate";
-        break;
-      case "debug":
-        renderMode = "debug";
-        break;
-      default:
-        break;
-    }
-
-    this.config = {
-      renderMode: renderMode,
-      setEngine: new DeetSetEngine(),
-      mapEngine: new DeetMapEngine(),
-      arrayEngine: new DeetArrayEngine(),
-      minPriorityQueueEngine: new DeetMinPriorityQueueEngine(),
-      maxPriorityQueueEngine: new DeetMaxPriorityQueueEngine(),
-      priorityQueueEngine: new DeetPriorityQueueEngine(),
-      ...config,
-    };
     const el = document.querySelector(config.selector);
 
     if (!el) {
@@ -762,7 +737,7 @@ class DeetCode {
   }
 
   changeRenderMode(mode: RenderMode) {
-    this.config.renderMode = mode;
+    this.renderMode = mode;
   }
 
   static enqueue(fn: Function) {

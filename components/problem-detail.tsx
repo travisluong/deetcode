@@ -17,14 +17,31 @@ import {
   MaxPriorityQueue,
 } from "@datastructures-js/priority-queue";
 
+type RenderMode = "animate" | "debug";
+
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const renderModeStr = localStorage.getItem("deetcode-render-mode");
+
+      let renderMode: RenderMode = "debug";
+      switch (renderModeStr) {
+        case "animate":
+          renderMode = "animate";
+          break;
+        case "debug":
+          renderMode = "debug";
+          break;
+        default:
+          break;
+      }
+
       const dcInstance = new dc.DeetCode({
         selector: "#deetcode",
+        renderMode: renderMode,
       });
       dcInstance.startRenderLoop();
       window.dcInstance = dcInstance;
