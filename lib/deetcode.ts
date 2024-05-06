@@ -743,6 +743,24 @@ class DeetCode {
   static enqueue(fn: Function) {
     window.dcInstance.renderQueue.push(fn);
   }
+
+  static monkeyPatchAll() {
+    DeetSet.monkeyPatch();
+    DeetMap.monkeyPatch();
+    DeetArray.monkeyPatch();
+    DeetMinPriorityQueue.monkeyPatch();
+    DeetMaxPriorityQueue.monkeyPatch();
+    DeetPriorityQueue.monkeyPatch();
+  }
+
+  static undoMonkeyPatchAll() {
+    DeetSet.undoMonkeyPatch();
+    DeetMap.undoMonkeyPatch();
+    DeetArray.undoMonkeyPatch();
+    DeetMinPriorityQueue.undoMonkeyPatch();
+    DeetMaxPriorityQueue.undoMonkeyPatch();
+    DeetPriorityQueue.undoMonkeyPatch();
+  }
 }
 
 const dc: DC = {

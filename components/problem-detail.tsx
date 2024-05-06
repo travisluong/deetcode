@@ -68,22 +68,12 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
     const code = editorRef.current.getValue();
     console.log(code);
     try {
-      dc.DeetSet.monkeyPatch();
-      dc.DeetMap.monkeyPatch();
-      dc.DeetArray.monkeyPatch();
-      dc.DeetMinPriorityQueue.monkeyPatch();
-      dc.DeetMaxPriorityQueue.monkeyPatch();
-      dc.DeetPriorityQueue.monkeyPatch();
+      dc.DeetCode.monkeyPatchAll();
       eval(code);
     } catch (error) {
       console.error(error);
     } finally {
-      dc.DeetSet.undoMonkeyPatch();
-      dc.DeetMap.undoMonkeyPatch();
-      dc.DeetArray.undoMonkeyPatch();
-      dc.DeetMinPriorityQueue.undoMonkeyPatch();
-      dc.DeetMaxPriorityQueue.undoMonkeyPatch();
-      dc.DeetPriorityQueue.undoMonkeyPatch();
+      dc.DeetCode.undoMonkeyPatchAll();
     }
   }
 
