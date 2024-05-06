@@ -49,21 +49,28 @@ type DeetDataStructure =
   | DeetPriorityQueue;
 
 abstract class DeetEngine {
-  abstract renderForAnimate(instance: DeetDataStructure): void;
+  abstract transformDeetToNative(
+    instance: DeetDataStructure
+  ): NativeDataStructure;
   abstract render(instance: NativeDataStructure, container: HTMLElement): void;
   renderFork(instance: DeetDataStructure) {
     switch (DeetCode.instance.renderMode) {
       case "animate":
-        this.renderForAnimate(instance);
+        this.renderDelayed(instance);
         break;
       case "debug":
-        this.renderForDebug(instance);
+        this.renderNow(instance);
         break;
       default:
         break;
     }
   }
-  renderForDebug(instance: DeetDataStructure) {
+  renderDelayed(instance: DeetDataStructure): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = () => this.render(nativeCopy, instance.container);
+    DeetCode.enqueue(fn);
+  }
+  renderNow(instance: DeetDataStructure) {
     this.render(instance, instance.container);
   }
   renderContainer(instance: DeetDataStructure): HTMLElement {
@@ -77,17 +84,15 @@ abstract class DeetEngine {
 }
 
 class DeetSetEngine extends DeetEngine {
-  renderForAnimate(instance: DeetSet) {
+  transformDeetToNative(instance: DeetSet): Set<any> {
     let copy;
     if (DeetSet.originalSet) {
       copy = new DeetSet.originalSet([...instance.values()]);
     } else {
       copy = new Set([...instance.values()]);
     }
-    const fn = () => this.render(copy, instance.container);
-    DeetCode.enqueue(fn);
+    return copy;
   }
-
   render(nativeInstance: Set<any>, container: HTMLElement) {
     container.innerHTML = "";
     const ul = document.createElement("ul");
@@ -146,15 +151,14 @@ class DeetSet extends Set {
 }
 
 class DeetMapEngine extends DeetEngine {
-  renderForAnimate(instance: DeetMap<any, any>): void {
+  transformDeetToNative(instance: DeetMap<any, any>): Map<any, any> {
     let copy;
     if (DeetMap.originalMap) {
       copy = new DeetMap.originalMap([...instance.entries()]);
     } else {
       copy = new Map([...instance.entries()]);
     }
-    const fn = () => this.render(copy, instance.container);
-    DeetCode.enqueue(fn);
+    return copy;
   }
   render(nativeInstance: Map<any, any>, container: HTMLElement): void {
     container.innerHTML = "";
@@ -241,28 +245,7 @@ class DeetMap<K, V> extends Map<K, V> {
 }
 
 class DeetArrayEngine extends DeetEngine {
-  lastArrayRendered?: Array<any>;
-
-  renderFork(instance: DeetArray) {
-    switch (DeetCode.instance.renderMode) {
-      case "animate":
-        this.renderForAnimate(instance);
-        break;
-      case "debug":
-        this.renderForDebug(instance);
-        break;
-      default:
-        break;
-    }
-  }
-  getOriginalArrayConstructor() {
-    if (DeetArray.originalArray) {
-      return DeetArray.originalArray;
-    } else {
-      return Array;
-    }
-  }
-  renderForAnimate(instance: DeetArray): void {
+  transformDeetToNative(instance: DeetArray): Array<any> {
     let copy;
     const arrayConstructor = this.getOriginalArrayConstructor();
     copy = new arrayConstructor();
@@ -279,16 +262,27 @@ class DeetArrayEngine extends DeetEngine {
         copy.push(item);
       }
     }
-    // no need to re-render the exact same values
-    if (this.lastArrayRendered) {
-      const isSame = this.shallowCompareArrays(copy, this.lastArrayRendered);
-      if (isSame) {
-        return;
-      }
+    return copy;
+  }
+
+  renderFork(instance: DeetArray) {
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        this.renderDelayed(instance);
+        break;
+      case "debug":
+        this.renderNow(instance);
+        break;
+      default:
+        break;
     }
-    this.lastArrayRendered = copy;
-    const fn = () => this.render(copy, instance.container);
-    DeetCode.enqueue(fn);
+  }
+  getOriginalArrayConstructor() {
+    if (DeetArray.originalArray) {
+      return DeetArray.originalArray;
+    } else {
+      return Array;
+    }
   }
   render(nativeArr: Array<any>, container: HTMLElement): void {
     console.log(nativeArr, container);
@@ -487,13 +481,12 @@ class DeetArray extends Array {
 }
 
 class DeetMinPriorityQueueEngine extends DeetEngine {
-  renderForAnimate(instance: DeetMinPriorityQueue): void {
-    const arr = instance.toArray();
-    const fn = () => this.render(arr, instance.container);
-    DeetCode.enqueue(fn);
+  transformDeetToNative(instance: DeetMinPriorityQueue): Array<any> {
+    return instance.toArray();
   }
-  renderForDebug(instance: DeetMinPriorityQueue): void {
-    const arr = instance.toArray();
+  // override renderNow since we need an array copy
+  renderNow(instance: DeetMinPriorityQueue): void {
+    const arr = this.transformDeetToNative(instance);
     this.render(arr, instance.container);
   }
   render(arr: Array<any>, container: HTMLElement): void {
@@ -549,13 +542,12 @@ class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
 }
 
 class DeetMaxPriorityQueueEngine extends DeetEngine {
-  renderForAnimate(instance: DeetMaxPriorityQueue): void {
-    const arr = instance.toArray();
-    const fn = () => this.render(arr, instance.container);
-    DeetCode.enqueue(fn);
+  transformDeetToNative(instance: DeetMaxPriorityQueue): Array<any> {
+    return instance.toArray();
   }
-  renderForDebug(instance: DeetMaxPriorityQueue): void {
-    const arr = instance.toArray();
+  // override renderNow since we need an array copy
+  renderNow(instance: DeetMaxPriorityQueue): void {
+    const arr = this.transformDeetToNative(instance);
     this.render(arr, instance.container);
   }
   render(arr: NativeDataStructure, container: HTMLElement): void {
@@ -609,13 +601,12 @@ class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
 }
 
 class DeetPriorityQueueEngine extends DeetEngine {
-  renderForAnimate(instance: DeetPriorityQueue): void {
-    const arr = instance.toArray();
-    const fn = () => this.render(arr, instance.container);
-    DeetCode.enqueue(fn);
+  transformDeetToNative(instance: DeetPriorityQueue): Array<any> {
+    return instance.toArray();
   }
-  renderForDebug(instance: DeetPriorityQueue): void {
-    const arr = instance.toArray();
+  // override renderNow since we need an array copy
+  renderNow(instance: DeetPriorityQueue): void {
+    const arr = this.transformDeetToNative(instance);
     this.render(arr, instance.container);
   }
   render(arr: NativeDataStructure, container: HTMLElement): void {
@@ -743,6 +734,7 @@ class DeetCode {
     this.el = el;
     this.el.classList.add("deetcode");
     this.renderQueue = new Array();
+    this.changeDirectionMode(this.directionMode);
   }
 
   startRenderLoop() {

@@ -16,10 +16,10 @@ import {
   MinPriorityQueue,
   MaxPriorityQueue,
 } from "@datastructures-js/priority-queue";
-import { cn } from "@/lib/utils";
 
 // TODO: MOVE SHARED TYPES INTO PROPER FILE
 type RenderMode = "animate" | "debug";
+type DirectionMode = "row" | "column";
 
 export default function ProblemDetail({ problem }: { problem: Problem }) {
   const editorRef = useRef(null);
@@ -28,7 +28,6 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const renderModeStr = localStorage.getItem("deetcode-render-mode");
-
       let renderMode: RenderMode = "debug";
       switch (renderModeStr) {
         case "animate":
@@ -41,9 +40,23 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
           break;
       }
 
+      let directionMode: DirectionMode = "row";
+      const directionModeStr = localStorage.getItem("deetcode-direction-mode");
+      switch (directionModeStr) {
+        case "row":
+          directionMode = "row";
+          break;
+        case "col":
+          directionMode = "column";
+          break;
+        default:
+          break;
+      }
+
       const dcInstance = new dc.DeetCode({
         selector: "#deetcode",
         renderMode: renderMode,
+        directionMode: directionMode,
       });
       dc.DeetCode.setInstance(dcInstance);
       dc.DeetCode.instance.startRenderLoop();
