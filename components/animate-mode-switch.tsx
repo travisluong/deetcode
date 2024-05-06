@@ -1,30 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Switch } from "./ui/switch";
 import dc from "@/lib/deetcode";
+import { Button } from "./ui/button";
+import { Crosshair2Icon, PlayIcon, VideoIcon } from "@radix-ui/react-icons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
+type RenderMode = "animate" | "debug";
 
 export default function AnimateModeSwitch() {
-  const [checked, setChecked] = useState(false);
+  const [mode, setMode] = useState<RenderMode>("animate");
 
   useEffect(() => {
     const renderMode = localStorage.getItem("deetcode-render-mode");
     switch (renderMode) {
       case "animate":
-        setChecked(true);
+        setMode("animate");
         break;
       case "debug":
-        setChecked(false);
+        setMode("debug");
         break;
       default:
         break;
     }
   }, []);
 
-  function handleChange() {
-    const newVal = !checked;
-    setChecked(newVal);
-    if (newVal) {
+  function handleClick(mode: RenderMode) {
+    setMode(mode);
+    if (mode === "animate") {
       dc.DeetCode.instance.changeRenderMode("animate");
       localStorage.setItem("deetcode-render-mode", "animate");
     } else {
@@ -34,8 +42,23 @@ export default function AnimateModeSwitch() {
   }
 
   return (
-    <div>
-      <Switch checked={checked} onCheckedChange={handleChange} /> Animate Mode
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon">
+          {mode === "animate" && <PlayIcon className="h-[1.2rem] w-[1.2rem]" />}
+          {mode === "debug" && (
+            <Crosshair2Icon className="h-[1.2rem] w-[1.2rem]" />
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => handleClick("animate")}>
+          Animate Mode
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleClick("debug")}>
+          Debug Mode
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
