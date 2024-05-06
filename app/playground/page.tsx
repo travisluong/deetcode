@@ -1,4 +1,4 @@
-import AnimateModeSwitch from "@/components/animate-mode-switch";
+import AnimateModeToggle from "@/components/animate-mode-toggle";
 import DirectionModeToggle from "@/components/direction-mode-toggle";
 import ProblemDetail from "@/components/problem-detail";
 import { Problem } from "@/lib/types";
@@ -74,7 +74,7 @@ export default function Page() {
         <h1 className="font-brand">Playground</h1>
         <div className="flex gap-2 justify-end">
           <div>
-            <AnimateModeSwitch />
+            <AnimateModeToggle />
           </div>
           <div>
             <DirectionModeToggle />

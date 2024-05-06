@@ -13,7 +13,7 @@ import {
 
 type RenderMode = "animate" | "debug";
 
-export default function AnimateModeSwitch() {
+export default function AnimateModeToggle() {
   const [mode, setMode] = useState<RenderMode>("animate");
 
   useEffect(() => {
