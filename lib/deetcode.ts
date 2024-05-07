@@ -76,10 +76,52 @@ abstract class DeetEngine {
   renderContainer(instance: DeetDataStructure): HTMLElement {
     const div = document.createElement("div");
     div.classList.add("deet-container");
-    // TODO: POSSIBLY REMOVE THIS ASSIGNMENT
-    instance.container = div;
-    DeetCode.instance.el?.appendChild(div);
+    div.appendChild(this.renderLabel(instance));
+
+    const fn = () => {
+      DeetCode.instance.el?.appendChild(div);
+    };
+
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
+
     return div;
+  }
+  renderLabel(instance: DeetDataStructure): HTMLElement {
+    const label = document.createElement("label");
+    if (instance instanceof DeetMap) {
+      label.innerHTML = "Map";
+      return label;
+    }
+    if (instance instanceof DeetSet) {
+      label.innerHTML = "Set";
+      return label;
+    }
+    if (instance instanceof DeetArray) {
+      label.innerHTML = "Array";
+      return label;
+    }
+    if (instance instanceof DeetMinPriorityQueue) {
+      label.innerHTML = "MinPriorityQueue";
+      return label;
+    }
+    if (instance instanceof DeetMaxPriorityQueue) {
+      label.innerHTML = "MaxPriorityQueue";
+      return label;
+    }
+    if (instance instanceof DeetPriorityQueue) {
+      label.innerHTML = "PriorityQueue";
+      return label;
+    }
+    return label;
   }
 }
 
@@ -282,12 +324,12 @@ class DeetArrayEngine extends DeetEngine {
 
   render(nativeArr: Array<any>, container: HTMLElement): void {
     container.innerHTML = "";
-    if (nativeArr.length === 0) {
-      return;
-    }
     const label = document.createElement("label");
     label.innerHTML = "Array";
     container.innerHTML = label.outerHTML;
+    if (nativeArr.length === 0) {
+      return;
+    }
     if (this.is2DArray(nativeArr)) {
       const el = this.render2d(nativeArr);
       container.innerHTML += el.outerHTML;
@@ -743,7 +785,7 @@ class DeetCode {
       if (!fn) return;
       console.log(fn);
       fn();
-    }, 100);
+    }, 1000);
   }
 
   changeRenderMode(mode: RenderMode) {
