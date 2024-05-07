@@ -66,11 +66,17 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
           break;
       }
 
+      const animationDelayStr = localStorage.getItem(
+        "deetcode-animation-delay"
+      );
+      const animationDelay = parseInt(animationDelayStr || "1000");
+
       const dcInstance = new dc.DeetCode({
         selector: "#deetcode",
         renderMode: renderMode,
         directionMode: directionMode,
         labelMode: labelMode,
+        animationDelay: animationDelay,
       });
       dc.DeetCode.setInstance(dcInstance);
       dc.DeetCode.instance.startRenderLoop();

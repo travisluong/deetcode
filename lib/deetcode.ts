@@ -740,6 +740,7 @@ interface DeetConfig {
   priorityQueueEngine?: DeetPriorityQueueEngine;
   directionMode?: DirectionMode;
   labelMode?: boolean;
+  animationDelay?: number;
 }
 
 class DeetCode {
@@ -755,6 +756,8 @@ class DeetCode {
   priorityQueueEngine: DeetPriorityQueueEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
+  animationDelay: number;
+  interval?: any;
 
   static instance: DeetCode;
 
@@ -772,6 +775,7 @@ class DeetCode {
       config.priorityQueueEngine || new DeetPriorityQueueEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
+    this.animationDelay = config.animationDelay || 1000;
 
     const el = document.querySelector(config.selector);
 
@@ -787,12 +791,17 @@ class DeetCode {
   }
 
   startRenderLoop() {
-    setInterval(() => {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    // make the lowest 10 milliseconds
+    const delay = this.animationDelay < 10 ? 10 : this.animationDelay;
+    this.interval = setInterval(() => {
       const fn = this.renderQueue.shift();
       if (!fn) return;
       console.log(fn);
       fn();
-    }, 1000);
+    }, delay);
   }
 
   changeRenderMode(mode: RenderMode) {
@@ -814,6 +823,11 @@ class DeetCode {
     } else {
       this.el.classList.add("deetcode-hide-labels");
     }
+  }
+
+  changeAnimationDelay(delay: number) {
+    this.animationDelay = delay;
+    this.startRenderLoop();
   }
 
   static enqueue(fn: Function) {
