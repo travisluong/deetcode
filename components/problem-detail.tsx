@@ -80,7 +80,6 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       });
       dc.DeetCode.setInstance(dcInstance);
       dc.DeetCode.instance.startRenderLoop();
-
       // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = dc.DeetSet;
       window.DeetMap = dc.DeetMap;
@@ -92,6 +91,19 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       window.MaxPriorityQueue = MaxPriorityQueue;
     }
   }, []);
+
+  useEffect(() => {
+    document.addEventListener("clearCode", handleClearCodeEvent);
+
+    return () => {
+      document.removeEventListener("clearCode", handleClearCodeEvent);
+    };
+  }, []);
+
+  function handleClearCodeEvent() {
+    //@ts-ignore
+    editorRef.current.setValue("");
+  }
 
   function handleEditorDidMount(editor: any, monaco: any) {
     editorRef.current = editor;

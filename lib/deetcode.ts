@@ -830,6 +830,10 @@ class DeetCode {
     this.startRenderLoop();
   }
 
+  erase() {
+    this.el.innerHTML = "";
+  }
+
   static enqueue(fn: Function) {
     DeetCode.instance.renderQueue.push(fn);
   }
