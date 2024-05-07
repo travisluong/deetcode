@@ -54,6 +54,13 @@ abstract class DeetEngine {
   ): NativeDataStructure;
   abstract render(instance: NativeDataStructure, container: HTMLElement): void;
   renderFork(instance: DeetDataStructure) {
+    // fix the duplicate rendering of array
+    // the proxy is hit first and then the real object
+    // thats why there is a duplicate render
+    // @ts-ignore
+    if (instance.__isProxy) {
+      return;
+    }
     switch (DeetCode.instance.renderMode) {
       case "animate":
         this.renderDelayed(instance);
