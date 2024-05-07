@@ -113,16 +113,16 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
   }
 
   return (
-    <div>
+    <div className="h-full w-full">
       <ResizablePanelGroup
         direction="horizontal"
         className="min-h-[200px] rounded-lg border"
       >
         <ResizablePanel defaultSize={50}>
-          <div className="dark:bg-[#1E1E1E]">
-            <div className="flex flex-col gap-5">
+          <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
+            <div className="flex flex-col gap-5 h-full w-full flex-grow">
               <Editor
-                height="50vh"
+                height="100%"
                 width="100%"
                 defaultLanguage="javascript"
                 defaultValue={problem.solution ?? undefined}

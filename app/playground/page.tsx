@@ -70,7 +70,7 @@ export default function Page() {
   };
 
   return (
-    <div className="flex flex-col gap-5 px-5">
+    <div className="flex flex-col gap-5 px-5 h-full">
       <div className="flex justify-between">
         <h1 className="font-brand">Playground</h1>
         <Toolbar />

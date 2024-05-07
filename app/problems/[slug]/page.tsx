@@ -16,10 +16,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="p-5">
-      <div>
-        <ProblemDetail problem={problem} />
-      </div>
+    <div className="flex flex-col p-5 h-full">
+      <ProblemDetail problem={problem} />
     </div>
   );
 }
