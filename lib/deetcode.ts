@@ -101,6 +101,9 @@ class DeetSetEngine extends DeetEngine {
       li.innerHTML = item;
       ul.appendChild(li);
     }
+    const label = document.createElement("label");
+    label.innerHTML = "Set";
+    container.appendChild(label);
     container.appendChild(ul);
   }
 }
@@ -188,6 +191,10 @@ class DeetMapEngine extends DeetEngine {
       tbody.appendChild(tr);
     }
 
+    const label = document.createElement("label");
+    label.innerHTML = "Map";
+
+    container.append(label);
     container.append(table);
   }
 }
@@ -278,12 +285,15 @@ class DeetArrayEngine extends DeetEngine {
     if (nativeArr.length === 0) {
       return;
     }
+    const label = document.createElement("label");
+    label.innerHTML = "Array";
+    container.innerHTML = label.outerHTML;
     if (this.is2DArray(nativeArr)) {
       const el = this.render2d(nativeArr);
-      container.innerHTML = el.outerHTML;
+      container.innerHTML += el.outerHTML;
     } else {
       const el = this.render1d(nativeArr);
-      container.innerHTML = el.outerHTML;
+      container.innerHTML += el.outerHTML;
     }
   }
 
@@ -476,6 +486,9 @@ class DeetMinPriorityQueueEngine extends DeetEngine {
       li.innerHTML = item.toString();
       ul.appendChild(li);
     }
+    const label = document.createElement("label");
+    label.innerHTML = "MinPriorityQueue";
+    container.appendChild(label);
     container.appendChild(ul);
   }
 }
@@ -537,6 +550,9 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
       li.innerHTML = item.toString();
       ul.appendChild(li);
     }
+    const label = document.createElement("label");
+    label.innerHTML = "MaxPriorityQueue";
+    container.appendChild(label);
     container.appendChild(ul);
   }
 }
@@ -600,6 +616,9 @@ class DeetPriorityQueueEngine extends DeetEngine {
       li.innerHTML = html;
       ul.appendChild(li);
     }
+    const label = document.createElement("label");
+    label.innerHTML = "PriorityQueue";
+    container.appendChild(label);
     container.appendChild(ul);
   }
 }
@@ -671,6 +690,7 @@ interface DeetConfig {
   maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
   priorityQueueEngine?: DeetPriorityQueueEngine;
   directionMode?: DirectionMode;
+  labelMode?: boolean;
 }
 
 class DeetCode {
@@ -685,6 +705,7 @@ class DeetCode {
   maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   priorityQueueEngine: DeetPriorityQueueEngine;
   directionMode: DirectionMode;
+  labelMode: boolean;
 
   static instance: DeetCode;
 
@@ -701,6 +722,7 @@ class DeetCode {
     this.priorityQueueEngine =
       config.priorityQueueEngine || new DeetPriorityQueueEngine();
     this.directionMode = config.directionMode || "row";
+    this.labelMode = config.labelMode || false;
 
     const el = document.querySelector(config.selector);
 
@@ -712,6 +734,7 @@ class DeetCode {
     this.el.classList.add("deetcode");
     this.renderQueue = new Array();
     this.changeDirectionMode(this.directionMode);
+    this.changeLabelMode(this.labelMode);
   }
 
   startRenderLoop() {
@@ -734,6 +757,14 @@ class DeetCode {
       this.el.classList.remove("flex-col");
     }
     this.directionMode = mode;
+  }
+
+  changeLabelMode(mode: boolean) {
+    if (mode) {
+      this.el.classList.remove("deetcode-hide-labels");
+    } else {
+      this.el.classList.add("deetcode-hide-labels");
+    }
   }
 
   static enqueue(fn: Function) {

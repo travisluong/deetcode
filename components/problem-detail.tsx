@@ -53,10 +53,24 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
           break;
       }
 
+      let labelMode = false;
+      const labelModeStr = localStorage.getItem("deetcode-label-mode");
+      switch (labelModeStr) {
+        case "true":
+          labelMode = true;
+          break;
+        case "false":
+          labelMode = false;
+          break;
+        default:
+          break;
+      }
+
       const dcInstance = new dc.DeetCode({
         selector: "#deetcode",
         renderMode: renderMode,
         directionMode: directionMode,
+        labelMode: labelMode,
       });
       dc.DeetCode.setInstance(dcInstance);
       dc.DeetCode.instance.startRenderLoop();
