@@ -51,7 +51,7 @@ async function loadDataFromCSV() {
 
       try {
         const [results, fields] = await conn.query(
-          "INSERT INTO problems SET ?",
+          "INSERT INTO problems SET ? ON DUPLICATE KEY UPDATE id=id",
           data
         );
         console.log("Data inserted successfully");

@@ -26,15 +26,17 @@ async function loadDataFromCSV() {
       }
 
       catSet.add(category);
+      const slug = category.toLowerCase().replace(/\s+/g, "-");
 
       const newCategory = {
         name: category,
+        slug: slug,
       };
 
       try {
         // Insert data into MySQL table
         const [insertRes, insertFields] = await conn.query(
-          "INSERT INTO categories SET ?",
+          "INSERT INTO categories SET ? ON DUPLICATE KEY UPDATE id=id, position=position, slug=slug",
           newCategory
         );
         console.log("Data inserted successfully");
