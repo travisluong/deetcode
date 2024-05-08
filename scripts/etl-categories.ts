@@ -14,45 +14,28 @@ const conn = await mysql.createConnection(dbConfig);
 async function loadDataFromCSV() {
   const csvFilePath = process.argv[2];
 
+  const catSet = new Set();
+
   fs.createReadStream(csvFilePath)
     .pipe(csv())
     .on("data", async (row) => {
-      const leetcodeUrl = row["Link"];
-      const pathSegments = leetcodeUrl
-        .split("/")
-        .filter((segment: string) => segment !== "");
-      const lastSubpath = pathSegments[pathSegments.length - 1];
-
-      const difficultyMap = {
-        e: 1,
-        m: 2,
-        h: 3,
-      };
-
       const category = row["Category"];
 
-      const [categoryRes, fields] = await conn.execute(
-        "SELECT * FROM categories WHERE name = ?",
-        [category]
-      );
+      if (catSet.has(category)) {
+        return;
+      }
 
-      const data = {
-        neetcode_url: row["Video Solution"],
-        category_id: categoryRes[0].id,
-        name: row["Name"],
-        leetcode_url: row["Link"],
-        neetcode_notes: row["Notes"],
-        slug: lastSubpath,
-        //@ts-ignore
-        difficulty: difficultyMap[row["Difficulty"]],
+      catSet.add(category);
+
+      const newCategory = {
+        name: category,
       };
 
-      console.log(data);
-
       try {
-        const [results, fields] = await conn.query(
-          "INSERT INTO problems SET ?",
-          data
+        // Insert data into MySQL table
+        const [insertRes, insertFields] = await conn.query(
+          "INSERT INTO categories SET ?",
+          newCategory
         );
         console.log("Data inserted successfully");
       } catch (error) {
@@ -61,6 +44,7 @@ async function loadDataFromCSV() {
     })
     .on("end", () => {
       console.log("CSV file successfully processed");
+      // Close MySQL connection pool
       // pool.end();
     })
     .on("error", (error) => {
@@ -68,4 +52,5 @@ async function loadDataFromCSV() {
     });
 }
 
+// Load data from CSV into MySQL database
 loadDataFromCSV();
