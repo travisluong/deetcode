@@ -32,7 +32,7 @@ async function loadDataFromCSV() {
       const category = row["Category"];
 
       const [categoryRes, fields] = await conn.execute(
-        "SELECT * FROM categories WHERE name = ?",
+        "SELECT * FROM category WHERE name = ?",
         [category]
       );
 
@@ -51,7 +51,7 @@ async function loadDataFromCSV() {
 
       try {
         const [results, fields] = await conn.query(
-          "INSERT INTO problems SET ? ON DUPLICATE KEY UPDATE id=id",
+          "INSERT INTO problem SET ? ON DUPLICATE KEY UPDATE id=id",
           data
         );
         console.log("Data inserted successfully");

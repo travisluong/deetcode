@@ -1,3 +1,9 @@
-import { problems } from "./schema";
+import { category, problem } from "./schema";
 
-export type Problem = typeof problems.$inferSelect;
+export type ProblemDB = typeof problem.$inferSelect;
+export type CategoryDB = typeof category.$inferSelect;
+
+export type ProblemCategoryRow = {
+  problem: ProblemDB;
+  category: CategoryDB;
+};

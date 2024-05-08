@@ -1,7 +1,6 @@
 import DifficultyBadge from "@/components/difficulty-badge";
 import ProblemNav from "@/components/problem-nav";
-import { Badge } from "@/components/ui/badge";
-import { getProblem } from "@/lib/data";
+import { getCategory, getProblem } from "@/lib/data";
 import { notFound } from "next/navigation";
 
 export default async function Layout({
@@ -19,11 +18,21 @@ export default async function Layout({
     notFound();
   }
 
+  if (!problem.category_id) {
+    notFound();
+  }
+
+  const category = await getCategory(problem.category_id);
+
+  if (!category) {
+    notFound();
+  }
+
   return (
     <section className="flex flex-col h-full">
       <div className="flex items-center mx-5 mb-5 gap-14">
         <h1 className="font-sans font-bold text-xl">{problem.name}</h1>
-        <div>{problem.category}</div>
+        <div>{category.name}</div>
         <div>
           {problem.difficulty && (
             <DifficultyBadge difficulty={problem.difficulty} />

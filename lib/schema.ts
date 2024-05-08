@@ -9,28 +9,28 @@ import {
   unique,
 } from "drizzle-orm/mysql-core";
 
-export const problems = mysqlTable("problems", {
+export const problem = mysqlTable("problem", {
   id: char("id", { length: 36 })
     .primaryKey()
     .notNull()
     .default(sql`(uuid())`),
-  categoryId: char("category_id", { length: 36 }).references(
-    () => categories.id
+  category_id: char("category_id", { length: 36 }).references(
+    () => category.id
   ),
   name: varchar("name", { length: 255 }),
   slug: varchar("slug", { length: 255 }).unique().notNull(),
   difficulty: int("difficulty"),
-  leetcodeUrl: varchar("leetcode_url", { length: 255 }),
-  youtubeUrl: varchar("youtube_url", { length: 255 }),
-  neetcodeUrl: varchar("neetcode_url", { length: 255 }),
+  leetcode_url: varchar("leetcode_url", { length: 255 }),
+  youtube_url: varchar("youtube_url", { length: 255 }),
+  neetcode_url: varchar("neetcode_url", { length: 255 }),
   solution: text("solution"),
   notes: text("notes"),
-  neetcodeNotes: text("neetcode_notes"),
+  neetcode_notes: text("neetcode_notes"),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const categories = mysqlTable("categories", {
+export const category = mysqlTable("category", {
   id: char("id", { length: 36 })
     .primaryKey()
     .notNull()
@@ -42,7 +42,7 @@ export const categories = mysqlTable("categories", {
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const lists = mysqlTable("lists", {
+export const problem_list = mysqlTable("problem_list", {
   id: char("id", { length: 36 })
     .primaryKey()
     .notNull()
@@ -52,19 +52,19 @@ export const lists = mysqlTable("lists", {
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const problems_to_lists = mysqlTable(
-  "problems_to_lists",
+export const problem_to_list = mysqlTable(
+  "problem_to_list",
   {
-    problemId: char("problem_id", { length: 36 })
+    problem_id: char("problem_id", { length: 36 })
       .notNull()
-      .references(() => problems.id),
-    listId: char("list_id", { length: 36 })
+      .references(() => problem.id),
+    list_id: char("list_id", { length: 36 })
       .notNull()
-      .references(() => lists.id),
+      .references(() => problem_list.id),
     created_at: timestamp("created_at").notNull().defaultNow(),
     updated_at: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => ({
-    unq: unique().on(t.problemId, t.listId),
+    unq: unique().on(t.problem_id, t.list_id),
   })
 );

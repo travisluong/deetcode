@@ -36,7 +36,7 @@ async function loadDataFromCSV() {
       try {
         // Insert data into MySQL table
         const [insertRes, insertFields] = await conn.query(
-          "INSERT INTO categories SET ? ON DUPLICATE KEY UPDATE id=id, position=position, slug=slug",
+          "INSERT INTO category SET ? ON DUPLICATE KEY UPDATE id=id, slug=slug",
           newCategory
         );
         console.log("Data inserted successfully");

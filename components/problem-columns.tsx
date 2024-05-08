@@ -4,23 +4,12 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "./ui/button";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { Badge } from "./ui/badge";
-import { cn } from "@/lib/utils";
 import DifficultyBadge from "./difficulty-badge";
+import { ProblemCategoryRow } from "@/lib/types";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Problem = {
-  id: number;
-  name: string | null;
-  difficulty: number | null;
-  category: string | null;
-  slug: string;
-};
-
-export const columns: ColumnDef<Problem>[] = [
+export const columns: ColumnDef<ProblemCategoryRow>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "problem.name",
     header: ({ column }) => {
       return (
         <Button
@@ -33,16 +22,19 @@ export const columns: ColumnDef<Problem>[] = [
       );
     },
     cell: ({ row }) => {
-      const problem = row.original;
+      const problemCategory = row.original;
       return (
-        <Link className="hover:text-primary" href={`/problems/${problem.slug}`}>
-          {problem.name}
+        <Link
+          className="hover:text-primary"
+          href={`/problems/${problemCategory.problem.slug}`}
+        >
+          {problemCategory.problem.name}
         </Link>
       );
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.name",
     header: ({ column }) => {
       return (
         <Button
@@ -56,7 +48,7 @@ export const columns: ColumnDef<Problem>[] = [
     },
   },
   {
-    accessorKey: "difficulty",
+    accessorKey: "problem.difficulty",
     header: ({ column }) => {
       return (
         <Button
@@ -70,10 +62,10 @@ export const columns: ColumnDef<Problem>[] = [
     },
     cell: ({ row }) => {
       const original = row.original;
-      if (!original.difficulty) {
+      if (!original.problem.difficulty) {
         return "";
       }
-      return <DifficultyBadge difficulty={original.difficulty} />;
+      return <DifficultyBadge difficulty={original.problem.difficulty} />;
     },
   },
 ];
