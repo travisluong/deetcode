@@ -26,6 +26,15 @@ export default function Header() {
             Problems
           </Link>
           <Link
+            href="/problem-list/blind-75"
+            className={cn(
+              "hover:text-primary",
+              pathname === "/problem-list/blind-75" && "text-primary"
+            )}
+          >
+            Blind 75
+          </Link>
+          <Link
             href="/playground"
             className={cn(
               "hover:text-primary",
