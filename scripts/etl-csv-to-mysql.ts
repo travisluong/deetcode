@@ -37,6 +37,7 @@ async function loadDataFromCSV() {
       );
 
       const data = {
+        id: crypto.randomUUID(),
         neetcode_url: row["Video Solution"],
         category_id: categoryRes[0].id,
         name: row["Name"],

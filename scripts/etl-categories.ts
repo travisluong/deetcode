@@ -29,6 +29,7 @@ async function loadDataFromCSV() {
       const slug = category.toLowerCase().replace(/\s+/g, "-");
 
       const newCategory = {
+        id: crypto.randomUUID(),
         name: category,
         slug: slug,
       };

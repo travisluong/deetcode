@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import {
   int,
   mysqlTable,
@@ -13,7 +12,7 @@ export const problem = mysqlTable("problem", {
   id: char("id", { length: 36 })
     .primaryKey()
     .notNull()
-    .default(sql`(uuid())`),
+    .$defaultFn(() => crypto.randomUUID()),
   category_id: char("category_id", { length: 36 }).references(
     () => category.id
   ),
@@ -34,7 +33,7 @@ export const category = mysqlTable("category", {
   id: char("id", { length: 36 })
     .primaryKey()
     .notNull()
-    .default(sql`(uuid())`),
+    .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
   slug: varchar("slug", { length: 255 }).unique(),
   position: int("position"),
@@ -46,7 +45,7 @@ export const problem_list = mysqlTable("problem_list", {
   id: char("id", { length: 36 })
     .primaryKey()
     .notNull()
-    .default(sql`(uuid())`),
+    .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
