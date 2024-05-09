@@ -7,17 +7,6 @@ import {
   PriorityQueue as PriorityQueueB,
 } from "@datastructures-js/priority-queue";
 
-interface DC {
-  DeetSet: typeof DeetSet;
-  DeetMap: typeof DeetMap;
-  DeetArray: typeof DeetArray;
-  DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
-  DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
-  DeetPriorityQueue: typeof DeetPriorityQueue;
-  DeetCode: typeof DeetCode;
-  DeetSetEngine: typeof DeetSetEngine;
-}
-
 declare global {
   interface Window {
     dcInstance: DeetCode;
@@ -33,6 +22,35 @@ declare global {
   }
 }
 
+interface DC {
+  DeetSet: typeof DeetSet;
+  DeetMap: typeof DeetMap;
+  DeetArray: typeof DeetArray;
+  DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
+  DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
+  DeetPriorityQueue: typeof DeetPriorityQueue;
+  DeetCode: typeof DeetCode;
+  DeetSetEngine: typeof DeetSetEngine;
+}
+
+interface VisualizeIndexObj {
+  [key: string]: number;
+}
+
+interface DeetConfig {
+  selector: string;
+  renderMode?: RenderMode;
+  setEngine?: DeetSetEngine;
+  mapEngine?: DeetMapEngine;
+  arrayEngine?: DeetArrayEngine;
+  minPriorityQueueEngine?: DeetMinPriorityQueueEngine;
+  maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
+  priorityQueueEngine?: DeetPriorityQueueEngine;
+  directionMode?: DirectionMode;
+  labelMode?: boolean;
+  animationDelay?: number;
+}
+
 type NativeDataStructure =
   | Set<any>
   | Map<any, any>
@@ -40,6 +58,7 @@ type NativeDataStructure =
   | MinPriorityQueueB<any>
   | MaxPriorityQueueB<any>
   | PriorityQueueB<any>;
+
 type DeetDataStructure =
   | DeetSet
   | DeetMap<any, any>
@@ -48,9 +67,9 @@ type DeetDataStructure =
   | DeetMaxPriorityQueue
   | DeetPriorityQueue;
 
-interface VisualizeIndexObj {
-  [key: string]: number;
-}
+type RenderMode = "animate" | "debug";
+
+type DirectionMode = "row" | "column";
 
 abstract class DeetEngine {
   abstract transformDeetToNative(
@@ -780,23 +799,6 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
   static undoMonkeyPatch() {
     window.PriorityQueue = this.originalPriorityQueue!;
   }
-}
-
-type RenderMode = "animate" | "debug";
-type DirectionMode = "row" | "column";
-
-interface DeetConfig {
-  selector: string;
-  renderMode?: RenderMode;
-  setEngine?: DeetSetEngine;
-  mapEngine?: DeetMapEngine;
-  arrayEngine?: DeetArrayEngine;
-  minPriorityQueueEngine?: DeetMinPriorityQueueEngine;
-  maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
-  priorityQueueEngine?: DeetPriorityQueueEngine;
-  directionMode?: DirectionMode;
-  labelMode?: boolean;
-  animationDelay?: number;
 }
 
 class DeetCode {
