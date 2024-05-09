@@ -47,6 +47,7 @@ export const problem_list = mysqlTable("problem_list", {
     .notNull()
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
+  slug: varchar("slug", { length: 255 }).unique(),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
 });
