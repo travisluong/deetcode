@@ -6,7 +6,6 @@ import {
   MinPriorityQueue as MinPriorityQueueB,
   PriorityQueue as PriorityQueueB,
 } from "@datastructures-js/priority-queue";
-import assert from "assert";
 
 declare global {
   interface Window {
