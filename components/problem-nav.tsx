@@ -1,13 +1,13 @@
 "use client";
 
-import { Problem } from "@/lib/types";
+import { ProblemDB } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Link2Icon, OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Toolbar from "./toolbar";
 
-export default function ProblemNav({ problem }: { problem: Problem }) {
+export default function ProblemNav({ problem }: { problem: ProblemDB }) {
   const pathname = usePathname();
   const { slug } = problem;
 
@@ -41,7 +41,7 @@ export default function ProblemNav({ problem }: { problem: Problem }) {
           )}
           href={`/problems/${slug}/notes`}
         >
-          Notes
+          Deetails
         </Link>
         <Link
           className={cn(
