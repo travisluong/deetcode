@@ -1,9 +1,9 @@
 "use client";
 
-import { Problem } from "@/lib/types";
+import { ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
 import { MouseEvent, useEffect, useRef } from "react";
-import dc from "@/lib/deetcode";
+import dc, { DirectionMode, RenderMode } from "@/lib/deetcode";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -17,11 +17,7 @@ import {
   MaxPriorityQueue,
 } from "@datastructures-js/priority-queue";
 
-// TODO: MOVE SHARED TYPES INTO PROPER FILE
-type RenderMode = "animate" | "debug";
-type DirectionMode = "row" | "column";
-
-export default function ProblemDetail({ problem }: { problem: Problem }) {
+export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
 
@@ -46,7 +42,7 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
         case "row":
           directionMode = "row";
           break;
-        case "col":
+        case "column":
           directionMode = "column";
           break;
         default:
@@ -80,6 +76,9 @@ export default function ProblemDetail({ problem }: { problem: Problem }) {
       });
       dc.DeetCode.setInstance(dcInstance);
       dc.DeetCode.instance.startRenderLoop();
+
+      window.Deet = dc.Deet;
+
       // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = dc.DeetSet;
       window.DeetMap = dc.DeetMap;

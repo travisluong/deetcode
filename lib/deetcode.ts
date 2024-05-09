@@ -19,10 +19,11 @@ declare global {
     MinPriorityQueue: typeof MinPriorityQueueB;
     MaxPriorityQueue: typeof MaxPriorityQueueB;
     PriorityQueue: typeof PriorityQueueB;
+    Deet: typeof Deet;
   }
 }
 
-interface DC {
+export interface DC {
   DeetSet: typeof DeetSet;
   DeetMap: typeof DeetMap;
   DeetArray: typeof DeetArray;
@@ -31,13 +32,14 @@ interface DC {
   DeetPriorityQueue: typeof DeetPriorityQueue;
   DeetCode: typeof DeetCode;
   DeetSetEngine: typeof DeetSetEngine;
+  Deet: typeof Deet;
 }
 
-interface VisualizeIndexObj {
+export interface VisualizeIndexObj {
   [key: string]: number;
 }
 
-interface DeetConfig {
+export interface DeetConfig {
   selector: string;
   renderMode?: RenderMode;
   setEngine?: DeetSetEngine;
@@ -51,7 +53,7 @@ interface DeetConfig {
   animationDelay?: number;
 }
 
-type NativeDataStructure =
+export type NativeDataStructure =
   | Set<any>
   | Map<any, any>
   | Array<any>
@@ -59,7 +61,7 @@ type NativeDataStructure =
   | MaxPriorityQueueB<any>
   | PriorityQueueB<any>;
 
-type DeetDataStructure =
+export type DeetDataStructure =
   | DeetSet
   | DeetMap<any, any>
   | DeetArray
@@ -67,9 +69,9 @@ type DeetDataStructure =
   | DeetMaxPriorityQueue
   | DeetPriorityQueue;
 
-type RenderMode = "animate" | "debug";
+export type RenderMode = "animate" | "debug";
 
-type DirectionMode = "row" | "column";
+export type DirectionMode = "row" | "column";
 
 abstract class DeetEngine {
   abstract transformDeetToNative(
@@ -573,6 +575,7 @@ class DeetArray extends Array {
   }
 
   visIndex(obj: VisualizeIndexObj) {
+    throw new Error("this method is deprecated in favor of Deet.visIndex");
     this.engine.renderIndexFork(this, obj);
   }
 
@@ -919,6 +922,14 @@ class DeetCode {
   }
 }
 
+class Deet {
+  static assert() {}
+
+  static visIndex(instance: DeetArray, obj: VisualizeIndexObj) {
+    instance.engine.renderIndexFork(instance, obj);
+  }
+}
+
 const dc: DC = {
   DeetSet: DeetSet,
   DeetMap: DeetMap,
@@ -928,6 +939,7 @@ const dc: DC = {
   DeetPriorityQueue: DeetPriorityQueue,
   DeetCode: DeetCode,
   DeetSetEngine: DeetSetEngine,
+  Deet: Deet,
 };
 
 export default dc;
