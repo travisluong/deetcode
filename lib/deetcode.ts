@@ -380,7 +380,13 @@ class DeetArrayEngine extends DeetEngine {
       const th = document.createElement("th");
       const td = document.createElement("td");
       th.innerHTML = index.toString();
-      td.innerHTML = value;
+      if (value) {
+        td.innerHTML = value;
+      } else {
+        const div = document.createElement("div");
+        div.style.height = "25px";
+        td.appendChild(div);
+      }
       trHead.append(th);
       trBody.append(td);
     }
