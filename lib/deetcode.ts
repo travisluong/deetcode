@@ -48,6 +48,10 @@ type DeetDataStructure =
   | DeetMaxPriorityQueue
   | DeetPriorityQueue;
 
+interface VisualizeIndexObj {
+  [key: string]: number;
+}
+
 abstract class DeetEngine {
   abstract transformDeetToNative(
     instance: DeetDataStructure
@@ -383,6 +387,44 @@ class DeetArrayEngine extends DeetEngine {
     return table;
   }
 
+  renderIndexFork(instance: DeetArray, obj: VisualizeIndexObj) {
+    const fn = () => this.renderIndex(instance, obj);
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
+  }
+
+  renderIndex(instance: DeetArray, obj: VisualizeIndexObj) {
+    const table = instance.container.querySelector("table");
+    let tfoot = table?.querySelector("tfoot");
+    if (!tfoot) {
+      tfoot = document.createElement("tfoot");
+      table?.appendChild(tfoot);
+    }
+    tfoot.innerHTML = "";
+    const arr = this.transformDeetToNative(instance);
+    for (const [key, value] of Object.entries(obj)) {
+      const tr = document.createElement("tr");
+      for (let i = 0; i < arr.length; i++) {
+        const th = document.createElement("th");
+        if (i === value) {
+          th.innerHTML = key;
+        } else {
+          th.innerHTML = '<div style="height: 25px"></div>';
+        }
+        tr.appendChild(th);
+      }
+      tfoot.appendChild(tr);
+    }
+  }
+
   render2d(arr: Array<Array<any>>) {
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -440,6 +482,10 @@ class DeetArray extends Array {
       get(target, key: any) {
         if (key === "__isProxy") {
           return true;
+        } else if (target[key] instanceof HTMLElement) {
+          return target[key];
+        } else if (target[key] instanceof DeetArrayEngine) {
+          return target[key];
         } else if (typeof target[key] === "object") {
           return new Proxy(target[key], this);
         } else {
@@ -499,6 +545,10 @@ class DeetArray extends Array {
     this.engine.renderFork(this);
     this.renderEnabled = true;
     return res;
+  }
+
+  visualizeIndex(obj: VisualizeIndexObj) {
+    this.engine.renderIndexFork(this, obj);
   }
 
   static monkeyPatch() {
