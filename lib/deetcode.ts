@@ -6,6 +6,7 @@ import {
   MinPriorityQueue as MinPriorityQueueB,
   PriorityQueue as PriorityQueueB,
 } from "@datastructures-js/priority-queue";
+import assert from "assert";
 
 declare global {
   interface Window {
@@ -923,7 +924,31 @@ class DeetCode {
 }
 
 class Deet {
-  static assert() {}
+  static assert(actual: any, expected: any) {
+    const fn = () => {
+      const div = document.createElement("div");
+      div.classList.add("deet-assert");
+      if (actual == expected) {
+        div.classList.add("deet-assert-pass");
+        div.innerHTML = `Assertion passed. Actual: ${actual}. Expected: ${expected}`;
+        DeetCode.instance.el.appendChild(div);
+      } else {
+        div.classList.add("deet-assert-fail");
+        div.innerHTML = `Assertion failed. Actual: ${actual}. Expected: ${expected}`;
+        DeetCode.instance.el.appendChild(div);
+      }
+    };
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
+  }
 
   static visIndex(instance: DeetArray, obj: VisualizeIndexObj) {
     instance.engine.renderIndexFork(instance, obj);
