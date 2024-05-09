@@ -553,7 +553,7 @@ class DeetArray extends Array {
     return res;
   }
 
-  visualizeIndex(obj: VisualizeIndexObj) {
+  visIndex(obj: VisualizeIndexObj) {
     this.engine.renderIndexFork(this, obj);
   }
 
