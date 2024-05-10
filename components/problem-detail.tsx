@@ -145,8 +145,19 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
         className="min-h-[200px] rounded-lg border"
       >
         <ResizablePanel defaultSize={50}>
+          <div className="flex h-full items-center justify-center p-6">
+            <div id="deetcode"></div>
+          </div>
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={50}>
           <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
             <div className="flex flex-col gap-5 h-full w-full flex-grow">
+              <div className="flex px-5 pt-5 justify-end">
+                <Button className="cursor-pointer" onClick={handleSubmit}>
+                  Submit
+                </Button>
+              </div>
               <Editor
                 height="100%"
                 width="100%"
@@ -156,18 +167,7 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
                 theme={theme === "light" ? "vs-light" : "vs-dark"}
                 options={{ minimap: { enabled: false } }}
               />
-              <div className="p-5">
-                <Button className="cursor-pointer" onClick={handleSubmit}>
-                  Submit
-                </Button>
-              </div>
             </div>
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={50}>
-          <div className="flex h-full items-center justify-center p-6">
-            <div id="deetcode"></div>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
