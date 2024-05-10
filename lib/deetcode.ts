@@ -1,4 +1,5 @@
 "use client";
+import { isEqual } from "lodash";
 
 import {
   ICompare,
@@ -19,7 +20,8 @@ declare global {
     MinPriorityQueue: typeof MinPriorityQueueB;
     MaxPriorityQueue: typeof MaxPriorityQueueB;
     PriorityQueue: typeof PriorityQueueB;
-    Deet: typeof Deet;
+    DeetTest: typeof DeetTest;
+    DeetVis: typeof DeetVis;
   }
 }
 
@@ -837,6 +839,7 @@ export class DeetCode {
     this.renderQueue = new Array();
     this.changeDirectionMode(this.directionMode);
     this.changeLabelMode(this.labelMode);
+    this.changeAnimationDelay(this.animationDelay);
   }
 
   startRenderLoop() {
@@ -910,18 +913,22 @@ export class DeetCode {
   }
 }
 
-export class Deet {
-  static assert(actual: any, expected: any) {
+export class DeetTest {
+  static isEqual(actual: any, expected: any) {
     const fn = () => {
       const div = document.createElement("div");
       div.classList.add("deet-assert");
-      if (actual == expected) {
+      if (isEqual(actual, expected)) {
         div.classList.add("deet-assert-pass");
-        div.innerHTML = `Assertion passed. Actual: ${actual}. Expected: ${expected}`;
+        div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
+          actual
+        )}<br>Expected: ${JSON.stringify(expected)}`;
         DeetCode.instance.el.appendChild(div);
       } else {
         div.classList.add("deet-assert-fail");
-        div.innerHTML = `Assertion failed. Actual: ${actual}. Expected: ${expected}`;
+        div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
+          actual
+        )}<br>Expected: ${JSON.stringify(expected)}`;
         DeetCode.instance.el.appendChild(div);
       }
     };
@@ -936,8 +943,10 @@ export class Deet {
         break;
     }
   }
+}
 
-  static visIndex(instance: DeetArray, obj: VisualizeIndexObj) {
+export class DeetVis {
+  static index(instance: DeetArray, obj: VisualizeIndexObj) {
     instance.engine.renderIndexFork(instance, obj);
   }
 }

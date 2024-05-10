@@ -4,7 +4,6 @@ import { ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
 import { MouseEvent, useEffect, useRef } from "react";
 import {
-  Deet,
   DeetArray,
   DeetCode,
   DeetMap,
@@ -12,6 +11,8 @@ import {
   DeetMinPriorityQueue,
   DeetPriorityQueue,
   DeetSet,
+  DeetTest,
+  DeetVis,
   DirectionMode,
   RenderMode,
 } from "@/lib/deetcode";
@@ -88,7 +89,8 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
       DeetCode.setInstance(dcInstance);
       DeetCode.instance.startRenderLoop();
 
-      window.Deet = Deet;
+      window.DeetTest = DeetTest;
+      window.DeetVis = DeetVis;
 
       // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = DeetSet;
