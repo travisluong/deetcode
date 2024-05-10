@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "./ui/input";
-import dc from "@/lib/deetcode";
+import { DeetCode } from "@/lib/deetcode";
 
 export default function AnimationDelayInput() {
   const [delay, setDelay] = useState<number>(1000);
@@ -10,16 +10,17 @@ export default function AnimationDelayInput() {
   useEffect(() => {
     const animationDelayStr = localStorage.getItem("deetcode-animation-delay");
     setDelay(parseInt(animationDelayStr || "1000"));
-  });
+  }, []);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const delayStr = e.target.value;
+
     if (!delayStr) {
       return;
     }
     const delay = parseInt(e.target.value);
     localStorage.setItem("deetcode-animation-delay", delayStr);
-    dc.DeetCode.instance.changeAnimationDelay(delay);
+    DeetCode.instance.changeAnimationDelay(delay);
     setDelay(delay);
   }
 

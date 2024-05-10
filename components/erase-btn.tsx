@@ -2,7 +2,7 @@
 
 import { CodeIcon, EraserIcon, TableIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
-import dc from "@/lib/deetcode";
+import { DeetCode } from "@/lib/deetcode";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +12,7 @@ import {
 
 export default function EraseBtn() {
   function handleClearVisual() {
-    dc.DeetCode.instance.erase();
+    DeetCode.instance.erase();
   }
 
   function handleClearCode() {

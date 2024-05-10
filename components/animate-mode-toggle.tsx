@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dc from "@/lib/deetcode";
+import { DeetCode } from "@/lib/deetcode";
 import { Button } from "./ui/button";
-import { Crosshair2Icon, PlayIcon, VideoIcon } from "@radix-ui/react-icons";
+import { Crosshair2Icon, PlayIcon } from "@radix-ui/react-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,10 +33,10 @@ export default function AnimateModeToggle() {
   function handleClick(mode: RenderMode) {
     setMode(mode);
     if (mode === "animate") {
-      dc.DeetCode.instance.changeRenderMode("animate");
+      DeetCode.instance.changeRenderMode("animate");
       localStorage.setItem("deetcode-render-mode", "animate");
     } else {
-      dc.DeetCode.instance.changeRenderMode("debug");
+      DeetCode.instance.changeRenderMode("debug");
       localStorage.setItem("deetcode-render-mode", "debug");
     }
   }

@@ -23,23 +23,11 @@ declare global {
   }
 }
 
-export interface DC {
-  DeetSet: typeof DeetSet;
-  DeetMap: typeof DeetMap;
-  DeetArray: typeof DeetArray;
-  DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
-  DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
-  DeetPriorityQueue: typeof DeetPriorityQueue;
-  DeetCode: typeof DeetCode;
-  DeetSetEngine: typeof DeetSetEngine;
-  Deet: typeof Deet;
-}
-
-export interface VisualizeIndexObj {
+interface VisualizeIndexObj {
   [key: string]: number;
 }
 
-export interface DeetConfig {
+interface DeetConfig {
   selector: string;
   renderMode?: RenderMode;
   setEngine?: DeetSetEngine;
@@ -53,7 +41,7 @@ export interface DeetConfig {
   animationDelay?: number;
 }
 
-export type NativeDataStructure =
+type NativeDataStructure =
   | Set<any>
   | Map<any, any>
   | Array<any>
@@ -61,7 +49,7 @@ export type NativeDataStructure =
   | MaxPriorityQueueB<any>
   | PriorityQueueB<any>;
 
-export type DeetDataStructure =
+type DeetDataStructure =
   | DeetSet
   | DeetMap<any, any>
   | DeetArray
@@ -182,7 +170,7 @@ class DeetSetEngine extends DeetEngine {
   }
 }
 
-class DeetSet extends Set {
+export class DeetSet extends Set {
   container: HTMLElement;
   engine: DeetSetEngine;
   static originalSet?: SetConstructor;
@@ -273,7 +261,7 @@ class DeetMapEngine extends DeetEngine {
   }
 }
 
-class DeetMap<K, V> extends Map<K, V> {
+export class DeetMap<K, V> extends Map<K, V> {
   container: HTMLElement;
   engine: DeetMapEngine;
   static originalMap?: MapConstructor;
@@ -493,7 +481,7 @@ class DeetArrayEngine extends DeetEngine {
   }
 }
 
-class DeetArray extends Array {
+export class DeetArray extends Array {
   container: HTMLElement;
   engine: DeetArrayEngine;
   renderEnabled: boolean = false;
@@ -620,7 +608,7 @@ class DeetMinPriorityQueueEngine extends DeetEngine {
   }
 }
 
-class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
+export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
   container: HTMLElement;
   engine: DeetMinPriorityQueueEngine;
   static originalMinPriorityQueue?: typeof MinPriorityQueueB;
@@ -684,7 +672,7 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
   }
 }
 
-class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
+export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
   engine: DeetMaxPriorityQueueEngine;
   container: HTMLElement;
   static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
@@ -750,7 +738,7 @@ class DeetPriorityQueueEngine extends DeetEngine {
   }
 }
 
-class DeetPriorityQueue extends PriorityQueueB<any> {
+export class DeetPriorityQueue extends PriorityQueueB<any> {
   engine: DeetPriorityQueueEngine;
   container: HTMLElement;
   static originalPriorityQueue?: typeof PriorityQueueB;
@@ -804,7 +792,7 @@ class DeetPriorityQueue extends PriorityQueueB<any> {
   }
 }
 
-class DeetCode {
+export class DeetCode {
   el: Element;
   renderQueue: Array<Function>;
   selector: string;
@@ -922,7 +910,7 @@ class DeetCode {
   }
 }
 
-class Deet {
+export class Deet {
   static assert(actual: any, expected: any) {
     const fn = () => {
       const div = document.createElement("div");
@@ -953,17 +941,3 @@ class Deet {
     instance.engine.renderIndexFork(instance, obj);
   }
 }
-
-const dc: DC = {
-  DeetSet: DeetSet,
-  DeetMap: DeetMap,
-  DeetArray: DeetArray,
-  DeetMinPriorityQueue: DeetMinPriorityQueue,
-  DeetMaxPriorityQueue: DeetMaxPriorityQueue,
-  DeetPriorityQueue: DeetPriorityQueue,
-  DeetCode: DeetCode,
-  DeetSetEngine: DeetSetEngine,
-  Deet: Deet,
-};
-
-export default dc;

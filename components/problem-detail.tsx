@@ -3,7 +3,18 @@
 import { ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
 import { MouseEvent, useEffect, useRef } from "react";
-import dc, { DirectionMode, RenderMode } from "@/lib/deetcode";
+import {
+  Deet,
+  DeetArray,
+  DeetCode,
+  DeetMap,
+  DeetMaxPriorityQueue,
+  DeetMinPriorityQueue,
+  DeetPriorityQueue,
+  DeetSet,
+  DirectionMode,
+  RenderMode,
+} from "@/lib/deetcode";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -67,25 +78,25 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
       );
       const animationDelay = parseInt(animationDelayStr || "1000");
 
-      const dcInstance = new dc.DeetCode({
+      const dcInstance = new DeetCode({
         selector: "#deetcode",
         renderMode: renderMode,
         directionMode: directionMode,
         labelMode: labelMode,
         animationDelay: animationDelay,
       });
-      dc.DeetCode.setInstance(dcInstance);
-      dc.DeetCode.instance.startRenderLoop();
+      DeetCode.setInstance(dcInstance);
+      DeetCode.instance.startRenderLoop();
 
-      window.Deet = dc.Deet;
+      window.Deet = Deet;
 
       // these declarations are only necessary if we want to use the Deet classes in the editor
-      window.DeetSet = dc.DeetSet;
-      window.DeetMap = dc.DeetMap;
-      window.DeetArray = dc.DeetArray;
-      window.DeetMinPriorityQueue = dc.DeetMinPriorityQueue;
-      window.DeetMaxPriorityQueue = dc.DeetMaxPriorityQueue;
-      window.DeetPriorityQueue = dc.DeetPriorityQueue;
+      window.DeetSet = DeetSet;
+      window.DeetMap = DeetMap;
+      window.DeetArray = DeetArray;
+      window.DeetMinPriorityQueue = DeetMinPriorityQueue;
+      window.DeetMaxPriorityQueue = DeetMaxPriorityQueue;
+      window.DeetPriorityQueue = DeetPriorityQueue;
       window.MinPriorityQueue = MinPriorityQueue;
       window.MaxPriorityQueue = MaxPriorityQueue;
     }
@@ -114,12 +125,12 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
     const code = editorRef.current.getValue();
     console.log(code);
     try {
-      dc.DeetCode.monkeyPatchAll();
+      DeetCode.monkeyPatchAll();
       eval(code);
     } catch (error) {
       console.error(error);
     } finally {
-      dc.DeetCode.undoMonkeyPatchAll();
+      DeetCode.undoMonkeyPatchAll();
     }
   }
 
