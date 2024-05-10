@@ -1,5 +1,5 @@
 "use client";
-import { isEqual } from "lodash";
+import _ from "lodash";
 
 import {
   ICompare,
@@ -914,11 +914,11 @@ export class DeetCode {
 }
 
 export class DeetTest {
-  static isEqual(actual: any, expected: any) {
+  static equal(actual: any, expected: any) {
     const fn = () => {
       const div = document.createElement("div");
       div.classList.add("deet-assert");
-      if (isEqual(actual, expected)) {
+      if (_.isEqual(actual, expected)) {
         div.classList.add("deet-assert-pass");
         div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
           actual
