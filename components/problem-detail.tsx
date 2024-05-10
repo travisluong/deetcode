@@ -28,6 +28,7 @@ import {
   MinPriorityQueue,
   MaxPriorityQueue,
 } from "@datastructures-js/priority-queue";
+import _ from "lodash";
 
 export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
   const editorRef = useRef(null);
@@ -91,6 +92,7 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
 
       window.DeetTest = DeetTest;
       window.DeetVis = DeetVis;
+      window._ = _;
 
       // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = DeetSet;
