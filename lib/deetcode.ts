@@ -67,7 +67,7 @@ abstract class DeetEngine {
   abstract transformDeetToNative(
     instance: DeetDataStructure
   ): NativeDataStructure;
-  abstract render(instance: NativeDataStructure, container: HTMLElement): void;
+  abstract render(instance: NativeDataStructure): HTMLElement;
   renderFork(instance: DeetDataStructure) {
     // fix the duplicate rendering of array
     // the proxy is hit first and then the real object
@@ -89,11 +89,15 @@ abstract class DeetEngine {
   }
   renderDelayed(instance: DeetDataStructure): void {
     const nativeCopy = this.transformDeetToNative(instance);
-    const fn = () => this.render(nativeCopy, instance.container);
+    const fn = () => {
+      const el = this.render(nativeCopy);
+      instance.container.innerHTML = el.outerHTML;
+    };
     DeetCode.enqueue(fn);
   }
   renderNow(instance: DeetDataStructure) {
-    this.render(instance, instance.container);
+    const el = this.render(instance);
+    instance.container.innerHTML = el.outerHTML;
   }
   renderContainer(instance: DeetDataStructure): HTMLElement {
     const div = document.createElement("div");
@@ -157,8 +161,8 @@ class DeetSetEngine extends DeetEngine {
     }
     return copy;
   }
-  render(nativeInstance: Set<any>, container: HTMLElement) {
-    container.innerHTML = "";
+  render(nativeInstance: Set<any>): HTMLElement {
+    const div = document.createElement("div");
     const ul = document.createElement("ul");
     for (const item of nativeInstance) {
       const li = document.createElement("li");
@@ -167,8 +171,9 @@ class DeetSetEngine extends DeetEngine {
     }
     const label = document.createElement("label");
     label.innerHTML = "Set";
-    container.appendChild(label);
-    container.appendChild(ul);
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
   }
 }
 
@@ -227,8 +232,8 @@ class DeetMapEngine extends DeetEngine {
     }
     return copy;
   }
-  render(nativeInstance: Map<any, any>, container: HTMLElement): void {
-    container.innerHTML = "";
+  render(nativeInstance: Map<any, any>): HTMLElement {
+    const div = document.createElement("div");
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const tr = document.createElement("tr");
@@ -258,8 +263,9 @@ class DeetMapEngine extends DeetEngine {
     const label = document.createElement("label");
     label.innerHTML = "Map";
 
-    container.append(label);
-    container.append(table);
+    div.append(label);
+    div.append(table);
+    return div;
   }
 }
 
@@ -352,21 +358,22 @@ class DeetArrayEngine extends DeetEngine {
     }
   }
 
-  render(nativeArr: Array<any>, container: HTMLElement): void {
-    container.innerHTML = "";
+  render(nativeArr: Array<any>): HTMLElement {
+    const div = document.createElement("div");
     const label = document.createElement("label");
     label.innerHTML = "Array";
-    container.innerHTML = label.outerHTML;
+    div.innerHTML = label.outerHTML;
     if (nativeArr.length === 0) {
-      return;
+      return div;
     }
     if (this.is2DArray(nativeArr)) {
       const el = this.render2d(nativeArr);
-      container.innerHTML += el.outerHTML;
+      div.innerHTML += el.outerHTML;
     } else {
       const el = this.render1d(nativeArr);
-      container.innerHTML += el.outerHTML;
+      div.innerHTML += el.outerHTML;
     }
+    return div;
   }
 
   is2DArray(arr: any) {
@@ -599,12 +606,11 @@ class DeetMinPriorityQueueEngine extends DeetEngine {
   // override renderNow since we need an array copy
   renderNow(instance: DeetMinPriorityQueue): void {
     const arr = this.transformDeetToNative(instance);
-    this.render(arr, instance.container);
+    const el = this.render(arr);
+    instance.container.innerHTML = el.outerHTML;
   }
-  render(arr: Array<any>, container: HTMLElement): void {
-    if (container) {
-      container.innerHTML = "";
-    }
+  render(arr: Array<any>): HTMLElement {
+    const div = document.createElement("div");
     const ul = document.createElement("ul");
     for (const item of arr) {
       const li = document.createElement("li");
@@ -613,8 +619,9 @@ class DeetMinPriorityQueueEngine extends DeetEngine {
     }
     const label = document.createElement("label");
     label.innerHTML = "MinPriorityQueue";
-    container.appendChild(label);
-    container.appendChild(ul);
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
   }
 }
 
@@ -663,12 +670,11 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
   // override renderNow since we need an array copy
   renderNow(instance: DeetMaxPriorityQueue): void {
     const arr = this.transformDeetToNative(instance);
-    this.render(arr, instance.container);
+    const el = this.render(arr);
+    instance.container.innerHTML = el.outerHTML;
   }
-  render(arr: NativeDataStructure, container: HTMLElement): void {
-    if (container) {
-      container.innerHTML = "";
-    }
+  render(arr: NativeDataStructure): HTMLElement {
+    const div = document.createElement("div");
     const ul = document.createElement("ul");
     for (const item of arr) {
       const li = document.createElement("li");
@@ -677,8 +683,9 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
     }
     const label = document.createElement("label");
     label.innerHTML = "MaxPriorityQueue";
-    container.appendChild(label);
-    container.appendChild(ul);
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
   }
 }
 
@@ -725,12 +732,11 @@ class DeetPriorityQueueEngine extends DeetEngine {
   // override renderNow since we need an array copy
   renderNow(instance: DeetPriorityQueue): void {
     const arr = this.transformDeetToNative(instance);
-    this.render(arr, instance.container);
+    const el = this.render(arr);
+    instance.container.innerHTML = el.outerHTML;
   }
-  render(arr: NativeDataStructure, container: HTMLElement): void {
-    if (container) {
-      container.innerHTML = "";
-    }
+  render(arr: NativeDataStructure): HTMLElement {
+    const div = document.createElement("div");
     const ul = document.createElement("ul");
     for (const item of arr) {
       const li = document.createElement("li");
@@ -743,8 +749,9 @@ class DeetPriorityQueueEngine extends DeetEngine {
     }
     const label = document.createElement("label");
     label.innerHTML = "PriorityQueue";
-    container.appendChild(label);
-    container.appendChild(ul);
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
   }
 }
 
