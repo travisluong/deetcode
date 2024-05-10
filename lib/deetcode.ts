@@ -266,6 +266,7 @@ class DeetMapEngine extends DeetEngine {
 export class DeetMap<K, V> extends Map<K, V> {
   container: HTMLElement;
   engine: DeetMapEngine;
+  renderEnabled: boolean;
   static originalMap?: MapConstructor;
 
   /**
@@ -276,6 +277,7 @@ export class DeetMap<K, V> extends Map<K, V> {
    */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
+    this.renderEnabled = false;
     this.engine = DeetCode.instance.mapEngine;
     this.container = this.engine.renderContainer(this);
     if (iterable) {
@@ -283,6 +285,8 @@ export class DeetMap<K, V> extends Map<K, V> {
         this.set(key, value);
       }
     }
+    this.renderEnabled = true;
+    this.engine.renderFork(this);
   }
 
   has(value: any): boolean {
@@ -291,13 +295,17 @@ export class DeetMap<K, V> extends Map<K, V> {
 
   set(key: any, value: any): any {
     const res = super.set(key, value);
-    this.engine.renderFork(this);
+    if (this.renderEnabled) {
+      this.engine.renderFork(this);
+    }
     return res;
   }
 
   delete(key: any): any {
     const res = super.delete(key);
-    this.engine.renderFork(this);
+    if (this.renderEnabled) {
+      this.engine.renderFork(this);
+    }
     return res;
   }
 
