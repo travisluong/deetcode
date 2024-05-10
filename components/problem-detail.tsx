@@ -152,8 +152,8 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={50}>
           <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
-            <div className="flex flex-col gap-5 h-full w-full flex-grow">
-              <div className="flex px-5 pt-5 justify-end">
+            <div className="flex flex-col gap-2 h-full w-full flex-grow">
+              <div className="flex px-5 pt-2 justify-end">
                 <Button className="cursor-pointer" onClick={handleSubmit}>
                   Submit
                 </Button>
