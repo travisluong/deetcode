@@ -811,7 +811,7 @@ export class DeetPriorityQueue extends PriorityQueueB<any> {
 
 export class DeetCode {
   el: Element;
-  renderQueue: Array<Function>;
+  renderQueue: Array<() => void>;
   selector: string;
   renderMode: RenderMode;
   setEngine: DeetSetEngine;
@@ -901,7 +901,7 @@ export class DeetCode {
     this.el.innerHTML = "";
   }
 
-  static enqueue(fn: Function) {
+  static enqueue(fn: () => void) {
     DeetCode.instance.renderQueue.push(fn);
   }
 
