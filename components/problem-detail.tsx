@@ -14,6 +14,7 @@ import {
   DeetTest,
   DeetVis,
   DirectionMode,
+  DeetListNode,
   RenderMode,
 } from "@/lib/deetcode";
 import {
@@ -93,6 +94,7 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
       window.DeetTest = DeetTest;
       window.DeetVis = DeetVis;
       window._ = _;
+      window.ListNode = DeetListNode;
 
       // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = DeetSet;

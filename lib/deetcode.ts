@@ -22,6 +22,8 @@ declare global {
     PriorityQueue: typeof PriorityQueueB;
     DeetTest: typeof DeetTest;
     DeetVis: typeof DeetVis;
+    DeetListNode: typeof DeetListNode;
+    ListNode: typeof DeetListNode;
   }
 }
 
@@ -38,6 +40,7 @@ interface DeetConfig {
   minPriorityQueueEngine?: DeetMinPriorityQueueEngine;
   maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
   priorityQueueEngine?: DeetPriorityQueueEngine;
+  listNodeEngine?: DeetListNodeEngine;
   directionMode?: DirectionMode;
   labelMode?: boolean;
   animationDelay?: number;
@@ -49,7 +52,8 @@ type NativeDataStructure =
   | Array<any>
   | MinPriorityQueueB<any>
   | MaxPriorityQueueB<any>
-  | PriorityQueueB<any>;
+  | PriorityQueueB<any>
+  | DeetListNode;
 
 type DeetDataStructure =
   | DeetSet
@@ -57,7 +61,8 @@ type DeetDataStructure =
   | DeetArray
   | DeetMinPriorityQueue
   | DeetMaxPriorityQueue
-  | DeetPriorityQueue;
+  | DeetPriorityQueue
+  | DeetListNode;
 
 export type RenderMode = "animate" | "debug";
 
@@ -68,7 +73,7 @@ abstract class DeetEngine {
     instance: DeetDataStructure
   ): NativeDataStructure;
   abstract render(instance: NativeDataStructure): HTMLElement;
-  renderFork(instance: DeetDataStructure) {
+  renderFork(instance: DeetDataStructure): void {
     // fix the duplicate rendering of array
     // the proxy is hit first and then the real object
     // thats why there is a duplicate render
@@ -90,12 +95,18 @@ abstract class DeetEngine {
   renderDelayed(instance: DeetDataStructure): void {
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = () => {
+      if (!instance.container) {
+        throw new Error("container not found");
+      }
       const el = this.render(nativeCopy);
       instance.container.innerHTML = el.outerHTML;
     };
     DeetCode.enqueue(fn);
   }
   renderNow(instance: DeetDataStructure) {
+    if (!instance.container) {
+      throw new Error("container not found");
+    }
     const el = this.render(instance);
     instance.container.innerHTML = el.outerHTML;
   }
@@ -145,6 +156,10 @@ abstract class DeetEngine {
     }
     if (instance instanceof DeetPriorityQueue) {
       label.innerHTML = "PriorityQueue";
+      return label;
+    }
+    if (instance instanceof DeetListNode) {
+      label.innerHTML = "ListNode";
       return label;
     }
     return label;
@@ -673,7 +688,7 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
     const el = this.render(arr);
     instance.container.innerHTML = el.outerHTML;
   }
-  render(arr: NativeDataStructure): HTMLElement {
+  render(arr: Array<any>): HTMLElement {
     const div = document.createElement("div");
     const ul = document.createElement("ul");
     for (const item of arr) {
@@ -735,7 +750,7 @@ class DeetPriorityQueueEngine extends DeetEngine {
     const el = this.render(arr);
     instance.container.innerHTML = el.outerHTML;
   }
-  render(arr: NativeDataStructure): HTMLElement {
+  render(arr: Array<any>): HTMLElement {
     const div = document.createElement("div");
     const ul = document.createElement("ul");
     for (const item of arr) {
@@ -820,6 +835,7 @@ export class DeetCode {
   minPriorityQueueEngine: DeetMinPriorityQueueEngine;
   maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   priorityQueueEngine: DeetPriorityQueueEngine;
+  listNodeEngine: DeetListNodeEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
   animationDelay: number;
@@ -839,6 +855,7 @@ export class DeetCode {
       config.maxPriorityQueueEngine || new DeetMaxPriorityQueueEngine();
     this.priorityQueueEngine =
       config.priorityQueueEngine || new DeetPriorityQueueEngine();
+    this.listNodeEngine = config.listNodeEngine || new DeetListNodeEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -963,5 +980,50 @@ export class DeetTest {
 export class DeetVis {
   static index(instance: DeetArray, obj: VisualizeIndexObj) {
     instance.engine.renderIndexFork(instance, obj);
+  }
+
+  static linkedList(node: DeetListNode) {
+    if (!node.container) {
+      const div = DeetCode.instance.listNodeEngine.renderContainer(node);
+      node.container = div;
+    }
+    DeetCode.instance.listNodeEngine.renderFork(node);
+  }
+}
+
+class DeetListNodeEngine extends DeetEngine {
+  transformDeetToNative(instance: DeetListNode): DeetListNode {
+    const dummy = new DeetListNode();
+    let copy = dummy;
+    let cur: DeetListNode | null = instance;
+    while (cur) {
+      const node = new DeetListNode(cur.val);
+      copy.next = node;
+      copy = node;
+      cur = cur.next;
+    }
+    return dummy.next || dummy;
+  }
+  render(instance: DeetListNode): HTMLElement {
+    const ul = document.createElement("ul");
+    let cur: DeetListNode | null = instance;
+    while (cur) {
+      const li = document.createElement("li");
+      li.innerHTML = cur.val?.toString();
+      ul.appendChild(li);
+      cur = cur.next;
+    }
+    return ul;
+  }
+}
+
+export class DeetListNode {
+  val = 0;
+  next: DeetListNode | null = null;
+  container?: HTMLElement;
+
+  constructor(val: number = 0, next: DeetListNode | null = null) {
+    this.val = val;
+    this.next = next;
   }
 }
