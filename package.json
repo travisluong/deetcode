@@ -18,6 +18,7 @@
     "@tanstack/react-table": "^8.16.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "d3": "^7.9.0",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.9",
     "lodash": "^4.17.21",
@@ -31,6 +32,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.3",
     "@types/lodash": "^4.17.1",
     "@types/node": "^20",
     "@types/react": "^18",

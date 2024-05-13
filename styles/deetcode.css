@@ -68,3 +68,18 @@
 .deet-assert-fail {
   border: 2px solid red;
 }
+
+/*
+d3 styles
+*/
+
+.node {
+  stroke: #000;
+}
+.arrow {
+  fill: none;
+  stroke: #000;
+}
+.node text {
+  pointer-events: none;
+}

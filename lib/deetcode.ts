@@ -1,5 +1,6 @@
 "use client";
 import _ from "lodash";
+import * as d3 from "d3";
 
 import {
   ICompare,
@@ -992,28 +993,101 @@ export class DeetVis {
 }
 
 class DeetListNodeEngine extends DeetEngine {
-  transformDeetToNative(instance: DeetListNode): DeetListNode {
-    const dummy = new DeetListNode();
-    let copy = dummy;
+  transformDeetToNative(instance: DeetListNode): Array<number> {
+    const res = [];
     let cur: DeetListNode | null = instance;
     while (cur) {
       const node = new DeetListNode(cur.val);
-      copy.next = node;
-      copy = node;
+      res.push(cur.val);
       cur = cur.next;
     }
-    return dummy.next || dummy;
+    return res;
   }
-  render(instance: DeetListNode): HTMLElement {
-    const ul = document.createElement("ul");
-    let cur: DeetListNode | null = instance;
-    while (cur) {
-      const li = document.createElement("li");
-      li.innerHTML = cur.val?.toString();
-      ul.appendChild(li);
-      cur = cur.next;
+  render(arr: Array<number>): HTMLElement {
+    const container = document.createElement("div");
+
+    // Declare the chart dimensions and margins.
+    const width = 640;
+    const height = 400;
+
+    // // Declare the x (horizontal position) scale.
+    // const x = d3
+    //   .scaleUtc()
+    //   .domain([new Date("2023-01-01"), new Date("2024-01-01")])
+    //   .range([marginLeft, width - marginRight]);
+
+    // // Declare the y (vertical position) scale.
+    // const y = d3
+    //   .scaleLinear()
+    //   .domain([0, 100])
+    //   .range([height - marginBottom, marginTop]);
+
+    // // Create the SVG container.
+    // const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+    // // Add the x-axis.
+    // svg
+    //   .append("g")
+    //   .attr("transform", `translate(0,${height - marginBottom})`)
+    //   .call(d3.axisBottom(x));
+
+    // // Add the y-axis.
+    // svg
+    //   .append("g")
+    //   .attr("transform", `translate(${marginLeft},0)`)
+    //   .call(d3.axisLeft(y));
+
+    // // Append the SVG element.
+    // container.append(svg.node());
+
+    // D3 visualization
+    const svg = d3.create("svg").attr("width", width).attr("height", height);
+    const nodeGroup = svg
+      .selectAll("g")
+      .data(arr)
+      .enter()
+      .append("g")
+      .attr("transform", (d, i) => `translate(${i * 100 + 50}, 100)`);
+
+    nodeGroup
+      .append("circle")
+      .attr("class", "node")
+      .attr("r", 25)
+      .style("fill", "lightgray");
+
+    nodeGroup
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".35em")
+      .text((d) => d);
+
+    // Draw arrows
+    for (let i = 0; i < arr.length - 1; i++) {
+      svg
+        .append("path")
+        .attr("class", "arrow")
+        .attr("d", `M ${i * 100 + 75},100 L ${i * 100 + 125},100`)
+        .attr("marker-end", "url(#arrowhead)");
     }
-    return ul;
+
+    // Define arrowhead marker
+    svg
+      .append("defs")
+      .append("marker")
+      .attr("id", "arrowhead")
+      .attr("viewBox", "0 0 10 10")
+      .attr("refX", 8)
+      .attr("refY", 5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M 0 0 L 10 5 L 0 10 z");
+
+    container.append(svg.node());
+    return container;
+
+    // return ul;
   }
 }
 
