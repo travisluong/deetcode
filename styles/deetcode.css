@@ -79,7 +79,17 @@ d3 styles
 .arrow {
   fill: none;
   stroke: #000;
+  stroke-width: 2px;
 }
 .node text {
   pointer-events: none;
+}
+
+.dark .node {
+  stroke: lightgray;
+}
+
+.dark .arrow {
+  stroke: lightgray;
+  fill: lightgray;
 }

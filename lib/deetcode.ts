@@ -32,6 +32,11 @@ interface VisualizeIndexObj {
   [key: string]: number;
 }
 
+interface DeetListNodeRenderObj {
+  val: number;
+  pointers: string[];
+}
+
 interface DeetConfig {
   selector: string;
   renderMode?: RenderMode;
@@ -62,8 +67,7 @@ type DeetDataStructure =
   | DeetArray
   | DeetMinPriorityQueue
   | DeetMaxPriorityQueue
-  | DeetPriorityQueue
-  | DeetListNode;
+  | DeetPriorityQueue;
 
 export type RenderMode = "animate" | "debug";
 
@@ -96,20 +100,17 @@ abstract class DeetEngine {
   renderDelayed(instance: DeetDataStructure): void {
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = () => {
-      if (!instance.container) {
-        throw new Error("container not found");
-      }
       const el = this.render(nativeCopy);
       instance.container.innerHTML = el.outerHTML;
     };
     DeetCode.enqueue(fn);
   }
   renderNow(instance: DeetDataStructure) {
-    if (!instance.container) {
-      throw new Error("container not found");
-    }
-    const el = this.render(instance);
+    DeetCode.undoMonkeyPatchAll();
+    const nativeCopy = this.transformDeetToNative(instance);
+    const el = this.render(nativeCopy);
     instance.container.innerHTML = el.outerHTML;
+    DeetCode.monkeyPatchAll();
   }
   renderContainer(instance: DeetDataStructure): HTMLElement {
     const div = document.createElement("div");
@@ -157,10 +158,6 @@ abstract class DeetEngine {
     }
     if (instance instanceof DeetPriorityQueue) {
       label.innerHTML = "PriorityQueue";
-      return label;
-    }
-    if (instance instanceof DeetListNode) {
-      label.innerHTML = "ListNode";
       return label;
     }
     return label;
@@ -983,62 +980,126 @@ export class DeetVis {
     instance.engine.renderIndexFork(instance, obj);
   }
 
-  static linkedList(node: DeetListNode) {
-    if (!node.container) {
-      const div = DeetCode.instance.listNodeEngine.renderContainer(node);
-      node.container = div;
+  static linkedList(
+    name: string,
+    node: DeetListNode,
+    pointers?: { [key: string]: DeetListNode | null }
+  ) {
+    // there is a bug in the next two loops
+    // TODO: FIX REFERENCE BUG
+    // need to create a copy of each node
+    // so that each animation frame doesn't pick up
+    // the current state of object
+    // clear all the pointers properties
+    let cur: DeetListNode | null = node;
+    while (cur) {
+      for (const val of cur.pointers) {
+        cur.pointers.delete(val);
+      }
+      cur = cur.next;
     }
-    DeetCode.instance.listNodeEngine.renderFork(node);
+    if (pointers) {
+      // push pointer keys onto pointer arrays
+      for (const [k, v] of Object.entries(pointers)) {
+        if (v) {
+          v.pointers.add(k);
+        }
+      }
+    }
+    if (!DeetCode.instance.listNodeEngine.containerRegistry.get(name)) {
+      const div = DeetCode.instance.listNodeEngine.renderContainer();
+      DeetCode.instance.listNodeEngine.containerRegistry.set(name, div);
+    }
+    DeetCode.instance.listNodeEngine.renderFork(node, name);
   }
 }
 
-class DeetListNodeEngine extends DeetEngine {
-  transformDeetToNative(instance: DeetListNode): Array<number> {
+class DeetListNodeEngine {
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  emptyContainerRegistry() {
+    for (const key in this.containerRegistry) {
+      this.containerRegistry.delete(key);
+    }
+  }
+  renderContainer(): HTMLElement {
+    const div = document.createElement("div");
+    div.classList.add("deet-container");
+    div.appendChild(this.renderLabel());
+
+    const fn = () => {
+      DeetCode.instance.el?.appendChild(div);
+    };
+
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
+
+    return div;
+  }
+  renderLabel() {
+    const label = document.createElement("label");
+    label.innerHTML = "ListNode";
+    return label;
+  }
+  renderFork(instance: DeetListNode, name: string): void {
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        this.renderDelayed(instance, name);
+        break;
+      case "debug":
+        this.renderNow(instance, name);
+        break;
+      default:
+        break;
+    }
+  }
+  renderDelayed(instance: DeetListNode, name: string): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = () => {
+      const el = this.render(nativeCopy, name);
+      const container = this.containerRegistry.get(name);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    DeetCode.enqueue(fn);
+  }
+  renderNow(instance: DeetListNode, name: string) {
+    DeetCode.undoMonkeyPatchAll();
+    const nativeCopy = this.transformDeetToNative(instance);
+    const el = this.render(nativeCopy, name);
+    const container = this.containerRegistry.get(name);
+    if (container) {
+      container.innerHTML = el.outerHTML;
+    }
+    DeetCode.monkeyPatchAll();
+  }
+  transformDeetToNative(instance: DeetListNode): Array<DeetListNodeRenderObj> {
     const res = [];
     let cur: DeetListNode | null = instance;
     while (cur) {
-      const node = new DeetListNode(cur.val);
-      res.push(cur.val);
+      const deetListNodeRenderObj: DeetListNodeRenderObj = {
+        ...cur,
+        pointers: [...cur.pointers],
+      };
+      res.push(deetListNodeRenderObj);
       cur = cur.next;
     }
     return res;
   }
-  render(arr: Array<number>): HTMLElement {
+  render(arr: Array<DeetListNodeRenderObj>, name: string): HTMLElement {
     const container = document.createElement("div");
 
     // Declare the chart dimensions and margins.
-    const width = 640;
-    const height = 400;
-
-    // // Declare the x (horizontal position) scale.
-    // const x = d3
-    //   .scaleUtc()
-    //   .domain([new Date("2023-01-01"), new Date("2024-01-01")])
-    //   .range([marginLeft, width - marginRight]);
-
-    // // Declare the y (vertical position) scale.
-    // const y = d3
-    //   .scaleLinear()
-    //   .domain([0, 100])
-    //   .range([height - marginBottom, marginTop]);
-
-    // // Create the SVG container.
-    // const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-    // // Add the x-axis.
-    // svg
-    //   .append("g")
-    //   .attr("transform", `translate(0,${height - marginBottom})`)
-    //   .call(d3.axisBottom(x));
-
-    // // Add the y-axis.
-    // svg
-    //   .append("g")
-    //   .attr("transform", `translate(${marginLeft},0)`)
-    //   .call(d3.axisLeft(y));
-
-    // // Append the SVG element.
-    // container.append(svg.node());
+    const width = 800;
+    const height = 100;
 
     // D3 visualization
     const svg = d3.create("svg").attr("width", width).attr("height", height);
@@ -1047,7 +1108,7 @@ class DeetListNodeEngine extends DeetEngine {
       .data(arr)
       .enter()
       .append("g")
-      .attr("transform", (d, i) => `translate(${i * 100 + 50}, 100)`);
+      .attr("transform", (d, i) => `translate(${i * 100 + 50}, 50)`);
 
     nodeGroup
       .append("circle")
@@ -1059,14 +1120,27 @@ class DeetListNodeEngine extends DeetEngine {
       .append("text")
       .attr("text-anchor", "middle")
       .attr("dy", ".35em")
-      .text((d) => d);
+      .text((d) => d.val);
+
+    nodeGroup
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("dy", "2.75em")
+      .style("fill", "lightgray")
+      .text((d) => d.pointers.join(","));
+
+    svg
+      .append("text")
+      .attr("transform", "translate(15, 15)")
+      .style("fill", "lightgray")
+      .text(name);
 
     // Draw arrows
     for (let i = 0; i < arr.length - 1; i++) {
       svg
         .append("path")
         .attr("class", "arrow")
-        .attr("d", `M ${i * 100 + 75},100 L ${i * 100 + 125},100`)
+        .attr("d", `M ${i * 100 + 75},50 L ${i * 100 + 125},50`)
         .attr("marker-end", "url(#arrowhead)");
     }
 
@@ -1076,13 +1150,14 @@ class DeetListNodeEngine extends DeetEngine {
       .append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "0 0 10 10")
-      .attr("refX", 8)
+      .attr("refX", 11)
       .attr("refY", 5)
       .attr("markerWidth", 6)
       .attr("markerHeight", 6)
       .attr("orient", "auto")
       .append("path")
-      .attr("d", "M 0 0 L 10 5 L 0 10 z");
+      .attr("d", "M 0 0 L 10 5 L 0 10 z")
+      .attr("class", "arrow");
 
     container.append(svg.node());
     return container;
@@ -1094,10 +1169,13 @@ class DeetListNodeEngine extends DeetEngine {
 export class DeetListNode {
   val = 0;
   next: DeetListNode | null = null;
-  container?: HTMLElement;
+  pointers: Set<string>;
 
   constructor(val: number = 0, next: DeetListNode | null = null) {
     this.val = val;
     this.next = next;
+    DeetSet.undoMonkeyPatch();
+    this.pointers = new Set();
+    DeetSet.monkeyPatch();
   }
 }

@@ -137,6 +137,8 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
       console.error(error);
     } finally {
       DeetCode.undoMonkeyPatchAll();
+      DeetCode.instance.listNodeEngine.emptyContainerRegistry();
+      debugger;
     }
   }
 
