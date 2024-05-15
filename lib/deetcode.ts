@@ -1162,10 +1162,11 @@ class DeetListNodeEngine {
       .attr("d", "M 0 0 L 10 5 L 0 10 z")
       .attr("class", "arrow");
 
-    container.append(svg.node());
+    const node = svg.node();
+    if (node) {
+      container.append(node);
+    }
     return container;
-
-    // return ul;
   }
 }
 
