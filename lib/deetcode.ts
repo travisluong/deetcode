@@ -36,6 +36,7 @@ interface VisualizeIndexObj {
 interface DeetListNodeRenderObj {
   val: number;
   pointers: string[];
+  pos: number;
 }
 
 interface DeetConfig {
@@ -993,13 +994,16 @@ export class DeetVis {
     // so that each animation frame doesn't pick up
     // the current state of object
     // clear all the pointers properties
-    debugger;
     let cur: DeetListNode | null = node;
-    while (cur) {
+    DeetSet.undoMonkeyPatch();
+    const set = new Set();
+    DeetSet.monkeyPatch();
+    while (cur && !set.has(cur)) {
       for (const val of cur.pointers) {
         cur.pointers.delete(val);
       }
       cur = cur.next;
+      set.add(cur);
     }
     if (pointers) {
       // push pointer keys onto pointer arrays
@@ -1087,14 +1091,34 @@ class DeetListNodeEngine {
   transformDeetToNative(instance: DeetListNode): Array<DeetListNodeRenderObj> {
     const res = [];
     let cur: DeetListNode | null = instance;
-    while (cur) {
+    // track the position of each node
+    DeetMap.undoMonkeyPatch();
+    const map = new Map<DeetListNode, number>();
+    DeetMap.monkeyPatch();
+    let index = 0;
+
+    while (cur && !map.has(cur)) {
       const deetListNodeRenderObj: DeetListNodeRenderObj = {
         ...cur,
         pointers: [...cur.pointers],
+        pos: index,
       };
       res.push(deetListNodeRenderObj);
+      map.set(cur, index);
       cur = cur.next;
+      index++;
     }
+
+    // there is a cycle, add it to end of result
+    if (cur !== null) {
+      const deetListNodeRenderObj: DeetListNodeRenderObj = {
+        ...cur,
+        pointers: [...cur.pointers],
+        pos: map.get(cur) || index,
+      };
+      res.push(deetListNodeRenderObj);
+    }
+
     return res;
   }
   render(arr: Array<DeetListNodeRenderObj>, name: string): HTMLElement {
@@ -1148,20 +1172,42 @@ class DeetListNodeEngine {
         .attr("marker-end", "url(#arrowhead)");
     }
 
+    // handle cycle arrow
+    debugger;
+    const cycleNode = arr[arr.length - 1];
+
+    if (cycleNode.pos !== arr.length - 1) {
+      const startX = (arr.length - 1) * 100 + 50;
+      const startY = 100;
+      const endX = cycleNode.pos * 100 + 50;
+      const endY = 100;
+
+      svg
+        .append("path")
+        .attr("class", "arrow")
+        .attr(
+          "d",
+          `M ${startX},${startY - 25} Q ${(startX + endX) / 2},${
+            startY + 10
+          } ${endX},${endY - 25}`
+        )
+        .attr("marker-end", "url(#arrowhead)");
+    }
+
     // Define arrowhead marker
     svg
       .append("defs")
       .append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "0 0 10 10")
-      .attr("refX", 11)
+      .attr("refX", 9)
       .attr("refY", 5)
       .attr("markerWidth", 6)
       .attr("markerHeight", 6)
       .attr("orient", "auto")
       .append("path")
       .attr("d", "M 0 0 L 10 5 L 0 10 z")
-      .attr("class", "arrow");
+      .attr("class", "arrowhead");
 
     const node = svg.node();
     if (node) {

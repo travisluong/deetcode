@@ -78,12 +78,17 @@ d3 styles
 */
 
 .node {
-  stroke: #000;
+  stroke: darkgray;
+  stroke-width: 2px;
 }
 .arrow {
   fill: none;
-  stroke: #000;
+  stroke: darkgray;
   stroke-width: 2px;
+}
+.arrowhead {
+  stroke: darkgray;
+  fill: darkgray;
 }
 .node text {
   pointer-events: none;
@@ -94,6 +99,11 @@ d3 styles
 }
 
 .dark .arrow {
+  stroke: lightgray;
+  fill: none;
+}
+
+.dark .arrowhead {
   stroke: lightgray;
   fill: lightgray;
 }
