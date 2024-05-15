@@ -12,6 +12,7 @@ import {
 declare global {
   interface Window {
     dcInstance: DeetCode;
+    DeetCode: typeof DeetCode;
     DeetSet: typeof DeetSet;
     DeetMap: typeof DeetMap;
     DeetArray: typeof DeetArray;
@@ -914,6 +915,7 @@ export class DeetCode {
 
   erase() {
     this.el.innerHTML = "";
+    this.listNodeEngine.emptyContainerRegistry();
   }
 
   static enqueue(fn: () => void) {
@@ -991,6 +993,7 @@ export class DeetVis {
     // so that each animation frame doesn't pick up
     // the current state of object
     // clear all the pointers properties
+    debugger;
     let cur: DeetListNode | null = node;
     while (cur) {
       for (const val of cur.pointers) {
@@ -1017,7 +1020,7 @@ export class DeetVis {
 class DeetListNodeEngine {
   containerRegistry: Map<string, HTMLElement> = new Map();
   emptyContainerRegistry() {
-    for (const key in this.containerRegistry) {
+    for (const key of this.containerRegistry.keys()) {
       this.containerRegistry.delete(key);
     }
   }

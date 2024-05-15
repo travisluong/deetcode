@@ -91,6 +91,7 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
       DeetCode.setInstance(dcInstance);
       DeetCode.instance.startRenderLoop();
 
+      window.DeetCode = DeetCode;
       window.DeetTest = DeetTest;
       window.DeetVis = DeetVis;
       window._ = _;
@@ -137,8 +138,6 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
       console.error(error);
     } finally {
       DeetCode.undoMonkeyPatchAll();
-      DeetCode.instance.listNodeEngine.emptyContainerRegistry();
-      debugger;
     }
   }
 
