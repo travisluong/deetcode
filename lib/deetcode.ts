@@ -1003,8 +1003,8 @@ export class DeetVis {
       for (const val of cur.pointers) {
         cur.pointers.delete(val);
       }
-      cur = cur.next;
       set.add(cur);
+      cur = cur.next;
     }
     if (pointers) {
       // push pointer keys onto pointer arrays
