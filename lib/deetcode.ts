@@ -994,6 +994,7 @@ export class DeetVis {
     // so that each animation frame doesn't pick up
     // the current state of object
     // clear all the pointers properties
+    debugger;
     let cur: DeetListNode | null = node;
     DeetSet.undoMonkeyPatch();
     const set = new Set();
@@ -1096,27 +1097,21 @@ class DeetListNodeEngine {
     const map = new Map<DeetListNode, number>();
     DeetMap.monkeyPatch();
     let index = 0;
-
+    debugger;
     while (cur && !map.has(cur)) {
       const deetListNodeRenderObj: DeetListNodeRenderObj = {
-        ...cur,
+        val: cur.val,
         pointers: [...cur.pointers],
         pos: index,
       };
       res.push(deetListNodeRenderObj);
       map.set(cur, index);
       cur = cur.next;
+      // check for cycle here
+      if (cur && map.has(cur)) {
+        deetListNodeRenderObj.pos = map.get(cur) || index;
+      }
       index++;
-    }
-
-    // there is a cycle, add it to end of result
-    if (cur !== null) {
-      const deetListNodeRenderObj: DeetListNodeRenderObj = {
-        ...cur,
-        pointers: [...cur.pointers],
-        pos: map.get(cur) || index,
-      };
-      res.push(deetListNodeRenderObj);
     }
 
     return res;
@@ -1173,10 +1168,9 @@ class DeetListNodeEngine {
     }
 
     // handle cycle arrow
-    debugger;
     const cycleNode = arr[arr.length - 1];
 
-    if (cycleNode.pos !== arr.length - 1) {
+    if (cycleNode && cycleNode.pos !== arr.length - 1) {
       const startX = (arr.length - 1) * 100 + 50;
       const startY = 100;
       const endX = cycleNode.pos * 100 + 50;
