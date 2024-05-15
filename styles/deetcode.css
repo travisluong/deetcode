@@ -56,6 +56,10 @@
   display: none;
 }
 
+.deetcode-hide-labels text.linked-list-label {
+  display: none;
+}
+
 .deet-assert {
   margin: 10px;
   padding: 10px;

@@ -1134,9 +1134,10 @@ class DeetListNodeEngine {
 
     svg
       .append("text")
+      .attr("class", "linked-list-label")
       .attr("transform", "translate(15, 15)")
       .style("fill", "lightgray")
-      .text(name);
+      .text("Linked List " + name);
 
     // Draw arrows
     for (let i = 0; i < arr.length - 1; i++) {
