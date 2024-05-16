@@ -5,31 +5,33 @@ import { Input } from "./ui/input";
 import { DeetCode } from "@/lib/deetcode";
 
 export default function AnimationDelayInput() {
-  const [delay, setDelay] = useState<number>(1000);
+  const [delay, setDelay] = useState<string>("500");
 
   useEffect(() => {
     const animationDelayStr = localStorage.getItem("deetcode-animation-delay");
-    setDelay(parseInt(animationDelayStr || "1000"));
+    setDelay(animationDelayStr || "500");
   }, []);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const delayStr = e.target.value;
-
     if (!delayStr) {
+      localStorage.setItem("deetcode-animation-delay", "0");
+      DeetCode.instance.changeAnimationDelay(0);
+      setDelay("");
       return;
     }
-    const delay = parseInt(e.target.value);
+    const delayInt = parseInt(e.target.value);
     localStorage.setItem("deetcode-animation-delay", delayStr);
-    DeetCode.instance.changeAnimationDelay(delay);
-    setDelay(delay);
+    DeetCode.instance.changeAnimationDelay(delayInt);
+    setDelay(delayStr);
   }
 
   return (
     <div className="flex gap-2 mx-5 items-center">
       <label>Delay:</label>
       <Input
-        type="number"
-        defaultValue={delay}
+        type="text"
+        value={delay}
         onChange={handleChange}
         className="w-24"
       />
