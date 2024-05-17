@@ -1330,15 +1330,24 @@ class DeetBitwiseEngine implements DeetVisEngine {
     const label = this.renderLabel(name, instance);
     div.appendChild(label);
     const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const thr = document.createElement("tr");
     const tbody = document.createElement("tbody");
     const tr = document.createElement("tr");
     const binary = DeetBitwiseEngine.integerToBinary(instance);
     const arr = binary.split("");
-    for (const num of arr) {
+    const n = arr.length;
+    for (const [index, num] of arr.entries()) {
+      const power = 2 ** (n - index - 1);
+      const th = document.createElement("th");
+      th.innerHTML = power.toString();
+      thr.appendChild(th);
       const td = document.createElement("td");
       td.innerHTML = num;
       tr.appendChild(td);
     }
+    thead.appendChild(thr);
+    table.appendChild(thead);
     tbody.appendChild(tr);
     table.appendChild(tbody);
     div.appendChild(table);
