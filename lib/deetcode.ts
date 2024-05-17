@@ -49,6 +49,7 @@ interface DeetConfig {
   maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
   priorityQueueEngine?: DeetPriorityQueueEngine;
   listNodeEngine?: DeetListNodeEngine;
+  bitwiseEngine?: DeetBitwiseEngine;
   directionMode?: DirectionMode;
   labelMode?: boolean;
   animationDelay?: number;
@@ -65,8 +66,9 @@ interface DeetConfig {
  * it on the instance itself.
  */
 interface DeetVisEngine {
-  renderContainer(): HTMLElement;
-  renderLabel(): HTMLElement;
+  containerRegistry: Map<string, HTMLElement>;
+  renderContainer(name: string, instance?: any): HTMLElement;
+  renderLabel(name: string, instance?: any): HTMLElement;
   renderFork(instance: any, name: string): void;
   renderDelayed(instance: any, name: string): void;
   renderNow(instance: any, name: string): void;
@@ -859,6 +861,7 @@ export class DeetCode {
   maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   priorityQueueEngine: DeetPriorityQueueEngine;
   listNodeEngine: DeetListNodeEngine;
+  bitwiseEngine: DeetBitwiseEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
   animationDelay: number;
@@ -879,6 +882,7 @@ export class DeetCode {
     this.priorityQueueEngine =
       config.priorityQueueEngine || new DeetPriorityQueueEngine();
     this.listNodeEngine = config.listNodeEngine || new DeetListNodeEngine();
+    this.bitwiseEngine = config.bitwiseEngine || new DeetBitwiseEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -940,6 +944,7 @@ export class DeetCode {
   erase() {
     this.el.innerHTML = "";
     this.listNodeEngine.emptyContainerRegistry();
+    this.bitwiseEngine.emptyContainerRegistry();
   }
 
   static enqueue(fn: () => void) {
@@ -1044,11 +1049,19 @@ export class DeetVis {
         }
       }
     }
-    if (!DeetCode.instance.listNodeEngine.containerRegistry.get(name)) {
-      const div = DeetCode.instance.listNodeEngine.renderContainer();
+    if (!DeetCode.instance.listNodeEngine.containerRegistry.has(name)) {
+      const div = DeetCode.instance.listNodeEngine.renderContainer(name);
       DeetCode.instance.listNodeEngine.containerRegistry.set(name, div);
     }
     DeetCode.instance.listNodeEngine.renderFork(node, name);
+  }
+
+  static bitwise(name: string, num: number) {
+    if (!DeetCode.instance.bitwiseEngine.containerRegistry.has(name)) {
+      const div = DeetCode.instance.bitwiseEngine.renderContainer(name, num);
+      DeetCode.instance.bitwiseEngine.containerRegistry.set(name, div);
+    }
+    DeetCode.instance.bitwiseEngine.renderFork(num, name);
   }
 }
 
@@ -1059,10 +1072,11 @@ class DeetListNodeEngine implements DeetVisEngine {
       this.containerRegistry.delete(key);
     }
   }
-  renderContainer(): HTMLElement {
+  renderContainer(name: string): HTMLElement {
     const div = document.createElement("div");
     div.classList.add("deet-container");
-    div.appendChild(this.renderLabel());
+    const label = this.renderLabel(name);
+    div.appendChild(label);
 
     const fn = () => {
       DeetCode.instance.el?.appendChild(div);
@@ -1081,9 +1095,9 @@ class DeetListNodeEngine implements DeetVisEngine {
 
     return div;
   }
-  renderLabel() {
+  renderLabel(name: string) {
     const label = document.createElement("label");
-    label.innerHTML = "ListNode";
+    label.innerHTML = "ListNode " + name;
     return label;
   }
   renderFork(instance: DeetListNode, name: string): void {
@@ -1262,25 +1276,157 @@ export class DeetListNode {
 }
 
 class DeetBitwiseEngine implements DeetVisEngine {
-  renderContainer(): HTMLElement {
-    throw new Error("Method not implemented.");
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  emptyContainerRegistry() {
+    for (const key of this.containerRegistry.keys()) {
+      this.containerRegistry.delete(key);
+    }
   }
-  renderLabel(): HTMLElement {
-    throw new Error("Method not implemented.");
+  renderContainer(name: string, instance: number): HTMLElement {
+    const label = this.renderLabel(name, instance);
+    return DeetRender.renderContainer(label);
   }
-  renderFork(instance: any, name: string): void {
-    throw new Error("Method not implemented.");
+  renderLabel(name: string, instance: number): HTMLElement {
+    return DeetRender.renderLabel("Bitwise " + name + " = " + instance);
   }
-  renderDelayed(instance: any, name: string): void {
-    throw new Error("Method not implemented.");
+  renderFork(instance: number, name: string): void {
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        this.renderDelayed(instance, name);
+        break;
+      case "debug":
+        this.renderNow(instance, name);
+        break;
+      default:
+        break;
+    }
   }
-  renderNow(instance: any, name: string): void {
-    throw new Error("Method not implemented.");
+  renderDelayed(instance: number, name: string): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = () => {
+      const el = this.render(nativeCopy, name);
+      const container = this.containerRegistry.get(name);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    DeetCode.enqueue(fn);
   }
-  transformDeetToNative(instance: any) {
-    throw new Error("Method not implemented.");
+  renderNow(instance: number, name: string): void {
+    DeetCode.undoMonkeyPatchAll();
+    const nativeCopy = this.transformDeetToNative(instance);
+    const el = this.render(nativeCopy, name);
+    const container = this.containerRegistry.get(name);
+    if (container) {
+      container.innerHTML = el.outerHTML;
+    }
+    DeetCode.monkeyPatchAll();
   }
-  render(instance: any, name: string): HTMLElement {
-    throw new Error("Method not implemented.");
+  transformDeetToNative(instance: number) {
+    return instance;
+  }
+  render(instance: number, name: string): HTMLElement {
+    const div = document.createElement("div");
+    const label = this.renderLabel(name, instance);
+    div.appendChild(label);
+    const table = document.createElement("table");
+    const tbody = document.createElement("tbody");
+    const tr = document.createElement("tr");
+    const binary = DeetBitwiseEngine.integerToBinary(instance);
+    const arr = binary.split("");
+    for (const num of arr) {
+      const td = document.createElement("td");
+      td.innerHTML = num;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
+    div.appendChild(table);
+    return div;
+  }
+  /**
+   * Example usage:
+   *   console.log(integerToBinary(10));  // Output: "1010"
+   *   console.log(integerToBinary(-10)); // Output: "11111111111111111111111111110110" (32-bit two's complement)
+   * @param num
+   * @returns
+   */
+  static integerToBinary(num: number) {
+    if (num === 0) {
+      return "0";
+    }
+
+    let binary = "";
+    let n = Math.abs(num);
+
+    while (n > 0) {
+      binary = (n % 2) + binary;
+      n = Math.floor(n / 2);
+    }
+
+    if (num < 0) {
+      // Convert to two's complement for negative numbers
+      binary = DeetBitwiseEngine.twosComplement(binary);
+    }
+
+    return binary;
+  }
+  static twosComplement(binary: string) {
+    // Invert the bits
+    let inverted = "";
+    for (let bit of binary) {
+      inverted += bit === "0" ? "1" : "0";
+    }
+
+    // Add 1 to the inverted bits
+    let carry = 1;
+    let result = "";
+    for (let i = inverted.length - 1; i >= 0; i--) {
+      let sum = parseInt(inverted[i]) + carry;
+      result = (sum % 2) + result;
+      carry = Math.floor(sum / 2);
+    }
+
+    // If there's still a carry, prepend it
+    if (carry) {
+      result = "1" + result;
+    }
+
+    return result;
   }
 }
+
+/**
+ * common rendering functions used anywhere
+ */
+const DeetRender = {
+  renderContainer(label?: HTMLElement) {
+    const div = document.createElement("div");
+    div.classList.add("deet-container");
+    if (label) {
+      div.appendChild(label);
+    }
+
+    const fn = () => {
+      DeetCode.instance.el?.appendChild(div);
+    };
+
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
+
+    return div;
+  },
+  renderLabel(name: string) {
+    const label = document.createElement("label");
+    label.innerHTML = name;
+    return label;
+  },
+};
