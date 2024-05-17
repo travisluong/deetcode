@@ -54,14 +54,33 @@ interface DeetConfig {
   animationDelay?: number;
 }
 
+/**
+ * the DeetVisEngine is for any types that are rendered
+ * by the DeetVis class. it follows a similar structure
+ * as the original DeetEngine abstract class. the main reason
+ * we need to use a separate interface is because of the
+ * difference in the way that the container html is stored.
+ * DeetVis Engines store the HTML containers in a container
+ * registry, while the DeetEngine abstract class stores
+ * it on the instance itself.
+ */
+interface DeetVisEngine {
+  renderContainer(): HTMLElement;
+  renderLabel(): HTMLElement;
+  renderFork(instance: any, name: string): void;
+  renderDelayed(instance: any, name: string): void;
+  renderNow(instance: any, name: string): void;
+  transformDeetToNative(instance: any): any;
+  render(instance: any, name: string): HTMLElement;
+}
+
 type NativeDataStructure =
   | Set<any>
   | Map<any, any>
   | Array<any>
   | MinPriorityQueueB<any>
   | MaxPriorityQueueB<any>
-  | PriorityQueueB<any>
-  | DeetListNode;
+  | PriorityQueueB<any>;
 
 type DeetDataStructure =
   | DeetSet
@@ -75,6 +94,10 @@ export type RenderMode = "animate" | "debug";
 
 export type DirectionMode = "row" | "column";
 
+/**
+ * DeetEngine abstract class contains common methods
+ * for rendering the native data structures.
+ */
 abstract class DeetEngine {
   abstract transformDeetToNative(
     instance: DeetDataStructure
@@ -978,23 +1001,30 @@ export class DeetTest {
   }
 }
 
+/**
+ * the DeetVis class is a utility that can be used from
+ * the code editor. it is responsible for visualizing
+ * types which are not extending the native types.
+ * for example, ListNode and Bitwise.
+ */
 export class DeetVis {
   static index(instance: DeetArray, obj: VisualizeIndexObj) {
     instance.engine.renderIndexFork(instance, obj);
   }
 
+  /**
+   * a static linked list visualization utility function.
+   *
+   * @param name the label to be rendered
+   * @param node the root ListNode object to start rendering at
+   * @param pointers an object with the name of pointers as keys and DeetListNode instance as key. used to render to the pointer labels under each node.
+   */
   static linkedList(
     name: string,
     node: DeetListNode,
     pointers?: { [key: string]: DeetListNode | null }
   ) {
-    // there is a bug in the next two loops
-    // TODO: FIX REFERENCE BUG
-    // need to create a copy of each node
-    // so that each animation frame doesn't pick up
-    // the current state of object
     // clear all the pointers properties
-    debugger;
     let cur: DeetListNode | null = node;
     DeetSet.undoMonkeyPatch();
     const set = new Set();
@@ -1022,7 +1052,7 @@ export class DeetVis {
   }
 }
 
-class DeetListNodeEngine {
+class DeetListNodeEngine implements DeetVisEngine {
   containerRegistry: Map<string, HTMLElement> = new Map();
   emptyContainerRegistry() {
     for (const key of this.containerRegistry.keys()) {
@@ -1089,6 +1119,13 @@ class DeetListNodeEngine {
     }
     DeetCode.monkeyPatchAll();
   }
+  /**
+   * need to create a copy of each node
+   * so that each animation frame doesn't pick up
+   * the current state of object
+   * @param instance
+   * @returns
+   */
   transformDeetToNative(instance: DeetListNode): Array<DeetListNodeRenderObj> {
     const res = [];
     let cur: DeetListNode | null = instance;
@@ -1097,7 +1134,6 @@ class DeetListNodeEngine {
     const map = new Map<DeetListNode, number>();
     DeetMap.monkeyPatch();
     let index = 0;
-    debugger;
     while (cur && !map.has(cur)) {
       const deetListNodeRenderObj: DeetListNodeRenderObj = {
         val: cur.val,
@@ -1222,5 +1258,29 @@ export class DeetListNode {
     DeetSet.undoMonkeyPatch();
     this.pointers = new Set();
     DeetSet.monkeyPatch();
+  }
+}
+
+class DeetBitwiseEngine implements DeetVisEngine {
+  renderContainer(): HTMLElement {
+    throw new Error("Method not implemented.");
+  }
+  renderLabel(): HTMLElement {
+    throw new Error("Method not implemented.");
+  }
+  renderFork(instance: any, name: string): void {
+    throw new Error("Method not implemented.");
+  }
+  renderDelayed(instance: any, name: string): void {
+    throw new Error("Method not implemented.");
+  }
+  renderNow(instance: any, name: string): void {
+    throw new Error("Method not implemented.");
+  }
+  transformDeetToNative(instance: any) {
+    throw new Error("Method not implemented.");
+  }
+  render(instance: any, name: string): HTMLElement {
+    throw new Error("Method not implemented.");
   }
 }
