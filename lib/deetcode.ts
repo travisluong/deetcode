@@ -26,6 +26,7 @@ declare global {
     DeetVis: typeof DeetVis;
     DeetListNode: typeof DeetListNode;
     ListNode: typeof DeetListNode;
+    TreeNode: typeof DeetTreeNode;
   }
 }
 
@@ -67,13 +68,14 @@ interface DeetConfig {
  */
 interface DeetVisEngine {
   containerRegistry: Map<string, HTMLElement>;
+  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>): void;
   renderContainer(name: string, instance?: any): HTMLElement;
-  renderLabel(name: string, instance?: any): HTMLElement;
   renderFork(instance: any, name: string): void;
   renderDelayed(instance: any, name: string): void;
   renderNow(instance: any, name: string): void;
   transformDeetToNative(instance: any): any;
-  render(instance: any, name: string): HTMLElement;
+  renderContent(instance: any, name: string): HTMLElement;
+  renderFn(instance: any, name: string): () => void;
 }
 
 type NativeDataStructure =
@@ -1057,10 +1059,7 @@ export class DeetVis {
   }
 
   static bitwise(name: string, num: number) {
-    if (!DeetCode.instance.bitwiseEngine.containerRegistry.has(name)) {
-      const div = DeetCode.instance.bitwiseEngine.renderContainer(name, num);
-      DeetCode.instance.bitwiseEngine.containerRegistry.set(name, div);
-    }
+    DeetCode.instance.bitwiseEngine.renderContainer(name, num);
     DeetCode.instance.bitwiseEngine.renderFork(num, name);
   }
 }
@@ -1068,37 +1067,14 @@ export class DeetVis {
 class DeetListNodeEngine implements DeetVisEngine {
   containerRegistry: Map<string, HTMLElement> = new Map();
   emptyContainerRegistry() {
-    for (const key of this.containerRegistry.keys()) {
-      this.containerRegistry.delete(key);
-    }
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(name: string): HTMLElement {
-    const div = document.createElement("div");
-    div.classList.add("deet-container");
-    const label = this.renderLabel(name);
+    const label = DeetRender.renderLabel("ListNode " + name);
+    const div = DeetRender.renderContainer();
     div.appendChild(label);
-
-    const fn = () => {
-      DeetCode.instance.el?.appendChild(div);
-    };
-
-    switch (DeetCode.instance.renderMode) {
-      case "animate":
-        DeetCode.enqueue(fn);
-        break;
-      case "debug":
-        fn();
-        break;
-      default:
-        break;
-    }
-
+    DeetRender.renderContainerFork(div);
     return div;
-  }
-  renderLabel(name: string) {
-    const label = document.createElement("label");
-    label.innerHTML = "ListNode " + name;
-    return label;
   }
   renderFork(instance: DeetListNode, name: string): void {
     switch (DeetCode.instance.renderMode) {
@@ -1112,25 +1088,26 @@ class DeetListNodeEngine implements DeetVisEngine {
         break;
     }
   }
-  renderDelayed(instance: DeetListNode, name: string): void {
-    const nativeCopy = this.transformDeetToNative(instance);
+  renderFn(instance: any, name: string): () => void {
     const fn = () => {
-      const el = this.render(nativeCopy, name);
+      const el = this.renderContent(instance, name);
       const container = this.containerRegistry.get(name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
     };
+    return fn;
+  }
+  renderDelayed(instance: DeetListNode, name: string): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = this.renderFn(nativeCopy, name);
     DeetCode.enqueue(fn);
   }
   renderNow(instance: DeetListNode, name: string) {
     DeetCode.undoMonkeyPatchAll();
     const nativeCopy = this.transformDeetToNative(instance);
-    const el = this.render(nativeCopy, name);
-    const container = this.containerRegistry.get(name);
-    if (container) {
-      container.innerHTML = el.outerHTML;
-    }
+    const fn = this.renderFn(nativeCopy, name);
+    fn();
     DeetCode.monkeyPatchAll();
   }
   /**
@@ -1166,7 +1143,7 @@ class DeetListNodeEngine implements DeetVisEngine {
 
     return res;
   }
-  render(arr: Array<DeetListNodeRenderObj>, name: string): HTMLElement {
+  renderContent(arr: Array<DeetListNodeRenderObj>, name: string): HTMLElement {
     const container = document.createElement("div");
 
     // Declare the chart dimensions and margins.
@@ -1283,11 +1260,16 @@ class DeetBitwiseEngine implements DeetVisEngine {
     }
   }
   renderContainer(name: string, instance: number): HTMLElement {
-    const label = this.renderLabel(name, instance);
-    return DeetRender.renderContainer(label);
-  }
-  renderLabel(name: string, instance: number): HTMLElement {
-    return DeetRender.renderLabel("Bitwise " + name + " = " + instance);
+    if (this.containerRegistry.has(name)) {
+      return this.containerRegistry.get(name)!;
+    }
+
+    const label = DeetRender.renderLabel("Bitwise " + name);
+    const container = DeetRender.renderContainer();
+    container.appendChild(label);
+    DeetRender.renderContainerFork(container);
+    this.containerRegistry.set(name, container);
+    return container;
   }
   renderFork(instance: number, name: string): void {
     switch (DeetCode.instance.renderMode) {
@@ -1301,33 +1283,35 @@ class DeetBitwiseEngine implements DeetVisEngine {
         break;
     }
   }
-  renderDelayed(instance: number, name: string): void {
-    const nativeCopy = this.transformDeetToNative(instance);
+  renderFn(nativeCopy: number, name: string): () => void {
     const fn = () => {
-      const el = this.render(nativeCopy, name);
+      const el = this.renderContent(nativeCopy, name);
       const container = this.containerRegistry.get(name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
     };
+
+    return fn;
+  }
+  renderDelayed(instance: number, name: string): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = this.renderFn(nativeCopy, name);
     DeetCode.enqueue(fn);
   }
   renderNow(instance: number, name: string): void {
     DeetCode.undoMonkeyPatchAll();
     const nativeCopy = this.transformDeetToNative(instance);
-    const el = this.render(nativeCopy, name);
-    const container = this.containerRegistry.get(name);
-    if (container) {
-      container.innerHTML = el.outerHTML;
-    }
+    const fn = this.renderFn(nativeCopy, name);
+    fn();
     DeetCode.monkeyPatchAll();
   }
   transformDeetToNative(instance: number) {
     return instance;
   }
-  render(instance: number, name: string): HTMLElement {
+  renderContent(instance: number, name: string): HTMLElement {
     const div = document.createElement("div");
-    const label = this.renderLabel(name, instance);
+    const label = DeetRender.renderLabel("Bitwise " + name);
     div.appendChild(label);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -1409,13 +1393,12 @@ class DeetBitwiseEngine implements DeetVisEngine {
  * common rendering functions used anywhere
  */
 const DeetRender = {
-  renderContainer(label?: HTMLElement) {
-    const div = document.createElement("div");
-    div.classList.add("deet-container");
-    if (label) {
-      div.appendChild(label);
+  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>) {
+    for (const key of containerRegistry.keys()) {
+      containerRegistry.delete(key);
     }
-
+  },
+  renderContainerFork(div: HTMLElement): void {
     const fn = () => {
       DeetCode.instance.el?.appendChild(div);
     };
@@ -1430,12 +1413,57 @@ const DeetRender = {
       default:
         break;
     }
-
+  },
+  renderContainer(): HTMLElement {
+    const div = document.createElement("div");
+    div.classList.add("deet-container");
     return div;
   },
-  renderLabel(name: string) {
+  renderLabel(name: string): HTMLElement {
     const label = document.createElement("label");
     label.innerHTML = name;
     return label;
   },
 };
+
+class DeetTreeNode {
+  val: number;
+  left?: DeetTreeNode | null;
+  right?: DeetTreeNode | null;
+  constructor(val: number, left = null, right = null) {
+    this.val = val;
+    this.left = left;
+    this.right = right;
+  }
+}
+
+class DeetTreeNodeEngine implements DeetVisEngine {
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>): void {
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(name: string, instance?: any): HTMLElement {
+    throw new Error("Method not implemented.");
+  }
+  renderLabel(name: string, instance?: any): HTMLElement {
+    throw new Error("Method not implemented.");
+  }
+  renderFork(instance: any, name: string): void {
+    throw new Error("Method not implemented.");
+  }
+  renderFn(instance: any, name: string): () => void {
+    throw new Error("Method not implemented.");
+  }
+  renderDelayed(instance: any, name: string): void {
+    throw new Error("Method not implemented.");
+  }
+  renderNow(instance: any, name: string): void {
+    throw new Error("Method not implemented.");
+  }
+  transformDeetToNative(instance: any) {
+    throw new Error("Method not implemented.");
+  }
+  renderContent(instance: any, name: string): HTMLElement {
+    throw new Error("Method not implemented.");
+  }
+}
