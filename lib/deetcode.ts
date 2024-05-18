@@ -1008,62 +1008,6 @@ export class DeetTest {
   }
 }
 
-/**
- * the DeetVis class is a utility that can be used from
- * the code editor. it is responsible for visualizing
- * types which are not extending the native types.
- * for example, ListNode and Bitwise.
- */
-export class DeetVis {
-  static index(instance: DeetArray, obj: VisualizeIndexObj) {
-    instance.engine.renderIndexFork(instance, obj);
-  }
-
-  /**
-   * a static linked list visualization utility function.
-   *
-   * @param name the label to be rendered
-   * @param node the root ListNode object to start rendering at
-   * @param pointers an object with the name of pointers as keys and DeetListNode instance as key. used to render to the pointer labels under each node.
-   */
-  static linkedList(
-    name: string,
-    node: DeetListNode,
-    pointers?: { [key: string]: DeetListNode | null }
-  ) {
-    // clear all the pointers properties
-    let cur: DeetListNode | null = node;
-    DeetSet.undoMonkeyPatch();
-    const set = new Set();
-    DeetSet.monkeyPatch();
-    while (cur && !set.has(cur)) {
-      for (const val of cur.pointers) {
-        cur.pointers.delete(val);
-      }
-      set.add(cur);
-      cur = cur.next;
-    }
-    if (pointers) {
-      // push pointer keys onto pointer arrays
-      for (const [k, v] of Object.entries(pointers)) {
-        if (v) {
-          v.pointers.add(k);
-        }
-      }
-    }
-    if (!DeetCode.instance.listNodeEngine.containerRegistry.has(name)) {
-      const div = DeetCode.instance.listNodeEngine.renderContainer(name);
-      DeetCode.instance.listNodeEngine.containerRegistry.set(name, div);
-    }
-    DeetCode.instance.listNodeEngine.renderFork(node, name);
-  }
-
-  static bitwise(name: string, num: number) {
-    DeetCode.instance.bitwiseEngine.renderContainer(name, num);
-    DeetCode.instance.bitwiseEngine.renderFork(num, name);
-  }
-}
-
 class DeetListNodeEngine implements DeetVisEngine {
   containerRegistry: Map<string, HTMLElement> = new Map();
   emptyContainerRegistry() {
@@ -1389,43 +1333,6 @@ class DeetBitwiseEngine implements DeetVisEngine {
   }
 }
 
-/**
- * common rendering functions used anywhere
- */
-const DeetRender = {
-  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>) {
-    for (const key of containerRegistry.keys()) {
-      containerRegistry.delete(key);
-    }
-  },
-  renderContainerFork(div: HTMLElement): void {
-    const fn = () => {
-      DeetCode.instance.el?.appendChild(div);
-    };
-
-    switch (DeetCode.instance.renderMode) {
-      case "animate":
-        DeetCode.enqueue(fn);
-        break;
-      case "debug":
-        fn();
-        break;
-      default:
-        break;
-    }
-  },
-  renderContainer(): HTMLElement {
-    const div = document.createElement("div");
-    div.classList.add("deet-container");
-    return div;
-  },
-  renderLabel(name: string): HTMLElement {
-    const label = document.createElement("label");
-    label.innerHTML = name;
-    return label;
-  },
-};
-
 class DeetTreeNode {
   val: number;
   left?: DeetTreeNode | null;
@@ -1467,3 +1374,96 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     throw new Error("Method not implemented.");
   }
 }
+
+/**
+ * the DeetVis class is a utility that can be used from
+ * the code editor. it is responsible for visualizing
+ * types which are not extending the native types.
+ * for example, ListNode and Bitwise.
+ */
+export const DeetVis = {
+  index(instance: DeetArray, obj: VisualizeIndexObj) {
+    instance.engine.renderIndexFork(instance, obj);
+  },
+
+  /**
+   * a static linked list visualization utility function.
+   *
+   * @param name the label to be rendered
+   * @param node the root ListNode object to start rendering at
+   * @param pointers an object with the name of pointers as keys and DeetListNode instance as key. used to render to the pointer labels under each node.
+   */
+  linkedList(
+    name: string,
+    node: DeetListNode,
+    pointers?: { [key: string]: DeetListNode | null }
+  ) {
+    // clear all the pointers properties
+    let cur: DeetListNode | null = node;
+    DeetSet.undoMonkeyPatch();
+    const set = new Set();
+    DeetSet.monkeyPatch();
+    while (cur && !set.has(cur)) {
+      for (const val of cur.pointers) {
+        cur.pointers.delete(val);
+      }
+      set.add(cur);
+      cur = cur.next;
+    }
+    if (pointers) {
+      // push pointer keys onto pointer arrays
+      for (const [k, v] of Object.entries(pointers)) {
+        if (v) {
+          v.pointers.add(k);
+        }
+      }
+    }
+    if (!DeetCode.instance.listNodeEngine.containerRegistry.has(name)) {
+      const div = DeetCode.instance.listNodeEngine.renderContainer(name);
+      DeetCode.instance.listNodeEngine.containerRegistry.set(name, div);
+    }
+    DeetCode.instance.listNodeEngine.renderFork(node, name);
+  },
+
+  bitwise(name: string, num: number) {
+    DeetCode.instance.bitwiseEngine.renderContainer(name, num);
+    DeetCode.instance.bitwiseEngine.renderFork(num, name);
+  },
+};
+
+/**
+ * common rendering functions used anywhere
+ */
+const DeetRender = {
+  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>) {
+    for (const key of containerRegistry.keys()) {
+      containerRegistry.delete(key);
+    }
+  },
+  renderContainerFork(div: HTMLElement): void {
+    const fn = () => {
+      DeetCode.instance.el?.appendChild(div);
+    };
+
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
+  },
+  renderContainer(): HTMLElement {
+    const div = document.createElement("div");
+    div.classList.add("deet-container");
+    return div;
+  },
+  renderLabel(name: string): HTMLElement {
+    const label = document.createElement("label");
+    label.innerHTML = name;
+    return label;
+  },
+};
