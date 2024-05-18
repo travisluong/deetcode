@@ -94,14 +94,6 @@ type DeetDataStructure =
   | DeetMaxPriorityQueue
   | DeetPriorityQueue;
 
-export type RenderMode = "animate" | "debug";
-
-export type DirectionMode = "row" | "column";
-
-/**
- * DeetEngine abstract class contains common methods
- * for rendering the native data structures.
- */
 abstract class DeetEngine {
   abstract transformDeetToNative(
     instance: DeetDataStructure
@@ -193,6 +185,11 @@ abstract class DeetEngine {
   }
 }
 
+/**
+ * DeetEngine abstract class contains common methods
+ * for rendering the native data structures.
+ */
+
 class DeetSetEngine extends DeetEngine {
   transformDeetToNative(instance: DeetSet): Set<any> {
     let copy;
@@ -216,51 +213,6 @@ class DeetSetEngine extends DeetEngine {
     div.appendChild(label);
     div.appendChild(ul);
     return div;
-  }
-}
-
-export class DeetSet extends Set {
-  container: HTMLElement;
-  engine: DeetSetEngine;
-  static originalSet?: SetConstructor;
-
-  constructor(iterable: any) {
-    super();
-    this.engine = DeetCode.instance.setEngine;
-    this.container = this.engine.renderContainer(this);
-    if (iterable) {
-      for (const item of iterable) {
-        this.add(item);
-      }
-    }
-  }
-
-  has(value: any): boolean {
-    return super.has(value);
-  }
-
-  add(value: any): any {
-    const res = super.add(value);
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  delete(value: any): any {
-    const res = super.delete(value);
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  static monkeyPatch() {
-    if (this.originalSet === undefined) {
-      this.originalSet = Set;
-    }
-
-    Set = DeetSet;
-  }
-
-  static undoMonkeyPatch() {
-    Set = this.originalSet!;
   }
 }
 
@@ -308,66 +260,6 @@ class DeetMapEngine extends DeetEngine {
     div.append(label);
     div.append(table);
     return div;
-  }
-}
-
-export class DeetMap<K, V> extends Map<K, V> {
-  container: HTMLElement;
-  engine: DeetMapEngine;
-  renderEnabled: boolean;
-  static originalMap?: MapConstructor;
-
-  /**
-   * passing iterable into super doesn't work
-   * since we need the container to be rendered
-   * before setting and rendering the key and values
-   * @param iterable
-   */
-  constructor(iterable?: readonly (readonly [K, V])[] | null) {
-    super();
-    this.renderEnabled = false;
-    this.engine = DeetCode.instance.mapEngine;
-    this.container = this.engine.renderContainer(this);
-    if (iterable) {
-      for (const [key, value] of iterable) {
-        this.set(key, value);
-      }
-    }
-    this.renderEnabled = true;
-    this.engine.renderFork(this);
-  }
-
-  has(value: any): boolean {
-    return super.has(value);
-  }
-
-  set(key: any, value: any): any {
-    const res = super.set(key, value);
-    if (this.renderEnabled) {
-      this.engine.renderFork(this);
-    }
-    return res;
-  }
-
-  delete(key: any): any {
-    const res = super.delete(key);
-    if (this.renderEnabled) {
-      this.engine.renderFork(this);
-    }
-    return res;
-  }
-
-  static monkeyPatch() {
-    if (this.originalMap === undefined) {
-      this.originalMap = Map;
-    }
-
-    // @ts-ignore
-    Map = DeetMap;
-  }
-
-  static undoMonkeyPatch() {
-    Map = this.originalMap!;
   }
 }
 
@@ -540,107 +432,6 @@ class DeetArrayEngine extends DeetEngine {
   }
 }
 
-export class DeetArray extends Array {
-  container: HTMLElement;
-  engine: DeetArrayEngine;
-  renderEnabled: boolean = false;
-  static originalArray?: ArrayConstructor;
-
-  constructor(...args: any) {
-    super(...args);
-    this.engine = DeetCode.instance.arrayEngine;
-    this.container = this.engine.renderContainer(this);
-    this.engine.renderFork(this);
-    this.renderEnabled = true;
-    return new Proxy(this, {
-      get(target, key: any) {
-        if (key === "__isProxy") {
-          return true;
-        } else if (target[key] instanceof HTMLElement) {
-          return target[key];
-        } else if (target[key] instanceof DeetArrayEngine) {
-          return target[key];
-        } else if (typeof target[key] === "object") {
-          return new Proxy(target[key], this);
-        } else {
-          return target[key];
-        }
-      },
-      set: (target, prop, value) => {
-        console.log(target, prop, value);
-        const res = Reflect.set(target, prop, value);
-        if (this.renderEnabled) {
-          this.engine.renderFork(this);
-        }
-        return res;
-      },
-    });
-  }
-
-  push(value: any): number {
-    console.log("push", value);
-    this.renderEnabled = false;
-    const res = super.push(value);
-    this.engine.renderFork(this);
-    this.renderEnabled = true;
-    return res;
-  }
-
-  unshift(value: any): number {
-    console.log("unshift", value);
-    this.renderEnabled = false;
-    const res = super.unshift(value);
-    this.engine.renderFork(this);
-    this.renderEnabled = true;
-    return res;
-  }
-
-  shift(): number {
-    console.log("shift");
-    this.renderEnabled = false;
-    const res = super.shift();
-    this.engine.renderFork(this);
-    this.renderEnabled = true;
-    return res;
-  }
-
-  pop() {
-    console.log("pop");
-    this.renderEnabled = false;
-    const res = super.pop();
-    this.engine.renderFork(this);
-    this.renderEnabled = true;
-    return res;
-  }
-
-  sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
-    this.renderEnabled = false;
-    const res = super.sort(compareFn);
-    this.engine.renderFork(this);
-    this.renderEnabled = true;
-    return res;
-  }
-
-  visIndex(obj: VisualizeIndexObj) {
-    throw new Error("this method is deprecated in favor of Deet.visIndex");
-    this.engine.renderIndexFork(this, obj);
-  }
-
-  static monkeyPatch() {
-    if (this.originalArray === undefined) {
-      this.originalArray = Array;
-    }
-
-    // @ts-ignore
-    Array = DeetArray;
-  }
-
-  static undoMonkeyPatch() {
-    // @ts-ignore
-    Array = this.originalArray;
-  }
-}
-
 class DeetMinPriorityQueueEngine extends DeetEngine {
   transformDeetToNative(instance: DeetMinPriorityQueue): Array<any> {
     return instance.toArray();
@@ -667,44 +458,6 @@ class DeetMinPriorityQueueEngine extends DeetEngine {
   }
 }
 
-export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
-  container: HTMLElement;
-  engine: DeetMinPriorityQueueEngine;
-  static originalMinPriorityQueue?: typeof MinPriorityQueueB;
-
-  constructor(...args: any) {
-    super(...args);
-    this.engine = DeetCode.instance.minPriorityQueueEngine;
-    this.container = this.engine.renderContainer(this);
-    this.engine.renderFork(this);
-  }
-
-  enqueue(value: any) {
-    const res = super.enqueue(value);
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  dequeue() {
-    const res = super.dequeue();
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  static monkeyPatch() {
-    if (this.originalMinPriorityQueue === undefined) {
-      this.originalMinPriorityQueue = MinPriorityQueueB;
-    }
-
-    window.MinPriorityQueue = DeetMinPriorityQueue;
-  }
-
-  static undoMonkeyPatch() {
-    //@ts-ignore
-    window.MinPriorityQueue = this.originalMinPriorityQueue;
-  }
-}
-
 class DeetMaxPriorityQueueEngine extends DeetEngine {
   transformDeetToNative(instance: DeetMaxPriorityQueue): Array<any> {
     return instance.toArray();
@@ -728,42 +481,6 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
     div.appendChild(label);
     div.appendChild(ul);
     return div;
-  }
-}
-
-export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
-  engine: DeetMaxPriorityQueueEngine;
-  container: HTMLElement;
-  static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
-
-  constructor(...args: any) {
-    super(...args);
-    this.engine = DeetCode.instance.maxPriorityQueueEngine;
-    this.container = this.engine.renderContainer(this);
-  }
-
-  enqueue(value: any) {
-    const res = super.enqueue(value);
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  dequeue() {
-    const res = super.dequeue();
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  static monkeyPatch() {
-    if (this.originalMaxPriorityQueue === undefined) {
-      this.originalMaxPriorityQueue = MaxPriorityQueueB;
-    }
-
-    window.MaxPriorityQueue = DeetMaxPriorityQueue;
-  }
-
-  static undoMonkeyPatch() {
-    window.MaxPriorityQueue = this.originalMaxPriorityQueue!;
   }
 }
 
@@ -794,217 +511,6 @@ class DeetPriorityQueueEngine extends DeetEngine {
     div.appendChild(label);
     div.appendChild(ul);
     return div;
-  }
-}
-
-export class DeetPriorityQueue extends PriorityQueueB<any> {
-  engine: DeetPriorityQueueEngine;
-  container: HTMLElement;
-  static originalPriorityQueue?: typeof PriorityQueueB;
-
-  constructor(compare: ICompare<any>, values?: any[] | undefined) {
-    super(compare, values);
-    this.engine = DeetCode.instance.priorityQueueEngine;
-    this.container = this.engine.renderContainer(this);
-  }
-
-  enqueue(value: any) {
-    const res = super.enqueue(value);
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  dequeue() {
-    const res = super.dequeue();
-    this.engine.renderFork(this);
-    return res;
-  }
-
-  render() {
-    if (this.container) {
-      this.container.innerHTML = "";
-    }
-    const arr = super.toArray();
-    const ul = document.createElement("ul");
-    for (const item of arr) {
-      const li = document.createElement("li");
-      let html = "";
-      for (const [key, value] of Object.entries(item)) {
-        html += `${key}: ${value}<br>`;
-      }
-      li.innerHTML = html;
-      ul.appendChild(li);
-    }
-    this.container?.appendChild(ul);
-  }
-
-  static monkeyPatch() {
-    if (this.originalPriorityQueue === undefined) {
-      this.originalPriorityQueue = PriorityQueueB;
-    }
-
-    window.PriorityQueue = DeetPriorityQueue;
-  }
-
-  static undoMonkeyPatch() {
-    window.PriorityQueue = this.originalPriorityQueue!;
-  }
-}
-
-export class DeetCode {
-  el: Element;
-  renderQueue: Array<() => void>;
-  selector: string;
-  renderMode: RenderMode;
-  setEngine: DeetSetEngine;
-  mapEngine: DeetMapEngine;
-  arrayEngine: DeetArrayEngine;
-  minPriorityQueueEngine: DeetMinPriorityQueueEngine;
-  maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
-  priorityQueueEngine: DeetPriorityQueueEngine;
-  listNodeEngine: DeetListNodeEngine;
-  bitwiseEngine: DeetBitwiseEngine;
-  directionMode: DirectionMode;
-  labelMode: boolean;
-  animationDelay: number;
-  interval?: any;
-
-  static instance: DeetCode;
-
-  constructor(config: DeetConfig) {
-    this.selector = config.selector;
-    this.renderMode = config.renderMode || "debug";
-    this.setEngine = config.setEngine || new DeetSetEngine();
-    this.mapEngine = config.mapEngine || new DeetMapEngine();
-    this.arrayEngine = config.arrayEngine || new DeetArrayEngine();
-    this.minPriorityQueueEngine =
-      config.minPriorityQueueEngine || new DeetMinPriorityQueueEngine();
-    this.maxPriorityQueueEngine =
-      config.maxPriorityQueueEngine || new DeetMaxPriorityQueueEngine();
-    this.priorityQueueEngine =
-      config.priorityQueueEngine || new DeetPriorityQueueEngine();
-    this.listNodeEngine = config.listNodeEngine || new DeetListNodeEngine();
-    this.bitwiseEngine = config.bitwiseEngine || new DeetBitwiseEngine();
-    this.directionMode = config.directionMode || "row";
-    this.labelMode = config.labelMode || false;
-    this.animationDelay = config.animationDelay || 1000;
-
-    const el = document.querySelector(config.selector);
-
-    if (!el) {
-      throw new Error("deetcode container element not found");
-    }
-
-    this.el = el;
-    this.el.classList.add("deetcode");
-    this.renderQueue = new Array();
-    this.changeDirectionMode(this.directionMode);
-    this.changeLabelMode(this.labelMode);
-    this.changeAnimationDelay(this.animationDelay);
-  }
-
-  startRenderLoop() {
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
-    // make the lowest 10 milliseconds
-    const delay = this.animationDelay < 10 ? 10 : this.animationDelay;
-    this.interval = setInterval(() => {
-      const fn = this.renderQueue.shift();
-      if (!fn) return;
-      console.log(fn);
-      fn();
-    }, delay);
-  }
-
-  changeRenderMode(mode: RenderMode) {
-    this.renderMode = mode;
-  }
-
-  changeDirectionMode(mode: DirectionMode) {
-    if (mode === "column") {
-      this.el.classList.add("flex-col");
-    } else if (mode === "row") {
-      this.el.classList.remove("flex-col");
-    }
-    this.directionMode = mode;
-  }
-
-  changeLabelMode(mode: boolean) {
-    if (mode) {
-      this.el.classList.remove("deetcode-hide-labels");
-    } else {
-      this.el.classList.add("deetcode-hide-labels");
-    }
-  }
-
-  changeAnimationDelay(delay: number) {
-    this.animationDelay = delay;
-    this.startRenderLoop();
-  }
-
-  erase() {
-    this.el.innerHTML = "";
-    this.listNodeEngine.emptyContainerRegistry();
-    this.bitwiseEngine.emptyContainerRegistry();
-  }
-
-  static enqueue(fn: () => void) {
-    DeetCode.instance.renderQueue.push(fn);
-  }
-
-  static monkeyPatchAll() {
-    DeetSet.monkeyPatch();
-    DeetMap.monkeyPatch();
-    DeetArray.monkeyPatch();
-    DeetMinPriorityQueue.monkeyPatch();
-    DeetMaxPriorityQueue.monkeyPatch();
-    DeetPriorityQueue.monkeyPatch();
-  }
-
-  static undoMonkeyPatchAll() {
-    DeetSet.undoMonkeyPatch();
-    DeetMap.undoMonkeyPatch();
-    DeetArray.undoMonkeyPatch();
-    DeetMinPriorityQueue.undoMonkeyPatch();
-    DeetMaxPriorityQueue.undoMonkeyPatch();
-    DeetPriorityQueue.undoMonkeyPatch();
-  }
-
-  static setInstance(deetcode: DeetCode) {
-    DeetCode.instance = deetcode;
-  }
-}
-
-export class DeetTest {
-  static equal(actual: any, expected: any) {
-    const fn = () => {
-      const div = document.createElement("div");
-      div.classList.add("deet-assert");
-      if (_.isEqual(actual, expected)) {
-        div.classList.add("deet-assert-pass");
-        div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
-          actual
-        )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetCode.instance.el.appendChild(div);
-      } else {
-        div.classList.add("deet-assert-fail");
-        div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
-          actual
-        )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetCode.instance.el.appendChild(div);
-      }
-    };
-    switch (DeetCode.instance.renderMode) {
-      case "animate":
-        DeetCode.enqueue(fn);
-        break;
-      case "debug":
-        fn();
-        break;
-      default:
-        break;
-    }
   }
 }
 
@@ -1182,20 +688,6 @@ class DeetListNodeEngine implements DeetVisEngine {
   }
 }
 
-export class DeetListNode {
-  val = 0;
-  next: DeetListNode | null = null;
-  pointers: Set<string>;
-
-  constructor(val: number = 0, next: DeetListNode | null = null) {
-    this.val = val;
-    this.next = next;
-    DeetSet.undoMonkeyPatch();
-    this.pointers = new Set();
-    DeetSet.monkeyPatch();
-  }
-}
-
 class DeetBitwiseEngine implements DeetVisEngine {
   containerRegistry: Map<string, HTMLElement> = new Map();
   emptyContainerRegistry() {
@@ -1333,17 +825,6 @@ class DeetBitwiseEngine implements DeetVisEngine {
   }
 }
 
-class DeetTreeNode {
-  val: number;
-  left?: DeetTreeNode | null;
-  right?: DeetTreeNode | null;
-  constructor(val: number, left = null, right = null) {
-    this.val = val;
-    this.left = left;
-    this.right = right;
-  }
-}
-
 class DeetTreeNodeEngine implements DeetVisEngine {
   containerRegistry: Map<string, HTMLElement> = new Map();
   emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>): void {
@@ -1372,6 +853,563 @@ class DeetTreeNodeEngine implements DeetVisEngine {
   }
   renderContent(instance: any, name: string): HTMLElement {
     throw new Error("Method not implemented.");
+  }
+}
+
+/**
+ * common rendering functions used anywhere
+ */
+const DeetRender = {
+  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>) {
+    for (const key of containerRegistry.keys()) {
+      containerRegistry.delete(key);
+    }
+  },
+  renderContainerFork(div: HTMLElement): void {
+    const fn = () => {
+      DeetCode.instance.el?.appendChild(div);
+    };
+
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
+  },
+  renderContainer(): HTMLElement {
+    const div = document.createElement("div");
+    div.classList.add("deet-container");
+    return div;
+  },
+  renderLabel(name: string): HTMLElement {
+    const label = document.createElement("label");
+    label.innerHTML = name;
+    return label;
+  },
+};
+
+export type RenderMode = "animate" | "debug";
+
+export type DirectionMode = "row" | "column";
+
+export class DeetSet extends Set {
+  container: HTMLElement;
+  engine: DeetSetEngine;
+  static originalSet?: SetConstructor;
+
+  constructor(iterable: any) {
+    super();
+    this.engine = DeetCode.instance.setEngine;
+    this.container = this.engine.renderContainer(this);
+    if (iterable) {
+      for (const item of iterable) {
+        this.add(item);
+      }
+    }
+  }
+
+  has(value: any): boolean {
+    return super.has(value);
+  }
+
+  add(value: any): any {
+    const res = super.add(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  delete(value: any): any {
+    const res = super.delete(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  static monkeyPatch() {
+    if (this.originalSet === undefined) {
+      this.originalSet = Set;
+    }
+
+    Set = DeetSet;
+  }
+
+  static undoMonkeyPatch() {
+    Set = this.originalSet!;
+  }
+}
+
+export class DeetMap<K, V> extends Map<K, V> {
+  container: HTMLElement;
+  engine: DeetMapEngine;
+  renderEnabled: boolean;
+  static originalMap?: MapConstructor;
+
+  /**
+   * passing iterable into super doesn't work
+   * since we need the container to be rendered
+   * before setting and rendering the key and values
+   * @param iterable
+   */
+  constructor(iterable?: readonly (readonly [K, V])[] | null) {
+    super();
+    this.renderEnabled = false;
+    this.engine = DeetCode.instance.mapEngine;
+    this.container = this.engine.renderContainer(this);
+    if (iterable) {
+      for (const [key, value] of iterable) {
+        this.set(key, value);
+      }
+    }
+    this.renderEnabled = true;
+    this.engine.renderFork(this);
+  }
+
+  has(value: any): boolean {
+    return super.has(value);
+  }
+
+  set(key: any, value: any): any {
+    const res = super.set(key, value);
+    if (this.renderEnabled) {
+      this.engine.renderFork(this);
+    }
+    return res;
+  }
+
+  delete(key: any): any {
+    const res = super.delete(key);
+    if (this.renderEnabled) {
+      this.engine.renderFork(this);
+    }
+    return res;
+  }
+
+  static monkeyPatch() {
+    if (this.originalMap === undefined) {
+      this.originalMap = Map;
+    }
+
+    // @ts-ignore
+    Map = DeetMap;
+  }
+
+  static undoMonkeyPatch() {
+    Map = this.originalMap!;
+  }
+}
+
+export class DeetArray extends Array {
+  container: HTMLElement;
+  engine: DeetArrayEngine;
+  renderEnabled: boolean = false;
+  static originalArray?: ArrayConstructor;
+
+  constructor(...args: any) {
+    super(...args);
+    this.engine = DeetCode.instance.arrayEngine;
+    this.container = this.engine.renderContainer(this);
+    this.engine.renderFork(this);
+    this.renderEnabled = true;
+    return new Proxy(this, {
+      get(target, key: any) {
+        if (key === "__isProxy") {
+          return true;
+        } else if (target[key] instanceof HTMLElement) {
+          return target[key];
+        } else if (target[key] instanceof DeetArrayEngine) {
+          return target[key];
+        } else if (typeof target[key] === "object") {
+          return new Proxy(target[key], this);
+        } else {
+          return target[key];
+        }
+      },
+      set: (target, prop, value) => {
+        console.log(target, prop, value);
+        const res = Reflect.set(target, prop, value);
+        if (this.renderEnabled) {
+          this.engine.renderFork(this);
+        }
+        return res;
+      },
+    });
+  }
+
+  push(value: any): number {
+    console.log("push", value);
+    this.renderEnabled = false;
+    const res = super.push(value);
+    this.engine.renderFork(this);
+    this.renderEnabled = true;
+    return res;
+  }
+
+  unshift(value: any): number {
+    console.log("unshift", value);
+    this.renderEnabled = false;
+    const res = super.unshift(value);
+    this.engine.renderFork(this);
+    this.renderEnabled = true;
+    return res;
+  }
+
+  shift(): number {
+    console.log("shift");
+    this.renderEnabled = false;
+    const res = super.shift();
+    this.engine.renderFork(this);
+    this.renderEnabled = true;
+    return res;
+  }
+
+  pop() {
+    console.log("pop");
+    this.renderEnabled = false;
+    const res = super.pop();
+    this.engine.renderFork(this);
+    this.renderEnabled = true;
+    return res;
+  }
+
+  sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
+    this.renderEnabled = false;
+    const res = super.sort(compareFn);
+    this.engine.renderFork(this);
+    this.renderEnabled = true;
+    return res;
+  }
+
+  visIndex(obj: VisualizeIndexObj) {
+    throw new Error("this method is deprecated in favor of Deet.visIndex");
+    this.engine.renderIndexFork(this, obj);
+  }
+
+  static monkeyPatch() {
+    if (this.originalArray === undefined) {
+      this.originalArray = Array;
+    }
+
+    // @ts-ignore
+    Array = DeetArray;
+  }
+
+  static undoMonkeyPatch() {
+    // @ts-ignore
+    Array = this.originalArray;
+  }
+}
+
+export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
+  container: HTMLElement;
+  engine: DeetMinPriorityQueueEngine;
+  static originalMinPriorityQueue?: typeof MinPriorityQueueB;
+
+  constructor(...args: any) {
+    super(...args);
+    this.engine = DeetCode.instance.minPriorityQueueEngine;
+    this.container = this.engine.renderContainer(this);
+    this.engine.renderFork(this);
+  }
+
+  enqueue(value: any) {
+    const res = super.enqueue(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  dequeue() {
+    const res = super.dequeue();
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  static monkeyPatch() {
+    if (this.originalMinPriorityQueue === undefined) {
+      this.originalMinPriorityQueue = MinPriorityQueueB;
+    }
+
+    window.MinPriorityQueue = DeetMinPriorityQueue;
+  }
+
+  static undoMonkeyPatch() {
+    //@ts-ignore
+    window.MinPriorityQueue = this.originalMinPriorityQueue;
+  }
+}
+
+export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
+  engine: DeetMaxPriorityQueueEngine;
+  container: HTMLElement;
+  static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
+
+  constructor(...args: any) {
+    super(...args);
+    this.engine = DeetCode.instance.maxPriorityQueueEngine;
+    this.container = this.engine.renderContainer(this);
+  }
+
+  enqueue(value: any) {
+    const res = super.enqueue(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  dequeue() {
+    const res = super.dequeue();
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  static monkeyPatch() {
+    if (this.originalMaxPriorityQueue === undefined) {
+      this.originalMaxPriorityQueue = MaxPriorityQueueB;
+    }
+
+    window.MaxPriorityQueue = DeetMaxPriorityQueue;
+  }
+
+  static undoMonkeyPatch() {
+    window.MaxPriorityQueue = this.originalMaxPriorityQueue!;
+  }
+}
+
+export class DeetPriorityQueue extends PriorityQueueB<any> {
+  engine: DeetPriorityQueueEngine;
+  container: HTMLElement;
+  static originalPriorityQueue?: typeof PriorityQueueB;
+
+  constructor(compare: ICompare<any>, values?: any[] | undefined) {
+    super(compare, values);
+    this.engine = DeetCode.instance.priorityQueueEngine;
+    this.container = this.engine.renderContainer(this);
+  }
+
+  enqueue(value: any) {
+    const res = super.enqueue(value);
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  dequeue() {
+    const res = super.dequeue();
+    this.engine.renderFork(this);
+    return res;
+  }
+
+  render() {
+    if (this.container) {
+      this.container.innerHTML = "";
+    }
+    const arr = super.toArray();
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      let html = "";
+      for (const [key, value] of Object.entries(item)) {
+        html += `${key}: ${value}<br>`;
+      }
+      li.innerHTML = html;
+      ul.appendChild(li);
+    }
+    this.container?.appendChild(ul);
+  }
+
+  static monkeyPatch() {
+    if (this.originalPriorityQueue === undefined) {
+      this.originalPriorityQueue = PriorityQueueB;
+    }
+
+    window.PriorityQueue = DeetPriorityQueue;
+  }
+
+  static undoMonkeyPatch() {
+    window.PriorityQueue = this.originalPriorityQueue!;
+  }
+}
+
+export class DeetListNode {
+  val = 0;
+  next: DeetListNode | null = null;
+  pointers: Set<string>;
+
+  constructor(val: number = 0, next: DeetListNode | null = null) {
+    this.val = val;
+    this.next = next;
+    DeetSet.undoMonkeyPatch();
+    this.pointers = new Set();
+    DeetSet.monkeyPatch();
+  }
+}
+
+export class DeetTreeNode {
+  val: number;
+  left?: DeetTreeNode | null;
+  right?: DeetTreeNode | null;
+  constructor(val: number, left = null, right = null) {
+    this.val = val;
+    this.left = left;
+    this.right = right;
+  }
+}
+
+export class DeetCode {
+  el: Element;
+  renderQueue: Array<() => void>;
+  selector: string;
+  renderMode: RenderMode;
+  setEngine: DeetSetEngine;
+  mapEngine: DeetMapEngine;
+  arrayEngine: DeetArrayEngine;
+  minPriorityQueueEngine: DeetMinPriorityQueueEngine;
+  maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
+  priorityQueueEngine: DeetPriorityQueueEngine;
+  listNodeEngine: DeetListNodeEngine;
+  bitwiseEngine: DeetBitwiseEngine;
+  directionMode: DirectionMode;
+  labelMode: boolean;
+  animationDelay: number;
+  interval?: any;
+
+  static instance: DeetCode;
+
+  constructor(config: DeetConfig) {
+    this.selector = config.selector;
+    this.renderMode = config.renderMode || "debug";
+    this.setEngine = config.setEngine || new DeetSetEngine();
+    this.mapEngine = config.mapEngine || new DeetMapEngine();
+    this.arrayEngine = config.arrayEngine || new DeetArrayEngine();
+    this.minPriorityQueueEngine =
+      config.minPriorityQueueEngine || new DeetMinPriorityQueueEngine();
+    this.maxPriorityQueueEngine =
+      config.maxPriorityQueueEngine || new DeetMaxPriorityQueueEngine();
+    this.priorityQueueEngine =
+      config.priorityQueueEngine || new DeetPriorityQueueEngine();
+    this.listNodeEngine = config.listNodeEngine || new DeetListNodeEngine();
+    this.bitwiseEngine = config.bitwiseEngine || new DeetBitwiseEngine();
+    this.directionMode = config.directionMode || "row";
+    this.labelMode = config.labelMode || false;
+    this.animationDelay = config.animationDelay || 1000;
+
+    const el = document.querySelector(config.selector);
+
+    if (!el) {
+      throw new Error("deetcode container element not found");
+    }
+
+    this.el = el;
+    this.el.classList.add("deetcode");
+    this.renderQueue = new Array();
+    this.changeDirectionMode(this.directionMode);
+    this.changeLabelMode(this.labelMode);
+    this.changeAnimationDelay(this.animationDelay);
+  }
+
+  startRenderLoop() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    // make the lowest 10 milliseconds
+    const delay = this.animationDelay < 10 ? 10 : this.animationDelay;
+    this.interval = setInterval(() => {
+      const fn = this.renderQueue.shift();
+      if (!fn) return;
+      console.log(fn);
+      fn();
+    }, delay);
+  }
+
+  changeRenderMode(mode: RenderMode) {
+    this.renderMode = mode;
+  }
+
+  changeDirectionMode(mode: DirectionMode) {
+    if (mode === "column") {
+      this.el.classList.add("flex-col");
+    } else if (mode === "row") {
+      this.el.classList.remove("flex-col");
+    }
+    this.directionMode = mode;
+  }
+
+  changeLabelMode(mode: boolean) {
+    if (mode) {
+      this.el.classList.remove("deetcode-hide-labels");
+    } else {
+      this.el.classList.add("deetcode-hide-labels");
+    }
+  }
+
+  changeAnimationDelay(delay: number) {
+    this.animationDelay = delay;
+    this.startRenderLoop();
+  }
+
+  erase() {
+    this.el.innerHTML = "";
+    this.listNodeEngine.emptyContainerRegistry();
+    this.bitwiseEngine.emptyContainerRegistry();
+  }
+
+  static enqueue(fn: () => void) {
+    DeetCode.instance.renderQueue.push(fn);
+  }
+
+  static monkeyPatchAll() {
+    DeetSet.monkeyPatch();
+    DeetMap.monkeyPatch();
+    DeetArray.monkeyPatch();
+    DeetMinPriorityQueue.monkeyPatch();
+    DeetMaxPriorityQueue.monkeyPatch();
+    DeetPriorityQueue.monkeyPatch();
+  }
+
+  static undoMonkeyPatchAll() {
+    DeetSet.undoMonkeyPatch();
+    DeetMap.undoMonkeyPatch();
+    DeetArray.undoMonkeyPatch();
+    DeetMinPriorityQueue.undoMonkeyPatch();
+    DeetMaxPriorityQueue.undoMonkeyPatch();
+    DeetPriorityQueue.undoMonkeyPatch();
+  }
+
+  static setInstance(deetcode: DeetCode) {
+    DeetCode.instance = deetcode;
+  }
+}
+
+export class DeetTest {
+  static equal(actual: any, expected: any) {
+    const fn = () => {
+      const div = document.createElement("div");
+      div.classList.add("deet-assert");
+      if (_.isEqual(actual, expected)) {
+        div.classList.add("deet-assert-pass");
+        div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
+          actual
+        )}<br>Expected: ${JSON.stringify(expected)}`;
+        DeetCode.instance.el.appendChild(div);
+      } else {
+        div.classList.add("deet-assert-fail");
+        div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
+          actual
+        )}<br>Expected: ${JSON.stringify(expected)}`;
+        DeetCode.instance.el.appendChild(div);
+      }
+    };
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        DeetCode.enqueue(fn);
+        break;
+      case "debug":
+        fn();
+        break;
+      default:
+        break;
+    }
   }
 }
 
@@ -1428,42 +1466,5 @@ export const DeetVis = {
   bitwise(name: string, num: number) {
     DeetCode.instance.bitwiseEngine.renderContainer(name, num);
     DeetCode.instance.bitwiseEngine.renderFork(num, name);
-  },
-};
-
-/**
- * common rendering functions used anywhere
- */
-const DeetRender = {
-  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>) {
-    for (const key of containerRegistry.keys()) {
-      containerRegistry.delete(key);
-    }
-  },
-  renderContainerFork(div: HTMLElement): void {
-    const fn = () => {
-      DeetCode.instance.el?.appendChild(div);
-    };
-
-    switch (DeetCode.instance.renderMode) {
-      case "animate":
-        DeetCode.enqueue(fn);
-        break;
-      case "debug":
-        fn();
-        break;
-      default:
-        break;
-    }
-  },
-  renderContainer(): HTMLElement {
-    const div = document.createElement("div");
-    div.classList.add("deet-container");
-    return div;
-  },
-  renderLabel(name: string): HTMLElement {
-    const label = document.createElement("label");
-    label.innerHTML = name;
-    return label;
   },
 };
