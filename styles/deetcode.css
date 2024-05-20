@@ -107,3 +107,21 @@ d3 styles
   stroke: lightgray;
   fill: lightgray;
 }
+
+/**
+tree node
+*/
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+.node text {
+  font: 12px sans-serif;
+  stroke: #333;
+}
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}

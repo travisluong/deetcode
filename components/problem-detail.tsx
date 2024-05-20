@@ -16,6 +16,7 @@ import {
   DirectionMode,
   DeetListNode,
   RenderMode,
+  DeetTreeNode,
 } from "@/lib/deetcode";
 import {
   ResizableHandle,
@@ -98,6 +99,7 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
       window.DeetVis = DeetVis;
       window._ = _;
       window.ListNode = DeetListNode;
+      window.TreeNode = DeetTreeNode;
 
       // these declarations are only necessary if we want to use the Deet classes in the editor
       window.DeetSet = DeetSet;

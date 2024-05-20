@@ -51,6 +51,7 @@ interface DeetConfig {
   priorityQueueEngine?: DeetPriorityQueueEngine;
   listNodeEngine?: DeetListNodeEngine;
   bitwiseEngine?: DeetBitwiseEngine;
+  treeNodeEngine?: DeetTreeNodeEngine;
   directionMode?: DirectionMode;
   labelMode?: boolean;
   animationDelay?: number;
@@ -76,6 +77,11 @@ interface DeetVisEngine {
   transformDeetToNative(instance: any): any;
   renderContent(instance: any, name: string): HTMLElement;
   renderFn(instance: any, name: string): () => void;
+}
+
+interface D3TreeNode {
+  name: number;
+  children: (D3TreeNode | null)[];
 }
 
 type NativeDataStructure =
@@ -847,29 +853,149 @@ class DeetTreeNodeEngine implements DeetVisEngine {
   emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
-  renderContainer(name: string, instance?: any): HTMLElement {
-    throw new Error("Method not implemented.");
+  renderContainer(name: string, instance?: DeetTreeNode): HTMLElement {
+    if (this.containerRegistry.has(name)) {
+      return this.containerRegistry.get(name)!;
+    }
+
+    const label = DeetRender.renderLabel("TreeNode " + name);
+    const div = DeetRender.renderContainer();
+    div.appendChild(label);
+    DeetRender.renderContainerFork(div);
+    this.containerRegistry.set(name, div);
+    return div;
   }
-  renderLabel(name: string, instance?: any): HTMLElement {
-    throw new Error("Method not implemented.");
+  renderFork(instance: DeetTreeNode, name: string): void {
+    switch (DeetCode.instance.renderMode) {
+      case "animate":
+        this.renderDelayed(instance, name);
+        break;
+      case "debug":
+        this.renderNow(instance, name);
+        break;
+      case "snapshot":
+        this.renderNow(instance, name);
+        DeetCode.instance.takeSnapshot();
+        break;
+      default:
+        break;
+    }
   }
-  renderFork(instance: any, name: string): void {
-    throw new Error("Method not implemented.");
+  renderFn(instance: D3TreeNode, name: string): () => void {
+    const fn = () => {
+      const el = this.renderContent(instance, name);
+      const container = this.containerRegistry.get(name);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    return fn;
   }
-  renderFn(instance: any, name: string): () => void {
-    throw new Error("Method not implemented.");
+  renderDelayed(instance: DeetTreeNode, name: string): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    if (nativeCopy) {
+      const fn = this.renderFn(nativeCopy, name);
+      DeetCode.enqueue(fn);
+    }
   }
-  renderDelayed(instance: any, name: string): void {
-    throw new Error("Method not implemented.");
+  renderNow(instance: DeetTreeNode, name: string): void {
+    DeetCode.undoMonkeyPatchAll();
+    const nativeCopy = this.transformDeetToNative(instance);
+    if (nativeCopy) {
+      const fn = this.renderFn(nativeCopy, name);
+      fn();
+    }
+    DeetCode.monkeyPatchAll();
   }
-  renderNow(instance: any, name: string): void {
-    throw new Error("Method not implemented.");
+  transformDeetToNative(instance: DeetTreeNode) {
+    return this.treeToHierarchy(instance);
   }
-  transformDeetToNative(instance: any) {
-    throw new Error("Method not implemented.");
+  renderContent(data: D3TreeNode, name: string): HTMLElement {
+    const div = document.createElement("div");
+
+    const width = 800;
+    const height = 600;
+
+    const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+    const g = svg.append("g").attr("transform", "translate(400,50)");
+
+    const tree = d3.tree().nodeSize([100, 40]);
+
+    const root = d3.hierarchy(data);
+
+    // @ts-ignore
+    tree(root);
+
+    // curved lines
+    // const link = g
+    //   .selectAll(".link")
+    //   .data(root.links())
+    //   .enter()
+    //   .append("path")
+    //   .attr("class", "link")
+    //   .attr(
+    //     "d",
+    //     d3
+    //       .linkVertical()
+    //       .x((d) => d.x)
+    //       .y((d) => d.y)
+    //   );
+
+    // Create straight line links
+    const link = g
+      .selectAll(".link")
+      .data(root.links())
+      .enter()
+      .append("line")
+      .attr("class", "link")
+      // @ts-ignore
+      .attr("x1", (d) => d.source.x)
+      // @ts-ignore
+      .attr("y1", (d) => d.source.y)
+      // @ts-ignore
+      .attr("x2", (d) => d.target.x)
+      // @ts-ignore
+      .attr("y2", (d) => d.target.y)
+      .attr("stroke", "darkgray")
+      .attr("stroke-width", 2);
+
+    const node = g
+      .selectAll(".node")
+      .data(root.descendants())
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .attr("transform", (d) => `translate(${d.x},${d.y})`);
+
+    node.append("circle").attr("r", 10);
+
+    node
+      .append("text")
+      .attr("dy", 5)
+      .attr("x", 0)
+      .style("text-anchor", "middle")
+      .text((d) => d.data.name);
+
+    const svgnode = svg.node();
+    if (svgnode) {
+      div.append(svgnode);
+    }
+
+    return div;
   }
-  renderContent(instance: any, name: string): HTMLElement {
-    throw new Error("Method not implemented.");
+  // Convert the TreeNode to a hierarchical format that D3 can understand
+  treeToHierarchy(node?: DeetTreeNode | null): D3TreeNode | null {
+    if (!node) {
+      return null;
+    }
+    return {
+      name: node.val,
+      children: [
+        this.treeToHierarchy(node.left),
+        this.treeToHierarchy(node.right),
+      ].filter(Boolean),
+    };
   }
 }
 
@@ -1289,6 +1415,7 @@ export class DeetCode {
   priorityQueueEngine: DeetPriorityQueueEngine;
   listNodeEngine: DeetListNodeEngine;
   bitwiseEngine: DeetBitwiseEngine;
+  treeNodeEngine: DeetTreeNodeEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
   animationDelay: number;
@@ -1312,6 +1439,7 @@ export class DeetCode {
       config.priorityQueueEngine || new DeetPriorityQueueEngine();
     this.listNodeEngine = config.listNodeEngine || new DeetListNodeEngine();
     this.bitwiseEngine = config.bitwiseEngine || new DeetBitwiseEngine();
+    this.treeNodeEngine = config.treeNodeEngine || new DeetTreeNodeEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -1547,5 +1675,10 @@ export const DeetVis = {
   bitwise(name: string, num: number) {
     DeetCode.instance.bitwiseEngine.renderContainer(name, num);
     DeetCode.instance.bitwiseEngine.renderFork(num, name);
+  },
+
+  tree(name: string, node: DeetTreeNode) {
+    DeetCode.instance.treeNodeEngine.renderContainer(name, node);
+    DeetCode.instance.treeNodeEngine.renderFork(node, name);
   },
 };
