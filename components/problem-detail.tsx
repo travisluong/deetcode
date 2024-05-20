@@ -46,6 +46,8 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
         case "debug":
           renderMode = "debug";
           break;
+        case "snapshot":
+          renderMode = "snapshot";
         default:
           break;
       }
@@ -132,8 +134,13 @@ export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
     const code = editorRef.current.getValue();
     console.log(code);
     try {
+      DeetCode.instance.emptySnapshots();
       DeetCode.monkeyPatchAll();
       eval(code);
+      document.dispatchEvent(new CustomEvent("deetcodeEvalCompleted"));
+      if (DeetCode.instance.renderMode === "snapshot") {
+        DeetCode.instance.initialSnapshot();
+      }
     } catch (error) {
       console.error(error);
     } finally {

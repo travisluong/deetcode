@@ -1,17 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DeetCode } from "@/lib/deetcode";
+import { DeetCode, RenderMode } from "@/lib/deetcode";
 import { Button } from "./ui/button";
-import { Crosshair2Icon, PlayIcon } from "@radix-ui/react-icons";
+import { CameraIcon, Crosshair2Icon, PlayIcon } from "@radix-ui/react-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-
-type RenderMode = "animate" | "debug";
 
 export default function AnimateModeToggle() {
   const [mode, setMode] = useState<RenderMode>("animate");
@@ -25,6 +23,8 @@ export default function AnimateModeToggle() {
       case "debug":
         setMode("debug");
         break;
+      case "snapshot":
+        setMode("snapshot");
       default:
         break;
     }
@@ -32,12 +32,21 @@ export default function AnimateModeToggle() {
 
   function handleClick(mode: RenderMode) {
     setMode(mode);
-    if (mode === "animate") {
-      DeetCode.instance.changeRenderMode("animate");
-      localStorage.setItem("deetcode-render-mode", "animate");
-    } else {
-      DeetCode.instance.changeRenderMode("debug");
-      localStorage.setItem("deetcode-render-mode", "debug");
+    switch (mode) {
+      case "animate":
+        DeetCode.instance.changeRenderMode("animate");
+        localStorage.setItem("deetcode-render-mode", "animate");
+        break;
+      case "debug":
+        DeetCode.instance.changeRenderMode("debug");
+        localStorage.setItem("deetcode-render-mode", "debug");
+        break;
+      case "snapshot":
+        DeetCode.instance.changeRenderMode("snapshot");
+        localStorage.setItem("deetcode-render-mode", "snapshot");
+        break;
+      default:
+        break;
     }
   }
 
@@ -49,6 +58,9 @@ export default function AnimateModeToggle() {
           {mode === "debug" && (
             <Crosshair2Icon className="h-[1.2rem] w-[1.2rem]" />
           )}
+          {mode === "snapshot" && (
+            <CameraIcon className="h-[1.2rem] w-[1.2rem]" />
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -57,6 +69,9 @@ export default function AnimateModeToggle() {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleClick("debug")}>
           <Crosshair2Icon className="h-[1.2rem] w-[1.2rem] mr-2" /> Debug Mode
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleClick("snapshot")}>
+          <CameraIcon className="h-[1.2rem] w-[1.2rem] mr-2" /> Snapshot Mode
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

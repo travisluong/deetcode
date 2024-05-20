@@ -114,6 +114,10 @@ abstract class DeetEngine {
       case "debug":
         this.renderNow(instance);
         break;
+      case "snapshot":
+        this.renderNow(instance);
+        DeetCode.instance.takeSnapshot();
+        break;
       default:
         break;
     }
@@ -149,6 +153,9 @@ abstract class DeetEngine {
       case "debug":
         fn();
         break;
+      case "snapshot":
+        fn();
+        DeetCode.instance.takeSnapshot();
       default:
         break;
     }
@@ -362,6 +369,9 @@ class DeetArrayEngine extends DeetEngine {
       case "debug":
         fn();
         break;
+      case "snapshot":
+        fn();
+        DeetCode.instance.takeSnapshot();
       default:
         break;
     }
@@ -533,6 +543,10 @@ class DeetListNodeEngine implements DeetVisEngine {
         break;
       case "debug":
         this.renderNow(instance, name);
+        break;
+      case "snapshot":
+        this.renderNow(instance, name);
+        DeetCode.instance.takeSnapshot();
         break;
       default:
         break;
@@ -715,6 +729,9 @@ class DeetBitwiseEngine implements DeetVisEngine {
       case "debug":
         this.renderNow(instance, name);
         break;
+      case "snapshot":
+        this.renderNow(instance, name);
+        DeetCode.instance.takeSnapshot();
       default:
         break;
     }
@@ -877,6 +894,9 @@ const DeetRender = {
       case "debug":
         fn();
         break;
+      case "snapshot":
+        fn();
+        DeetCode.instance.takeSnapshot();
       default:
         break;
     }
@@ -893,7 +913,7 @@ const DeetRender = {
   },
 };
 
-export type RenderMode = "animate" | "debug";
+export type RenderMode = "animate" | "debug" | "snapshot";
 
 export type DirectionMode = "row" | "column";
 
@@ -1273,6 +1293,8 @@ export class DeetCode {
   labelMode: boolean;
   animationDelay: number;
   interval?: any;
+  snapshots: Node[] = [];
+  snapshotIndex: number = 0;
 
   static instance: DeetCode;
 
@@ -1354,6 +1376,62 @@ export class DeetCode {
     this.bitwiseEngine.emptyContainerRegistry();
   }
 
+  takeSnapshot() {
+    const snapshot = this.el.cloneNode(true);
+    this.snapshots.push(snapshot);
+  }
+
+  prevSnapshot() {
+    if (this.snapshotIndex <= 0) {
+      return this.snapshotIndex;
+    }
+    this.snapshotIndex--;
+    this.el.innerHTML = "";
+    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    return this.snapshotIndex;
+  }
+
+  nextSnapshot() {
+    if (this.snapshotIndex >= this.snapshots.length - 1) {
+      return this.snapshotIndex;
+    }
+    this.snapshotIndex++;
+    this.el.innerHTML = "";
+    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    return this.snapshotIndex;
+  }
+
+  initialSnapshot() {
+    this.snapshotIndex = 0;
+    this.el.innerHTML = "";
+    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+  }
+
+  firstSnapshot() {
+    if (this.snapshotIndex <= 0) {
+      return this.snapshotIndex;
+    }
+    this.snapshotIndex = 0;
+    this.el.innerHTML = "";
+    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    return this.snapshotIndex;
+  }
+
+  lastSnapshot() {
+    if (this.snapshotIndex >= this.snapshots.length - 1) {
+      return this.snapshotIndex;
+    }
+    this.snapshotIndex = this.snapshots.length - 1;
+    this.el.innerHTML = "";
+    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    return this.snapshotIndex;
+  }
+
+  emptySnapshots() {
+    this.snapshotIndex = 0;
+    this.snapshots = [];
+  }
+
   static enqueue(fn: () => void) {
     DeetCode.instance.renderQueue.push(fn);
   }
@@ -1407,6 +1485,9 @@ export class DeetTest {
       case "debug":
         fn();
         break;
+      case "snapshot":
+        fn();
+        DeetCode.instance.takeSnapshot();
       default:
         break;
     }
