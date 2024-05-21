@@ -69,7 +69,7 @@ interface DeetConfig {
  */
 interface DeetVisEngine {
   containerRegistry: Map<string, HTMLElement>;
-  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>): void;
+  emptyContainerRegistry(): void;
   renderContainer(name: string, instance?: any): HTMLElement;
   renderFork(instance: any, name: string): void;
   renderDelayed(instance: any, name: string): void;
@@ -850,7 +850,7 @@ class DeetBitwiseEngine implements DeetVisEngine {
 
 class DeetTreeNodeEngine implements DeetVisEngine {
   containerRegistry: Map<string, HTMLElement> = new Map();
-  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>): void {
+  emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(name: string, instance?: DeetTreeNode): HTMLElement {
@@ -1502,6 +1502,7 @@ export class DeetCode {
     this.el.innerHTML = "";
     this.listNodeEngine.emptyContainerRegistry();
     this.bitwiseEngine.emptyContainerRegistry();
+    this.treeNodeEngine.emptyContainerRegistry();
   }
 
   takeSnapshot() {
