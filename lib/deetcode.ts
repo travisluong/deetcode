@@ -915,15 +915,20 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     const div = document.createElement("div");
 
     const width = 800;
-    const height = 600;
-
-    const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-    const g = svg.append("g").attr("transform", "translate(400,50)");
 
     const tree = d3.tree().nodeSize([50, 40]);
 
     const root = d3.hierarchy(data);
+
+    // dynamic height based on the height of tree
+    const height = root.height * 40 + 22;
+    const svg = d3.create("svg").attr("width", width).attr("height", height);
+    const g = svg.append("g").attr("transform", "translate(400,10)");
+
+    svg
+      .append("text")
+      .text("TreeNode " + name)
+      .attr("transform", "translate(0, 20)");
 
     // @ts-ignore
     tree(root);

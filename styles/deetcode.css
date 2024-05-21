@@ -108,14 +108,19 @@ d3 styles
   fill: lightgray;
 }
 
+.dark text {
+  fill: white;
+}
+
 /**
 tree node
 */
 .node circle {
 }
 .node text {
-  font: 12px consolas;
-  stroke: #111;
+  font: 11px sans-serif;
+  fill: black;
+  stroke: black;
 }
 .link {
   fill: none;
