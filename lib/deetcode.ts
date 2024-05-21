@@ -537,11 +537,15 @@ class DeetListNodeEngine implements DeetVisEngine {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(name: string): HTMLElement {
+    if (this.containerRegistry.has(name)) {
+      return this.containerRegistry.get(name)!;
+    }
     const label = DeetRender.renderLabel("ListNode " + name);
-    const div = DeetRender.renderContainer();
-    div.appendChild(label);
-    DeetRender.renderContainerFork(div);
-    return div;
+    const container = DeetRender.renderContainer();
+    container.appendChild(label);
+    DeetRender.renderContainerFork(container);
+    this.containerRegistry.set(name, container);
+    return container;
   }
   renderFork(instance: DeetListNode, name: string): void {
     switch (DeetCode.instance.renderMode) {
@@ -616,6 +620,7 @@ class DeetListNodeEngine implements DeetVisEngine {
   }
   renderContent(arr: Array<DeetListNodeRenderObj>, name: string): HTMLElement {
     const container = document.createElement("div");
+    container.classList.add("deetcode-listnode");
 
     // Declare the chart dimensions and margins.
     const width = 800;
@@ -628,13 +633,10 @@ class DeetListNodeEngine implements DeetVisEngine {
       .data(arr)
       .enter()
       .append("g")
-      .attr("transform", (d, i) => `translate(${i * 100 + 50}, 50)`);
+      .attr("transform", (d, i) => `translate(${i * 100 + 50}, 50)`)
+      .attr("class", "nodegroup");
 
-    nodeGroup
-      .append("circle")
-      .attr("class", "node")
-      .attr("r", 25)
-      .style("fill", "lightgray");
+    nodeGroup.append("circle").attr("r", 25);
 
     nodeGroup
       .append("text")
@@ -646,14 +648,12 @@ class DeetListNodeEngine implements DeetVisEngine {
       .append("text")
       .attr("text-anchor", "middle")
       .attr("dy", "2.75em")
-      .style("fill", "lightgray")
       .text((d) => d.pointers.join(","));
 
     svg
       .append("text")
       .attr("class", "linked-list-label")
       .attr("transform", "translate(15, 15)")
-      .style("fill", "lightgray")
       .text("Linked List " + name);
 
     // Draw arrows
@@ -1680,10 +1680,7 @@ export const DeetVis = {
         }
       }
     }
-    if (!DeetCode.instance.listNodeEngine.containerRegistry.has(name)) {
-      const div = DeetCode.instance.listNodeEngine.renderContainer(name);
-      DeetCode.instance.listNodeEngine.containerRegistry.set(name, div);
-    }
+    DeetCode.instance.listNodeEngine.renderContainer(name);
     DeetCode.instance.listNodeEngine.renderFork(node, name);
   },
 
