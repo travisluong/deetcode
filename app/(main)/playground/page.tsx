@@ -52,6 +52,15 @@ pq.enqueue({name: "bar", rank: 2});
 pq.enqueue({name: "baz", rank: 3});
 pq.dequeue();
 pq.front();
+
+const linkedlist = new ListNode(1);
+linkedlist.next = new ListNode(2);
+linkedlist.next.next = new ListNode(3);
+linkedlist.next.next.next = new ListNode(4);
+linkedlist.next.next.next.next = linkedlist.next;
+const prev = linkedlist;
+const cur = linkedlist.next;
+DeetVis.linkedList("linkedlist", linkedlist, {prev, cur});
 `;
 
 export default function Page() {
