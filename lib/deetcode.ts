@@ -82,6 +82,7 @@ interface DeetVisEngine {
 interface D3TreeNode {
   name: number;
   children: (D3TreeNode | null)[];
+  color: string;
 }
 
 type NativeDataStructure =
@@ -920,7 +921,7 @@ class DeetTreeNodeEngine implements DeetVisEngine {
 
     const g = svg.append("g").attr("transform", "translate(400,50)");
 
-    const tree = d3.tree().nodeSize([100, 40]);
+    const tree = d3.tree().nodeSize([50, 40]);
 
     const root = d3.hierarchy(data);
 
@@ -957,7 +958,7 @@ class DeetTreeNodeEngine implements DeetVisEngine {
       .attr("x2", (d) => d.target.x)
       // @ts-ignore
       .attr("y2", (d) => d.target.y)
-      .attr("stroke", "darkgray")
+      .attr("stroke", (d) => d.target.data.color)
       .attr("stroke-width", 2);
 
     const node = g
@@ -966,16 +967,22 @@ class DeetTreeNodeEngine implements DeetVisEngine {
       .enter()
       .append("g")
       .attr("class", "node")
-      .attr("transform", (d) => `translate(${d.x},${d.y})`);
+      .attr("transform", (d) => `translate(${d.x},${d.y})`)
+      .attr("fill", (d) => d.data.color);
 
-    node.append("circle").attr("r", 10);
+    node
+      .append("circle")
+      .attr("r", 10)
+      .attr("fill", (d) => d.data.color)
+      .attr("stroke-width", 0);
 
     node
       .append("text")
       .attr("dy", 5)
       .attr("x", 0)
       .style("text-anchor", "middle")
-      .text((d) => d.data.name);
+      .text((d) => d.data.name)
+      .attr("stroke-width", "1px");
 
     const svgnode = svg.node();
     if (svgnode) {
@@ -991,6 +998,7 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     }
     return {
       name: node.val,
+      color: node.color ?? "darkgray",
       children: [
         this.treeToHierarchy(node.left),
         this.treeToHierarchy(node.right),
@@ -1395,6 +1403,7 @@ export class DeetTreeNode {
   val: number;
   left?: DeetTreeNode | null;
   right?: DeetTreeNode | null;
+  color?: string;
   constructor(val: number, left = null, right = null) {
     this.val = val;
     this.left = left;

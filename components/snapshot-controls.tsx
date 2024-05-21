@@ -62,8 +62,8 @@ export default function SnapshotControls() {
       >
         <ChevronLeftIcon />
       </Button>
-      <Button variant="ghost">
-        {snapshotIndex} / {snapshotLength}
+      <Button variant="ghost" disabled>
+        {snapshotIndex + 1} / {snapshotLength}
       </Button>
       <Button
         variant="outline"
