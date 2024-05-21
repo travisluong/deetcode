@@ -1597,8 +1597,8 @@ export class DeetCode {
   }
 }
 
-export class DeetTest {
-  static equal(actual: any, expected: any) {
+export const DeetTest = {
+  equal(actual: any, expected: any) {
     const fn = () => {
       const div = document.createElement("div");
       div.classList.add("deet-assert");
@@ -1629,8 +1629,8 @@ export class DeetTest {
       default:
         break;
     }
-  }
-}
+  },
+};
 
 /**
  * the DeetVis class is a utility that can be used from
