@@ -117,13 +117,27 @@ d3 list node styles
 /**
 tree node
 */
-.deetcode-treenode .node text {
-  font: 11px sans-serif;
+.deetcode-treenode text {
   fill: black;
-  stroke: black;
+  font-size: small;
+}
+
+.deetcode-treenode circle {
+  fill: lightgray;
 }
 
 .deetcode-treenode .link {
-  fill: none;
-  stroke-width: 2px;
+  stroke: darkgray;
+}
+
+.dark .deetcode-treenode text {
+  fill: white;
+}
+
+.dark .deetcode-treenode circle {
+  fill: darkslategray;
+}
+
+.dark .deetcode-treenode .link {
+  stroke: lightgray;
 }
