@@ -707,6 +707,33 @@ class DeetListNodeEngine implements DeetVisEngine {
     }
     return container;
   }
+  clearAllPointers(node: DeetListNode) {
+    let cur: DeetListNode | null = node;
+    // TODO: this needs to be rewritten if monkey patching
+    // becomes an optional feature.
+    // since it is always on, we can assume the Set
+    // constructor has been monkey patched
+    DeetSet.undoMonkeyPatch();
+    const set = new Set();
+    DeetSet.monkeyPatch();
+    while (cur && !set.has(cur)) {
+      for (const val of cur.pointers) {
+        cur.pointers.delete(val);
+      }
+      set.add(cur);
+      cur = cur.next;
+    }
+  }
+  addPointers(pointers: { [key: string]: DeetListNode | null } | undefined) {
+    if (pointers) {
+      // push pointer keys onto pointer arrays
+      for (const [k, v] of Object.entries(pointers)) {
+        if (v) {
+          v.pointers.add(k);
+        }
+      }
+    }
+  }
 }
 
 class DeetBitwiseEngine implements DeetVisEngine {
@@ -1660,26 +1687,8 @@ export const DeetVis = {
     node: DeetListNode,
     pointers?: { [key: string]: DeetListNode | null }
   ) {
-    // clear all the pointers properties
-    let cur: DeetListNode | null = node;
-    DeetSet.undoMonkeyPatch();
-    const set = new Set();
-    DeetSet.monkeyPatch();
-    while (cur && !set.has(cur)) {
-      for (const val of cur.pointers) {
-        cur.pointers.delete(val);
-      }
-      set.add(cur);
-      cur = cur.next;
-    }
-    if (pointers) {
-      // push pointer keys onto pointer arrays
-      for (const [k, v] of Object.entries(pointers)) {
-        if (v) {
-          v.pointers.add(k);
-        }
-      }
-    }
+    DeetCode.instance.listNodeEngine.clearAllPointers(node);
+    DeetCode.instance.listNodeEngine.addPointers(pointers);
     DeetCode.instance.listNodeEngine.renderContainer(name);
     DeetCode.instance.listNodeEngine.renderFork(node, name);
   },
