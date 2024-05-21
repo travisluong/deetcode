@@ -1668,7 +1668,7 @@ export const DeetTest = {
  * the DeetVis class is a utility that can be used from
  * the code editor. it is responsible for visualizing
  * types which are not extending the native types.
- * for example, ListNode and Bitwise.
+ * for example, ListNode, Bitwise, TreeNode.
  */
 export const DeetVis = {
   index(instance: DeetArray, obj: VisualizeIndexObj) {
