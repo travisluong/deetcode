@@ -43,15 +43,6 @@ interface DeetListNodeRenderObj {
 interface DeetConfig {
   selector: string;
   renderMode?: RenderMode;
-  setEngine?: DeetSetEngine;
-  mapEngine?: DeetMapEngine;
-  arrayEngine?: DeetArrayEngine;
-  minPriorityQueueEngine?: DeetMinPriorityQueueEngine;
-  maxPriorityQueueEngine?: DeetMaxPriorityQueueEngine;
-  priorityQueueEngine?: DeetPriorityQueueEngine;
-  listNodeEngine?: DeetListNodeEngine;
-  bitwiseEngine?: DeetBitwiseEngine;
-  treeNodeEngine?: DeetTreeNodeEngine;
   directionMode?: DirectionMode;
   labelMode?: boolean;
   animationDelay?: number;
@@ -68,6 +59,7 @@ interface DeetConfig {
  * it on the instance itself.
  */
 interface DeetVisEngine {
+  deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement>;
   emptyContainerRegistry(): void;
   renderContainer(name: string): HTMLElement;
@@ -102,6 +94,10 @@ type DeetDataStructure =
   | DeetPriorityQueue;
 
 abstract class DeetEngine {
+  deetcodeInstance: DeetCode;
+  constructor(deetcodeInstance: DeetCode) {
+    this.deetcodeInstance = deetcodeInstance;
+  }
   abstract transformDeetToNative(
     instance: DeetDataStructure
   ): NativeDataStructure;
@@ -114,7 +110,7 @@ abstract class DeetEngine {
     if (instance.__isProxy) {
       return;
     }
-    switch (DeetCode.instance.renderMode) {
+    switch (this.deetcodeInstance.renderMode) {
       case "animate":
         this.renderDelayed(instance);
         break;
@@ -123,7 +119,7 @@ abstract class DeetEngine {
         break;
       case "snapshot":
         this.renderNow(instance);
-        DeetCode.instance.takeSnapshot();
+        this.deetcodeInstance.takeSnapshot();
         break;
       default:
         break;
@@ -150,10 +146,10 @@ abstract class DeetEngine {
     div.appendChild(this.renderLabel(instance));
 
     const fn = () => {
-      DeetCode.instance.el?.appendChild(div);
+      this.deetcodeInstance.el?.appendChild(div);
     };
 
-    switch (DeetCode.instance.renderMode) {
+    switch (this.deetcodeInstance.renderMode) {
       case "animate":
         DeetCode.enqueue(fn);
         break;
@@ -162,7 +158,7 @@ abstract class DeetEngine {
         break;
       case "snapshot":
         fn();
-        DeetCode.instance.takeSnapshot();
+        this.deetcodeInstance.takeSnapshot();
       default:
         break;
     }
@@ -198,11 +194,6 @@ abstract class DeetEngine {
     return label;
   }
 }
-
-/**
- * DeetEngine abstract class contains common methods
- * for rendering the native data structures.
- */
 
 class DeetSetEngine extends DeetEngine {
   transformDeetToNative(instance: DeetSet): Set<any> {
@@ -369,7 +360,7 @@ class DeetArrayEngine extends DeetEngine {
 
   renderIndexFork(instance: DeetArray, obj: VisualizeIndexObj) {
     const fn = () => this.renderIndex(instance, obj);
-    switch (DeetCode.instance.renderMode) {
+    switch (this.deetcodeInstance.renderMode) {
       case "animate":
         DeetCode.enqueue(fn);
         break;
@@ -378,7 +369,7 @@ class DeetArrayEngine extends DeetEngine {
         break;
       case "snapshot":
         fn();
-        DeetCode.instance.takeSnapshot();
+        this.deetcodeInstance.takeSnapshot();
       default:
         break;
     }
@@ -532,7 +523,11 @@ class DeetPriorityQueueEngine extends DeetEngine {
 }
 
 class DeetListNodeEngine implements DeetVisEngine {
+  deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement> = new Map();
+  constructor(deetcodeInstance: DeetCode) {
+    this.deetcodeInstance = deetcodeInstance;
+  }
   emptyContainerRegistry() {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
@@ -548,7 +543,7 @@ class DeetListNodeEngine implements DeetVisEngine {
     return container;
   }
   renderFork(name: string, instance: DeetListNode): void {
-    switch (DeetCode.instance.renderMode) {
+    switch (this.deetcodeInstance.renderMode) {
       case "animate":
         this.renderDelayed(name, instance);
         break;
@@ -557,7 +552,7 @@ class DeetListNodeEngine implements DeetVisEngine {
         break;
       case "snapshot":
         this.renderNow(name, instance);
-        DeetCode.instance.takeSnapshot();
+        this.deetcodeInstance.takeSnapshot();
         break;
       default:
         break;
@@ -737,7 +732,11 @@ class DeetListNodeEngine implements DeetVisEngine {
 }
 
 class DeetBitwiseEngine implements DeetVisEngine {
+  deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement> = new Map();
+  constructor(deetcodeInstance: DeetCode) {
+    this.deetcodeInstance = deetcodeInstance;
+  }
   emptyContainerRegistry() {
     for (const key of this.containerRegistry.keys()) {
       this.containerRegistry.delete(key);
@@ -756,7 +755,7 @@ class DeetBitwiseEngine implements DeetVisEngine {
     return container;
   }
   renderFork(name: string, instance: number): void {
-    switch (DeetCode.instance.renderMode) {
+    switch (this.deetcodeInstance.renderMode) {
       case "animate":
         this.renderDelayed(name, instance);
         break;
@@ -765,7 +764,7 @@ class DeetBitwiseEngine implements DeetVisEngine {
         break;
       case "snapshot":
         this.renderNow(name, instance);
-        DeetCode.instance.takeSnapshot();
+        this.deetcodeInstance.takeSnapshot();
       default:
         break;
     }
@@ -877,7 +876,11 @@ class DeetBitwiseEngine implements DeetVisEngine {
 }
 
 class DeetTreeNodeEngine implements DeetVisEngine {
+  deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement> = new Map();
+  constructor(deetcodeInstance: DeetCode) {
+    this.deetcodeInstance = deetcodeInstance;
+  }
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
@@ -894,7 +897,7 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     return div;
   }
   renderFork(name: string, instance: DeetTreeNode): void {
-    switch (DeetCode.instance.renderMode) {
+    switch (this.deetcodeInstance.renderMode) {
       case "animate":
         this.renderDelayed(name, instance);
         break;
@@ -903,7 +906,7 @@ class DeetTreeNodeEngine implements DeetVisEngine {
         break;
       case "snapshot":
         this.renderNow(name, instance);
-        DeetCode.instance.takeSnapshot();
+        this.deetcodeInstance.takeSnapshot();
         break;
       default:
         break;
@@ -1496,18 +1499,15 @@ export class DeetCode {
   constructor(config: DeetConfig) {
     this.selector = config.selector;
     this.renderMode = config.renderMode || "debug";
-    this.setEngine = config.setEngine || new DeetSetEngine();
-    this.mapEngine = config.mapEngine || new DeetMapEngine();
-    this.arrayEngine = config.arrayEngine || new DeetArrayEngine();
-    this.minPriorityQueueEngine =
-      config.minPriorityQueueEngine || new DeetMinPriorityQueueEngine();
-    this.maxPriorityQueueEngine =
-      config.maxPriorityQueueEngine || new DeetMaxPriorityQueueEngine();
-    this.priorityQueueEngine =
-      config.priorityQueueEngine || new DeetPriorityQueueEngine();
-    this.listNodeEngine = config.listNodeEngine || new DeetListNodeEngine();
-    this.bitwiseEngine = config.bitwiseEngine || new DeetBitwiseEngine();
-    this.treeNodeEngine = config.treeNodeEngine || new DeetTreeNodeEngine();
+    this.setEngine = new DeetSetEngine(this);
+    this.mapEngine = new DeetMapEngine(this);
+    this.arrayEngine = new DeetArrayEngine(this);
+    this.minPriorityQueueEngine = new DeetMinPriorityQueueEngine(this);
+    this.maxPriorityQueueEngine = new DeetMaxPriorityQueueEngine(this);
+    this.priorityQueueEngine = new DeetPriorityQueueEngine(this);
+    this.listNodeEngine = new DeetListNodeEngine(this);
+    this.bitwiseEngine = new DeetBitwiseEngine(this);
+    this.treeNodeEngine = new DeetTreeNodeEngine(this);
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
