@@ -1037,6 +1037,33 @@ class DeetTreeNodeEngine implements DeetVisEngine {
       ].filter(Boolean),
     };
   }
+  arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
+    if (array.length === 0) return null;
+
+    const root = new DeetTreeNode(array[0]!);
+    const queue: (DeetTreeNode | null)[] = [root];
+    let index = 1;
+
+    while (queue.length > 0 && index < array.length) {
+      const node = queue.shift();
+
+      if (node !== null && node !== undefined) {
+        if (index < array.length && array[index] !== null) {
+          node.left = new DeetTreeNode(array[index]!);
+          queue.push(node.left);
+        }
+        index++;
+
+        if (index < array.length && array[index] !== null) {
+          node.right = new DeetTreeNode(array[index]!);
+          queue.push(node.right);
+        }
+        index++;
+      }
+    }
+
+    return root;
+  }
 }
 
 /**
@@ -1701,5 +1728,9 @@ export const DeetVis = {
   tree(name: string, node: DeetTreeNode) {
     DeetCode.instance.treeNodeEngine.renderContainer(name);
     DeetCode.instance.treeNodeEngine.renderFork(name, node);
+  },
+
+  arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
+    return DeetCode.instance.treeNodeEngine.arrayToBinaryTree(array);
   },
 };
