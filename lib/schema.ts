@@ -68,3 +68,12 @@ export const problem_to_list = mysqlTable(
     unq: unique().on(t.problem_id, t.list_id),
   })
 );
+
+export const sync_log = mysqlTable("sync_log", {
+  id: char("id", { length: 36 })
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  started_at: timestamp("started_at").notNull().defaultNow(),
+  completed_at: timestamp("completed_at"),
+});
