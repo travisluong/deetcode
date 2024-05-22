@@ -1702,13 +1702,6 @@ export const DeetVis = {
     instance.engine.renderIndexFork(instance, obj);
   },
 
-  /**
-   * a static linked list visualization utility function.
-   *
-   * @param name the label to be rendered
-   * @param node the root ListNode object to start rendering at
-   * @param pointers an object with the name of pointers as keys and DeetListNode instance as key. used to render to the pointer labels under each node.
-   */
   linkedList(
     name: string,
     node: DeetListNode,
