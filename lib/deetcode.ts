@@ -93,7 +93,7 @@ type DeetDataStructure =
   | DeetMaxPriorityQueue
   | DeetPriorityQueue;
 
-abstract class DeetEngine {
+abstract class NativeEngine {
   deetcodeInstance: DeetCode;
   constructor(deetcodeInstance: DeetCode) {
     this.deetcodeInstance = deetcodeInstance;
@@ -195,7 +195,7 @@ abstract class DeetEngine {
   }
 }
 
-class DeetSetEngine extends DeetEngine {
+class NativeSetEngine extends NativeEngine {
   transformDeetToNative(instance: DeetSet): Set<any> {
     let copy;
     if (DeetSet.originalSet) {
@@ -221,7 +221,7 @@ class DeetSetEngine extends DeetEngine {
   }
 }
 
-class DeetMapEngine extends DeetEngine {
+class NativeMapEngine extends NativeEngine {
   transformDeetToNative(instance: DeetMap<any, any>): Map<any, any> {
     let copy;
     if (DeetMap.originalMap) {
@@ -268,7 +268,7 @@ class DeetMapEngine extends DeetEngine {
   }
 }
 
-class DeetArrayEngine extends DeetEngine {
+class NativeArrayEngine extends NativeEngine {
   transformDeetToNative(instance: DeetArray): Array<any> {
     let copy;
     const arrayConstructor = this.getOriginalArrayConstructor();
@@ -440,7 +440,7 @@ class DeetArrayEngine extends DeetEngine {
   }
 }
 
-class DeetMinPriorityQueueEngine extends DeetEngine {
+class NativeMinPriorityQueueEngine extends NativeEngine {
   transformDeetToNative(instance: DeetMinPriorityQueue): Array<any> {
     return instance.toArray();
   }
@@ -466,7 +466,7 @@ class DeetMinPriorityQueueEngine extends DeetEngine {
   }
 }
 
-class DeetMaxPriorityQueueEngine extends DeetEngine {
+class NativeMaxPriorityQueueEngine extends NativeEngine {
   transformDeetToNative(instance: DeetMaxPriorityQueue): Array<any> {
     return instance.toArray();
   }
@@ -492,7 +492,7 @@ class DeetMaxPriorityQueueEngine extends DeetEngine {
   }
 }
 
-class DeetPriorityQueueEngine extends DeetEngine {
+class NativePriorityQueueEngine extends NativeEngine {
   transformDeetToNative(instance: DeetPriorityQueue): Array<any> {
     return instance.toArray();
   }
@@ -1115,7 +1115,7 @@ export type DirectionMode = "row" | "column";
 
 export class DeetSet extends Set {
   container: HTMLElement;
-  engine: DeetSetEngine;
+  engine: NativeSetEngine;
   static originalSet?: SetConstructor;
 
   constructor(iterable: any) {
@@ -1160,7 +1160,7 @@ export class DeetSet extends Set {
 
 export class DeetMap<K, V> extends Map<K, V> {
   container: HTMLElement;
-  engine: DeetMapEngine;
+  engine: NativeMapEngine;
   renderEnabled: boolean;
   static originalMap?: MapConstructor;
 
@@ -1220,7 +1220,7 @@ export class DeetMap<K, V> extends Map<K, V> {
 
 export class DeetArray extends Array {
   container: HTMLElement;
-  engine: DeetArrayEngine;
+  engine: NativeArrayEngine;
   renderEnabled: boolean = false;
   static originalArray?: ArrayConstructor;
 
@@ -1236,7 +1236,7 @@ export class DeetArray extends Array {
           return true;
         } else if (target[key] instanceof HTMLElement) {
           return target[key];
-        } else if (target[key] instanceof DeetArrayEngine) {
+        } else if (target[key] instanceof NativeArrayEngine) {
           return target[key];
         } else if (typeof target[key] === "object") {
           return new Proxy(target[key], this);
@@ -1321,7 +1321,7 @@ export class DeetArray extends Array {
 
 export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
   container: HTMLElement;
-  engine: DeetMinPriorityQueueEngine;
+  engine: NativeMinPriorityQueueEngine;
   static originalMinPriorityQueue?: typeof MinPriorityQueueB;
 
   constructor(...args: any) {
@@ -1358,7 +1358,7 @@ export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
 }
 
 export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
-  engine: DeetMaxPriorityQueueEngine;
+  engine: NativeMaxPriorityQueueEngine;
   container: HTMLElement;
   static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
 
@@ -1394,7 +1394,7 @@ export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
 }
 
 export class DeetPriorityQueue extends PriorityQueueB<any> {
-  engine: DeetPriorityQueueEngine;
+  engine: NativePriorityQueueEngine;
   container: HTMLElement;
   static originalPriorityQueue?: typeof PriorityQueueB;
 
@@ -1478,12 +1478,12 @@ export class DeetCode {
   renderQueue: Array<() => void>;
   selector: string;
   renderMode: RenderMode;
-  setEngine: DeetSetEngine;
-  mapEngine: DeetMapEngine;
-  arrayEngine: DeetArrayEngine;
-  minPriorityQueueEngine: DeetMinPriorityQueueEngine;
-  maxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
-  priorityQueueEngine: DeetPriorityQueueEngine;
+  setEngine: NativeSetEngine;
+  mapEngine: NativeMapEngine;
+  arrayEngine: NativeArrayEngine;
+  minPriorityQueueEngine: NativeMinPriorityQueueEngine;
+  maxPriorityQueueEngine: NativeMaxPriorityQueueEngine;
+  priorityQueueEngine: NativePriorityQueueEngine;
   listNodeEngine: DeetListNodeEngine;
   bitwiseEngine: DeetBitwiseEngine;
   treeNodeEngine: DeetTreeNodeEngine;
@@ -1499,12 +1499,12 @@ export class DeetCode {
   constructor(config: DeetConfig) {
     this.selector = config.selector;
     this.renderMode = config.renderMode || "debug";
-    this.setEngine = new DeetSetEngine(this);
-    this.mapEngine = new DeetMapEngine(this);
-    this.arrayEngine = new DeetArrayEngine(this);
-    this.minPriorityQueueEngine = new DeetMinPriorityQueueEngine(this);
-    this.maxPriorityQueueEngine = new DeetMaxPriorityQueueEngine(this);
-    this.priorityQueueEngine = new DeetPriorityQueueEngine(this);
+    this.setEngine = new NativeSetEngine(this);
+    this.mapEngine = new NativeMapEngine(this);
+    this.arrayEngine = new NativeArrayEngine(this);
+    this.minPriorityQueueEngine = new NativeMinPriorityQueueEngine(this);
+    this.maxPriorityQueueEngine = new NativeMaxPriorityQueueEngine(this);
+    this.priorityQueueEngine = new NativePriorityQueueEngine(this);
     this.listNodeEngine = new DeetListNodeEngine(this);
     this.bitwiseEngine = new DeetBitwiseEngine(this);
     this.treeNodeEngine = new DeetTreeNodeEngine(this);
