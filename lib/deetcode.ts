@@ -93,6 +93,8 @@ type DeetDataStructure =
   | DeetMaxPriorityQueue
   | DeetPriorityQueue;
 
+type VisMode = "deet" | "native";
+
 abstract class NativeEngine {
   deetcodeInstance: DeetCode;
   constructor(deetcodeInstance: DeetCode) {
@@ -519,6 +521,89 @@ class NativePriorityQueueEngine extends NativeEngine {
     div.appendChild(label);
     div.appendChild(ul);
     return div;
+  }
+}
+
+class DeetSetEngine implements DeetVisEngine {
+  deetcodeInstance: DeetCode;
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  constructor(deetcodeInstance: DeetCode) {
+    this.deetcodeInstance = deetcodeInstance;
+  }
+  emptyContainerRegistry(): void {
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(name: string): HTMLElement {
+    if (this.containerRegistry.has(name)) {
+      return this.containerRegistry.get(name)!;
+    }
+    const label = DeetRender.renderLabel("Set " + name);
+    const container = DeetRender.renderContainer();
+    container.appendChild(label);
+    DeetRender.renderContainerFork(container);
+    this.containerRegistry.set(name, container);
+    return container;
+  }
+  renderFork(name: string, instance: any): void {
+    switch (this.deetcodeInstance.renderMode) {
+      case "animate":
+        this.renderDelayed(name, instance);
+        break;
+      case "debug":
+        this.renderNow(name, instance);
+        break;
+      case "snapshot":
+        this.renderNow(name, instance);
+        this.deetcodeInstance.takeSnapshot();
+        break;
+      default:
+        break;
+    }
+  }
+  renderDelayed(name: string, instance: any): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = this.renderFn(name, nativeCopy);
+    DeetCode.enqueue(fn);
+  }
+  renderNow(name: string, instance: any): void {
+    DeetCode.undoMonkeyPatchAll();
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = this.renderFn(name, nativeCopy);
+    fn();
+    DeetCode.monkeyPatchAll();
+  }
+  transformDeetToNative(instance: any) {
+    let copy;
+    if (DeetSet.originalSet) {
+      copy = new DeetSet.originalSet([...instance.values()]);
+    } else {
+      copy = new Set([...instance.values()]);
+    }
+    return copy;
+  }
+  renderContent(name: string, instance: any): HTMLElement {
+    const div = document.createElement("div");
+    const ul = document.createElement("ul");
+    for (const item of instance) {
+      const li = document.createElement("li");
+      li.innerHTML = item;
+      ul.appendChild(li);
+    }
+    const label = document.createElement("label");
+    label.innerHTML = "Set " + name;
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
+  }
+  renderFn(name: string, instance: any): () => void {
+    const fn = () => {
+      const el = this.renderContent(name, instance);
+      const container = this.containerRegistry.get(name);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    return fn;
   }
 }
 
@@ -1154,7 +1239,9 @@ export class DeetSet extends Set {
   }
 
   static undoMonkeyPatch() {
-    Set = this.originalSet!;
+    if (this.originalSet) {
+      Set = this.originalSet;
+    }
   }
 }
 
@@ -1214,7 +1301,9 @@ export class DeetMap<K, V> extends Map<K, V> {
   }
 
   static undoMonkeyPatch() {
-    Map = this.originalMap!;
+    if (this.originalMap) {
+      Map = this.originalMap;
+    }
   }
 }
 
@@ -1314,8 +1403,9 @@ export class DeetArray extends Array {
   }
 
   static undoMonkeyPatch() {
-    // @ts-ignore
-    Array = this.originalArray;
+    if (this.originalArray) {
+      Array = this.originalArray;
+    }
   }
 }
 
@@ -1352,8 +1442,9 @@ export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
   }
 
   static undoMonkeyPatch() {
-    //@ts-ignore
-    window.MinPriorityQueue = this.originalMinPriorityQueue;
+    if (this.originalMinPriorityQueue) {
+      window.MinPriorityQueue = this.originalMinPriorityQueue;
+    }
   }
 }
 
@@ -1389,7 +1480,9 @@ export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
   }
 
   static undoMonkeyPatch() {
-    window.MaxPriorityQueue = this.originalMaxPriorityQueue!;
+    if (this.originalMaxPriorityQueue) {
+      window.MaxPriorityQueue = this.originalMaxPriorityQueue;
+    }
   }
 }
 
@@ -1443,7 +1536,9 @@ export class DeetPriorityQueue extends PriorityQueueB<any> {
   }
 
   static undoMonkeyPatch() {
-    window.PriorityQueue = this.originalPriorityQueue!;
+    if (this.originalPriorityQueue) {
+      window.PriorityQueue = this.originalPriorityQueue;
+    }
   }
 }
 
@@ -1484,6 +1579,7 @@ export class DeetCode {
   minPriorityQueueEngine: NativeMinPriorityQueueEngine;
   maxPriorityQueueEngine: NativeMaxPriorityQueueEngine;
   priorityQueueEngine: NativePriorityQueueEngine;
+  deetSetEngine: DeetSetEngine;
   listNodeEngine: DeetListNodeEngine;
   bitwiseEngine: DeetBitwiseEngine;
   treeNodeEngine: DeetTreeNodeEngine;
@@ -1493,6 +1589,7 @@ export class DeetCode {
   interval?: any;
   snapshots: Node[] = [];
   snapshotIndex: number = 0;
+  visMode: VisMode = "deet";
 
   static instance: DeetCode;
 
@@ -1505,6 +1602,7 @@ export class DeetCode {
     this.minPriorityQueueEngine = new NativeMinPriorityQueueEngine(this);
     this.maxPriorityQueueEngine = new NativeMaxPriorityQueueEngine(this);
     this.priorityQueueEngine = new NativePriorityQueueEngine(this);
+    this.deetSetEngine = new DeetSetEngine(this);
     this.listNodeEngine = new DeetListNodeEngine(this);
     this.bitwiseEngine = new DeetBitwiseEngine(this);
     this.treeNodeEngine = new DeetTreeNodeEngine(this);
@@ -1629,6 +1727,22 @@ export class DeetCode {
     this.snapshots = [];
   }
 
+  init() {
+    if (this.visMode === "deet") {
+      window.MinPriorityQueue = MinPriorityQueueB;
+      window.MaxPriorityQueue = MaxPriorityQueueB;
+      window.PriorityQueue = PriorityQueueB;
+      window.DeetCode = DeetCode;
+      window.DeetTest = DeetTest;
+      window.DeetVis = DeetVis;
+      window._ = _;
+      window.ListNode = DeetListNode;
+      window.TreeNode = DeetTreeNode;
+    } else if (this.visMode === "native") {
+      DeetCode.monkeyPatchAll();
+    }
+  }
+
   static enqueue(fn: () => void) {
     DeetCode.instance.renderQueue.push(fn);
   }
@@ -1702,6 +1816,11 @@ export const DeetVis = {
     instance.engine.renderIndexFork(instance, obj);
   },
 
+  set(name: string, instance: Set<any>) {
+    DeetCode.instance.deetSetEngine.renderContainer(name);
+    DeetCode.instance.deetSetEngine.renderFork(name, instance);
+  },
+
   linkedList(
     name: string,
     node: DeetListNode,
@@ -1725,5 +1844,15 @@ export const DeetVis = {
 
   arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
     return DeetCode.instance.treeNodeEngine.arrayToBinaryTree(array);
+  },
+
+  enableNative() {
+    DeetCode.monkeyPatchAll();
+    DeetCode.instance.visMode = "native";
+  },
+
+  disableNative() {
+    DeetCode.undoMonkeyPatchAll();
+    DeetCode.instance.visMode = "deet";
   },
 };

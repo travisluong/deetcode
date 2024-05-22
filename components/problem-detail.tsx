@@ -97,23 +97,6 @@ export default function ProblemDetail({
       });
       DeetCode.setInstance(dcInstance);
       DeetCode.instance.startRenderLoop();
-
-      window.DeetCode = DeetCode;
-      window.DeetTest = DeetTest;
-      window.DeetVis = DeetVis;
-      window._ = _;
-      window.ListNode = DeetListNode;
-      window.TreeNode = DeetTreeNode;
-
-      // these declarations are only necessary if we want to use the Deet classes in the editor
-      window.DeetSet = DeetSet;
-      window.DeetMap = DeetMap;
-      window.DeetArray = DeetArray;
-      window.DeetMinPriorityQueue = DeetMinPriorityQueue;
-      window.DeetMaxPriorityQueue = DeetMaxPriorityQueue;
-      window.DeetPriorityQueue = DeetPriorityQueue;
-      window.MinPriorityQueue = MinPriorityQueue;
-      window.MaxPriorityQueue = MaxPriorityQueue;
     }
   }, []);
 
@@ -141,7 +124,7 @@ export default function ProblemDetail({
     console.log(code);
     try {
       DeetCode.instance.emptySnapshots();
-      DeetCode.monkeyPatchAll();
+      DeetCode.instance.init();
       eval(code);
       document.dispatchEvent(new CustomEvent("deetcodeEvalCompleted"));
       if (DeetCode.instance.renderMode === "snapshot") {
