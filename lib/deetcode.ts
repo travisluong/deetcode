@@ -798,7 +798,7 @@ class DeetBitwiseEngine implements DeetVisEngine {
   }
   renderContent(name: string, instance: number): HTMLElement {
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel("Bitwise " + name);
+    const label = DeetRender.renderLabel("Bitwise " + name + " " + instance);
     div.appendChild(label);
     const table = document.createElement("table");
     const thead = document.createElement("thead");

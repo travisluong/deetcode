@@ -2,7 +2,7 @@ import AnimateModeToggle from "@/components/animate-mode-toggle";
 import DirectionModeToggle from "@/components/direction-mode-toggle";
 import ProblemDetail from "@/components/problem-detail";
 import Toolbar from "@/components/toolbar";
-import { Problem } from "@/lib/types";
+import { PlaygroundProblem, ProblemDB } from "@/lib/types";
 
 const code = `
 const map = new Map([[1, 1], [2, 2], [3, 3]]);
@@ -61,20 +61,28 @@ linkedlist.next.next.next.next = linkedlist.next;
 const prev = linkedlist;
 const cur = linkedlist.next;
 DeetVis.linkedList("linkedlist", linkedlist, {prev, cur});
+
+DeetVis.bitwise("binary", 123);
+
+const rootNode = new TreeNode(6);
+    rootNode.left = new TreeNode(2);
+        rootNode.left.left = new TreeNode(0);
+        rootNode.left.right = new TreeNode(4);
+            rootNode.left.right.left = new TreeNode(3);
+            rootNode.left.right.right = new TreeNode(5);
+    rootNode.right = new TreeNode(8);
+        rootNode.right.left = new TreeNode(7);
+        rootNode.right.right = new TreeNode(9);
+rootNode.color = "green";
+DeetVis.tree("rootNode", rootNode);
+
+const treeFromArray = DeetVis.arrayToBinaryTree([4,2,7,1,3,6,9]);
+DeetVis.tree("treeFromArray", treeFromArray);
+
 `;
 
 export default function Page() {
-  const problem: Problem = {
-    id: -1,
-    name: null,
-    slug: "",
-    category: null,
-    difficulty: null,
-    leetcode_url: null,
-    youtube_url: null,
-    github_url: null,
-    neetcode_url: null,
-    notes: null,
+  const problem: PlaygroundProblem = {
     solution: code,
   };
 

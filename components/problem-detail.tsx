@@ -1,6 +1,6 @@
 "use client";
 
-import { ProblemDB } from "@/lib/types";
+import { PlaygroundProblem, ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
 import { MouseEvent, useEffect, useRef } from "react";
 import {
@@ -32,7 +32,11 @@ import {
 } from "@datastructures-js/priority-queue";
 import _ from "lodash";
 
-export default function ProblemDetail({ problem }: { problem: ProblemDB }) {
+export default function ProblemDetail({
+  problem,
+}: {
+  problem: ProblemDB | PlaygroundProblem;
+}) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
 

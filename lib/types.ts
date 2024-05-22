@@ -7,3 +7,7 @@ export type ProblemCategoryRow = {
   problem: ProblemDB;
   category: CategoryDB;
 };
+
+export type PlaygroundProblem = {
+  solution: string;
+};

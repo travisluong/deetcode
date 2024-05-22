@@ -119,7 +119,7 @@ tree node
 */
 .deetcode-treenode text {
   fill: black;
-  font-size: small;
+  font-size: medium;
 }
 
 .deetcode-treenode circle {
