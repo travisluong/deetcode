@@ -10,8 +10,12 @@ export default function Header() {
   const pathname = usePathname();
   return (
     <header className="p-3 flex justify-between border-b border-gray-400 dark:border-gray-800">
-      <Link href="/">
-        <LightningBoltIcon className="text-primary w-7 h-7 hover:text-yellow-300" />
+      <Link
+        href="/"
+        className="font-brand text-primary flex gap-2 items-center text-xl"
+      >
+        <LightningBoltIcon className="text-primary w-7 h-7 hover:text-yellow-300" />{" "}
+        DeetCode
       </Link>
 
       <div className="flex gap-5 items-center">
