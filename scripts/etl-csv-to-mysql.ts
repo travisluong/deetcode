@@ -39,6 +39,7 @@ async function loadDataFromCSV() {
       const data = {
         id: crypto.randomUUID(),
         neetcode_url: row["Video Solution"],
+        // @ts-ignore
         category_id: categoryRes[0].id,
         name: row["Name"],
         leetcode_url: row["Link"],
