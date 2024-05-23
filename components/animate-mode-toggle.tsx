@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DeetCode, RenderMode } from "@/lib/deetcode";
+import { RenderMode } from "@/lib/deetcode";
 import { Button } from "./ui/button";
 import { CameraIcon, Crosshair2Icon, PlayIcon } from "@radix-ui/react-icons";
 import {
@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { getInstance } from "@/lib/deet-instance";
 
 export default function AnimateModeToggle() {
   const [mode, setMode] = useState<RenderMode>("animate");
@@ -34,15 +35,15 @@ export default function AnimateModeToggle() {
     setMode(mode);
     switch (mode) {
       case "animate":
-        DeetCode.instance.changeRenderMode("animate");
+        getInstance().changeRenderMode("animate");
         localStorage.setItem("deetcode-render-mode", "animate");
         break;
       case "debug":
-        DeetCode.instance.changeRenderMode("debug");
+        getInstance().changeRenderMode("debug");
         localStorage.setItem("deetcode-render-mode", "debug");
         break;
       case "snapshot":
-        DeetCode.instance.changeRenderMode("snapshot");
+        getInstance().changeRenderMode("snapshot");
         localStorage.setItem("deetcode-render-mode", "snapshot");
         break;
       default:

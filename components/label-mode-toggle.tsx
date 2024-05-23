@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { DeetCode } from "@/lib/deetcode";
+import { getInstance } from "@/lib/deet-instance";
 
 export default function LabelModeToggle() {
   const [mode, setMode] = useState<boolean>(false);
@@ -32,10 +32,10 @@ export default function LabelModeToggle() {
     setMode(mode);
     if (mode) {
       localStorage.setItem("deetcode-label-mode", "true");
-      DeetCode.instance.changeLabelMode(true);
+      getInstance().changeLabelMode(true);
     } else {
       localStorage.setItem("deetcode-label-mode", "false");
-      DeetCode.instance.changeLabelMode(false);
+      getInstance().changeLabelMode(false);
     }
   }
 

@@ -7,8 +7,8 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
-import { DeetCode } from "@/lib/deetcode";
 import { useEffect, useState } from "react";
+import { getInstance } from "@/lib/deet-instance";
 
 export default function SnapshotControls() {
   const [snapshotIndex, setSnapshotIndex] = useState(0);
@@ -26,24 +26,24 @@ export default function SnapshotControls() {
   }, []);
 
   function deetcodeEvalCompleted() {
-    setSnapshotIndex(DeetCode.instance.snapshotIndex);
-    setSnapshotLength(DeetCode.instance.snapshots.length);
+    setSnapshotIndex(getInstance().snapshotIndex);
+    setSnapshotLength(getInstance().snapshots.length);
   }
 
   function prevSnapshot() {
-    setSnapshotIndex(DeetCode.instance.prevSnapshot());
+    setSnapshotIndex(getInstance().prevSnapshot());
   }
 
   function nextSnapshot() {
-    setSnapshotIndex(DeetCode.instance.nextSnapshot());
+    setSnapshotIndex(getInstance().nextSnapshot());
   }
 
   function firstSnapshot() {
-    setSnapshotIndex(DeetCode.instance.firstSnapshot());
+    setSnapshotIndex(getInstance().firstSnapshot());
   }
 
   function lastSnapshot() {
-    setSnapshotIndex(DeetCode.instance.lastSnapshot());
+    setSnapshotIndex(getInstance().lastSnapshot());
   }
 
   return (

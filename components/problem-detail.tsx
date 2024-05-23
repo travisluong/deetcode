@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
 import _ from "lodash";
+import { getInstance, setInstance } from "@/lib/deet-instance";
 
 export default function ProblemDetail({
   problem,
@@ -21,7 +22,6 @@ export default function ProblemDetail({
 }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
-  const [deetcode, setDeetcode] = useState<DeetCode>();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -78,7 +78,7 @@ export default function ProblemDetail({
         labelMode: labelMode,
         animationDelay: animationDelay,
       });
-      setDeetcode(dcInstance);
+      setInstance(dcInstance);
       window.DeetVis = new DeetVis(dcInstance);
     }
   }, []);
@@ -102,7 +102,7 @@ export default function ProblemDetail({
 
   function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    if (!deetcode) {
+    if (!getInstance()) {
       return;
     }
     if (!editorRef.current) {
@@ -112,13 +112,13 @@ export default function ProblemDetail({
     const code = editorRef.current.getValue();
     console.log(code);
     try {
-      deetcode.init();
+      getInstance().init();
       eval(code);
       document.dispatchEvent(new CustomEvent("deetcodeEvalCompleted"));
     } catch (error) {
       console.error(error);
     } finally {
-      deetcode.end();
+      getInstance().end();
     }
   }
 
