@@ -33,14 +33,28 @@ DeetVis.map("map1", map1);
  * Array
  */
 const arr1 = [1, 2, 3];
-DeetVis.array("arr1", arr1);
+DeetVis.array({
+  name: "arr1",
+  data: arr1,
+  indexObj: { i: 0, j: 2 },
+});
+
+arr1.push(4);
+DeetVis.array({
+  name: "arr1",
+  data: arr1,
+  indexObj: { i: 1, j: 1 },
+});
 
 const arr2 = [
   [1, 2, 3],
   [4, 5, 6],
   [7, 8, 9],
 ];
-DeetVis.array("arr2", arr2);
+DeetVis.array({
+  name: "arr2",
+  data: arr2,
+});
 
 /**
  * Linked List

@@ -48,6 +48,18 @@ interface DeetConfig {
   animationDelay?: number;
 }
 
+interface DeetOptions {
+  name: string;
+  data: any;
+  copiedData: any;
+}
+
+interface DeetArrayOptions extends DeetOptions {
+  data: Array<any>;
+  copiedData: Array<any>;
+  indexObj?: { [key: string]: number };
+}
+
 /**
  * the DeetVisEngine is for any types that are rendered
  * by the DeetVis class. it follows a similar structure
@@ -66,9 +78,32 @@ interface DeetVisEngine {
   renderFork(name: string, instance: any): void;
   renderDelayed(name: string, instance: any): void;
   renderNow(name: string, instance: any): void;
-  transformDeetToNative(instance: any): any;
   renderContent(name: string, instance: any): HTMLElement;
   renderFn(name: string, instance: any): () => void;
+}
+
+/**
+ * DeetVisEngineV2 differs from V1 in that
+ * options object is preferred over multiple parameters.
+ * options object is much easier to extend.
+ * there is much value in having a consistent contract
+ * in which all engines much comply, but
+ * also the flexibility to adjust to diverging requirements
+ * of each engine. furthermore the auto native types should
+ * depend on the deet engines, as the deet engines operate
+ * on native structures
+ */
+interface DeetVisEngineV2 {
+  deetcodeInstance: DeetCode;
+  containerRegistry: Map<string, HTMLElement>;
+  emptyContainerRegistry(): void;
+  renderContainer(options: DeetOptions): HTMLElement;
+  renderFork(options: DeetOptions): void;
+  renderDelayed(options: DeetOptions): void;
+  renderNow(options: DeetOptions): void;
+  renderContent(options: DeetOptions): HTMLElement;
+  renderFn(options: DeetOptions): () => void;
+  copyData(options: DeetOptions): any;
 }
 
 interface D3TreeNode {
@@ -696,7 +731,7 @@ class DeetMapEngine implements DeetVisEngine {
   }
 }
 
-class DeetArrayEngine implements DeetVisEngine {
+class DeetArrayEngine implements DeetVisEngineV2 {
   deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement> = new Map();
   constructor(deetcodeInstance: DeetCode) {
@@ -705,72 +740,57 @@ class DeetArrayEngine implements DeetVisEngine {
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
-  renderContainer(name: string): HTMLElement {
+  renderContainer(options: DeetArrayOptions): HTMLElement {
+    const { name } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       name: name,
       label: "Array",
     });
   }
-  renderFork(name: string, instance: any): void {
+  renderFork(options: DeetArrayOptions): void {
+    // the copied data must be created here to avoid race condition
+    this.copyData(options);
     DeetRender.renderFork({
       dcInstance: this.deetcodeInstance,
       delayedCallback: () => {
-        this.renderDelayed(name, instance);
+        this.renderDelayed(options);
       },
       nowCallback: () => {
-        this.renderNow(name, instance);
+        this.renderNow(options);
       },
     });
   }
-  renderDelayed(name: string, instance: any): void {
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
+  renderDelayed(options: DeetArrayOptions): void {
+    const fn = this.renderFn(options);
     DeetCode.enqueue(fn);
   }
-  renderNow(name: string, instance: any): void {
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
+  renderNow(options: DeetArrayOptions): void {
+    const fn = this.renderFn(options);
     fn();
   }
-  transformDeetToNative(instance: any) {
-    let copy;
-    const arrayConstructor = this.getOriginalArrayConstructor();
-    copy = new arrayConstructor();
-    for (const item of instance) {
-      if (Array.isArray(item)) {
-        // handle 2d arrays
-        const newArr = new arrayConstructor();
-        for (const it of item) {
-          newArr.push(it);
-        }
-        copy.push(newArr);
-      } else {
-        // handle 1d arrays
-        copy.push(item);
-      }
-    }
-    return copy;
-  }
-  renderContent(name: string, instance: any): HTMLElement {
+  renderContent(options: DeetArrayOptions): HTMLElement {
+    const { name, indexObj } = options;
+    const data = this.copyData(options);
     const div = document.createElement("div");
     const label = DeetRender.renderLabel("Array " + name);
     div.innerHTML = label.outerHTML;
-    if (instance.length === 0) {
+    if (data.length === 0) {
       return div;
     }
-    if (this.is2DArray(instance)) {
-      const el = this.render2d(instance);
+    if (this.is2DArray(data)) {
+      const el = this.render2d(options);
       div.innerHTML += el.outerHTML;
     } else {
-      const el = this.render1d(instance);
+      const el = this.render1d(options);
       div.innerHTML += el.outerHTML;
     }
     return div;
   }
-  renderFn(name: string, instance: any): () => void {
+  renderFn(options: DeetArrayOptions): () => void {
+    const { name } = options;
     const fn = () => {
-      const el = this.renderContent(name, instance);
+      const el = this.renderContent(options);
       const container = this.containerRegistry.get(name);
       if (container) {
         container.innerHTML = el.outerHTML;
@@ -785,7 +805,7 @@ class DeetArrayEngine implements DeetVisEngine {
       return Array;
     }
   }
-  is2DArray(arr: any) {
+  is2DArray(arr: Array<any>) {
     // Check if arr is an array
     if (!Array.isArray(arr)) {
       return false;
@@ -801,7 +821,9 @@ class DeetArrayEngine implements DeetVisEngine {
     // If all elements are arrays, it's a 2D array
     return true;
   }
-  render1d(arr: Array<any>) {
+  render1d(options: DeetArrayOptions) {
+    const { indexObj } = options;
+    const data = this.copyData(options);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const trHead = document.createElement("tr");
@@ -810,7 +832,7 @@ class DeetArrayEngine implements DeetVisEngine {
     table.append(thead, tbody);
     thead.append(trHead);
     tbody.append(trBody);
-    for (const [index, value] of arr.entries()) {
+    for (const [index, value] of data.entries()) {
       const th = document.createElement("th");
       const td = document.createElement("td");
       th.innerHTML = index.toString();
@@ -824,9 +846,16 @@ class DeetArrayEngine implements DeetVisEngine {
       trHead.append(th);
       trBody.append(td);
     }
+    if (indexObj) {
+      const tfoot = this.renderArrayIndex(options);
+      if (tfoot) {
+        table.append(tfoot);
+      }
+    }
     return table;
   }
-  render2d(arr: Array<Array<any>>) {
+  render2d(options: DeetArrayOptions) {
+    const data = this.copyData(options);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const tbody = document.createElement("tbody");
@@ -835,21 +864,21 @@ class DeetArrayEngine implements DeetVisEngine {
     theadTr.appendChild(th);
     table.append(thead, tbody);
 
-    for (let i = 0; i < this.getLengthOfLongestArray(arr); i++) {
+    for (let i = 0; i < this.getLengthOfLongestArray(data); i++) {
       const th = document.createElement("th");
       th.innerHTML = i.toString();
       theadTr.appendChild(th);
     }
     thead.appendChild(theadTr);
 
-    for (let i = 0; i < arr.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       const tr = document.createElement("tr");
       const th = document.createElement("th");
       th.innerHTML = i.toString();
       tr.appendChild(th);
-      for (let j = 0; j < arr[i].length; j++) {
+      for (let j = 0; j < data[i].length; j++) {
         const td = document.createElement("td");
-        td.innerHTML = arr[i][j];
+        td.innerHTML = data[i][j];
         tr.appendChild(td);
       }
       tbody.appendChild(tr);
@@ -863,6 +892,50 @@ class DeetArrayEngine implements DeetVisEngine {
       max = Math.max(max, a.length);
     }
     return max;
+  }
+  renderArrayIndex(options: DeetArrayOptions): HTMLElement | null {
+    const { indexObj } = options;
+    if (!indexObj) {
+      return null;
+    }
+    const data = this.copyData(options);
+    let tfoot = document.createElement("tfoot");
+    for (const [key, value] of Object.entries(indexObj)) {
+      const tr = document.createElement("tr");
+      for (let i = 0; i < data.length; i++) {
+        const th = document.createElement("th");
+        if (i === value) {
+          th.innerHTML = key;
+        } else {
+          th.innerHTML = '<div style="height: 25px"></div>';
+        }
+        tr.appendChild(th);
+      }
+      tfoot.appendChild(tr);
+    }
+    return tfoot;
+  }
+  copyData(options: DeetArrayOptions): Array<any> {
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    const { data } = options;
+    const copy = new Array();
+    for (const item of data) {
+      if (Array.isArray(item)) {
+        // handle 2d arrays
+        const newArr = new Array();
+        for (const it of item) {
+          newArr.push(it);
+        }
+        copy.push(newArr);
+      } else {
+        // handle 1d arrays
+        copy.push(item);
+      }
+    }
+    options.copiedData = copy;
+    return copy;
   }
 }
 
@@ -1432,11 +1505,11 @@ const DeetRender = {
     name: string;
     label: string;
   }): HTMLElement {
-    const container = document.createElement("div");
-    container.classList.add("deet-container");
     if (options.containerRegistry.has(options.name)) {
       return options.containerRegistry.get(options.name)!;
     }
+    const container = document.createElement("div");
+    container.classList.add("deet-container");
     const label = DeetRender.renderLabel(`${options.label} ` + options.name);
     container.appendChild(label);
     DeetRender.renderContainerFork(container);
@@ -2104,9 +2177,9 @@ export const DeetVis = {
     DeetCode.instance.deetMapEngine.renderFork(name, instance);
   },
 
-  array(name: string, instance: Array<any>) {
-    DeetCode.instance.deetArrayEngine.renderContainer(name);
-    DeetCode.instance.deetArrayEngine.renderFork(name, instance);
+  array(options: DeetArrayOptions) {
+    DeetCode.instance.deetArrayEngine.renderContainer(options);
+    DeetCode.instance.deetArrayEngine.renderFork(options);
   },
 
   linkedList(
