@@ -1,7 +1,12 @@
 // @ts-nocheck
 
 /**
- * By Default, Deet Mode is enabled.
+ * DeetCode supports visualizations for the following data structures
+ * commonly used in LeetCode problems:
+ * Set, Map, Array, MinPriorityQueue, MaxPriorityQueue, PriorityQueue,
+ * Linked List, Binary Tree.
+ * DeetCode also provides various visualization utilities such as:
+ * Indexes on an array and Bitwise.
  */
 
 const set1 = new Set([1, 2, 3]);
@@ -37,7 +42,8 @@ DeetVis.tree("treeFromArray", treeFromArray);
 
 /**
  * DeetCode supports auto visualizations of native JavaScript
- * data structures. This experimental feature can be enabled
+ * data structures. This allows you to create visualizations without
+ * having to call DeetVis. This experimental feature can be enabled
  * with DeetVis.enableNative().
  */
 DeetVis.enableNative();
