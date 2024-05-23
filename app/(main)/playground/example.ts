@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 /**
- * DeetCode supports visualizations for the following data structures
+ * DeetCode supports visualizations for data structures
  * commonly used in LeetCode problems:
  * Set, Map, Array, MinPriorityQueue, MaxPriorityQueue, PriorityQueue,
  * Linked List, Binary Tree.
@@ -9,11 +9,17 @@
  * Indexes on an array and Bitwise.
  */
 
+/**
+ * Set
+ */
 const set1 = new Set([1, 2, 3]);
 set1.delete(3);
 set1.add(3);
 DeetVis.set("set1", set1);
 
+/**
+ * Map
+ */
 const map1 = new Map([
   [1, 1],
   [2, 2],
@@ -23,17 +29,39 @@ map1.delete(3);
 map1.set(3, 3);
 DeetVis.map("map1", map1);
 
-const linkedlist = new ListNode(1);
-linkedlist.next = new ListNode(2);
-linkedlist.next.next = new ListNode(3);
-linkedlist.next.next.next = new ListNode(4);
-linkedlist.next.next.next.next = linkedlist.next;
-const prev = linkedlist;
-const cur = linkedlist.next;
-DeetVis.linkedList("linkedlist", linkedlist, { prev, cur });
+/**
+ * Linked List
+ */
+const linkedList = new ListNode(1);
+linkedList.next = new ListNode(2);
+linkedList.next.next = new ListNode(3);
+linkedList.next.next.next = new ListNode(4);
+const prev = linkedList;
+const cur = linkedList.next;
+DeetVis.linkedList("linked list", linkedList);
 
+/**
+ * Linked List Pointers
+ */
+DeetVis.linkedList("with pointers", linkedList, {
+  prev: prev,
+  cur: cur,
+});
+
+/**
+ * Linked List Cycle
+ */
+linkedList.next.next.next.next = linkedList.next;
+DeetVis.linkedList("with cycle", linkedList);
+
+/**
+ * Bitwise
+ */
 DeetVis.bitwise("binary", 123);
 
+/**
+ * Binary Tree
+ */
 const rootNode = new TreeNode(6);
 rootNode.left = new TreeNode(2);
 rootNode.left.left = new TreeNode(0);
@@ -46,6 +74,9 @@ rootNode.right.right = new TreeNode(9);
 rootNode.color = "green";
 DeetVis.tree("rootNode", rootNode);
 
+/**
+ * LeetCode style array to binary tree syntax is supported
+ */
 const treeFromArray = DeetVis.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
 DeetVis.tree("treeFromArray", treeFromArray);
 
@@ -72,6 +103,9 @@ numSet.has(1);
 numSet.delete(3);
 numSet.add(3);
 
+/**
+ * DeetVis still works even with Auto Native Visualization enabled
+ */
 DeetVis.set("numSet", numSet);
 
 const arr = new Array();
