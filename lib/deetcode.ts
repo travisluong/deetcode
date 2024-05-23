@@ -2087,6 +2087,8 @@ export class DeetCode {
   }
 
   init() {
+    DeetCode.setInstance(this);
+    this.emptySnapshots();
     window.MinPriorityQueue = MinPriorityQueueB;
     window.MaxPriorityQueue = MaxPriorityQueueB;
     window.PriorityQueue = PriorityQueueB;
@@ -2097,6 +2099,17 @@ export class DeetCode {
     window.TreeNode = DeetTreeNode;
     if (this.isAutoNativeEnabled) {
       this.monkeyPatchAll();
+    }
+
+    if (this.renderMode === "animate") {
+      this.startRenderLoop();
+    }
+  }
+
+  end() {
+    this.undoMonkeyPatchAll();
+    if (this.renderMode === "snapshot") {
+      this.initialSnapshot();
     }
   }
 
@@ -2109,7 +2122,6 @@ export class DeetCode {
   }
 
   monkeyPatchAll() {
-    DeetCode.setInstance(this);
     DeetSet.monkeyPatch();
     DeetMap.monkeyPatch();
     DeetArray.monkeyPatch();

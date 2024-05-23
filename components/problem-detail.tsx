@@ -79,9 +79,7 @@ export default function ProblemDetail({
         animationDelay: animationDelay,
       });
       setDeetcode(dcInstance);
-      DeetCode.setInstance(dcInstance);
       window.DeetVis = new DeetVis(dcInstance);
-      dcInstance.startRenderLoop();
     }
   }, []);
 
@@ -114,17 +112,13 @@ export default function ProblemDetail({
     const code = editorRef.current.getValue();
     console.log(code);
     try {
-      deetcode.emptySnapshots();
       deetcode.init();
       eval(code);
       document.dispatchEvent(new CustomEvent("deetcodeEvalCompleted"));
-      if (deetcode.renderMode === "snapshot") {
-        deetcode.initialSnapshot();
-      }
     } catch (error) {
       console.error(error);
     } finally {
-      deetcode.undoMonkeyPatchAll();
+      deetcode.end();
     }
   }
 
