@@ -14,6 +14,15 @@ set1.delete(3);
 set1.add(3);
 DeetVis.set("set1", set1);
 
+const map1 = new Map([
+  [1, 1],
+  [2, 2],
+  [3, 3],
+]);
+map1.delete(3);
+map1.set(3, 3);
+DeetVis.map("map1", map1);
+
 const linkedlist = new ListNode(1);
 linkedlist.next = new ListNode(2);
 linkedlist.next.next = new ListNode(3);
