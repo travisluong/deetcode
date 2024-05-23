@@ -2,7 +2,7 @@
 
 import { PlaygroundProblem, ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
-import { MouseEvent, useEffect, useRef } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import { DeetCode, DeetVis, DirectionMode, RenderMode } from "@/lib/deetcode";
 import {
   ResizableHandle,
@@ -21,6 +21,7 @@ export default function ProblemDetail({
 }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
+  const [deetcode, setDeetcode] = useState<DeetCode>();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -77,9 +78,10 @@ export default function ProblemDetail({
         labelMode: labelMode,
         animationDelay: animationDelay,
       });
-      window.DeetVis = new DeetVis(dcInstance);
+      setDeetcode(dcInstance);
       DeetCode.setInstance(dcInstance);
-      DeetCode.instance.startRenderLoop();
+      window.DeetVis = new DeetVis(dcInstance);
+      dcInstance.startRenderLoop();
     }
   }, []);
 
@@ -102,21 +104,27 @@ export default function ProblemDetail({
 
   function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
+    if (!deetcode) {
+      return;
+    }
+    if (!editorRef.current) {
+      return;
+    }
     // @ts-ignore
     const code = editorRef.current.getValue();
     console.log(code);
     try {
-      DeetCode.instance.emptySnapshots();
-      DeetCode.instance.init();
+      deetcode.emptySnapshots();
+      deetcode.init();
       eval(code);
       document.dispatchEvent(new CustomEvent("deetcodeEvalCompleted"));
-      if (DeetCode.instance.renderMode === "snapshot") {
-        DeetCode.instance.initialSnapshot();
+      if (deetcode.renderMode === "snapshot") {
+        deetcode.initialSnapshot();
       }
     } catch (error) {
       console.error(error);
     } finally {
-      DeetCode.undoMonkeyPatchAll();
+      deetcode.undoMonkeyPatchAll();
     }
   }
 

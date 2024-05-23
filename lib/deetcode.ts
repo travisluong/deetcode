@@ -177,11 +177,11 @@ abstract class NativeEngine {
     DeetCode.enqueue(fn);
   }
   renderNow(instance: DeetDataStructure) {
-    DeetCode.undoMonkeyPatchAll();
+    this.deetcodeInstance.undoMonkeyPatchAll();
     const nativeCopy = this.transformDeetToNative(instance);
     const el = this.render(nativeCopy);
     instance.container.innerHTML = el.outerHTML;
-    DeetCode.monkeyPatchAll();
+    this.deetcodeInstance.monkeyPatchAll();
   }
   renderContainer(instance: DeetDataStructure): HTMLElement {
     const div = document.createElement("div");
@@ -670,11 +670,11 @@ class DeetMapEngine implements DeetVisEngine {
     this.deetcodeInstance.enqueue(fn);
   }
   renderNow(name: string, instance: any): void {
-    DeetCode.undoMonkeyPatchAll();
+    this.deetcodeInstance.undoMonkeyPatchAll();
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = this.renderFn(name, nativeCopy);
     fn();
-    DeetCode.monkeyPatchAll();
+    this.deetcodeInstance.monkeyPatchAll();
   }
   transformDeetToNative(instance: any) {
     let copy;
@@ -987,11 +987,11 @@ class DeetListNodeEngine implements DeetVisEngine {
     this.deetcodeInstance.enqueue(fn);
   }
   renderNow(name: string, instance: DeetListNode) {
-    DeetCode.undoMonkeyPatchAll();
+    this.deetcodeInstance.undoMonkeyPatchAll();
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = this.renderFn(name, nativeCopy);
     fn();
-    DeetCode.monkeyPatchAll();
+    this.deetcodeInstance.monkeyPatchAll();
   }
   /**
    * need to create a copy of each node
@@ -1194,11 +1194,11 @@ class DeetBitwiseEngine implements DeetVisEngine {
     this.deetcodeInstance.enqueue(fn);
   }
   renderNow(name: string, instance: number): void {
-    DeetCode.undoMonkeyPatchAll();
+    this.deetcodeInstance.undoMonkeyPatchAll();
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = this.renderFn(name, nativeCopy);
     fn();
-    DeetCode.monkeyPatchAll();
+    this.deetcodeInstance.monkeyPatchAll();
   }
   transformDeetToNative(instance: number) {
     return instance;
@@ -1326,6 +1326,9 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     return fn;
   }
   renderDelayed(name: string, instance: DeetTreeNode): void {
+    // this works even though the data types are monkey patched
+    // because by the time it runs, the monkey patches would have
+    // already been undone.
     const nativeCopy = this.transformDeetToNative(instance);
     if (nativeCopy) {
       const fn = this.renderFn(name, nativeCopy);
@@ -1333,13 +1336,17 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     }
   }
   renderNow(name: string, instance: DeetTreeNode): void {
-    DeetCode.undoMonkeyPatchAll();
+    // the undoing of monkeypatching is necessary here because
+    // d3 requires the use of the original constructors instead
+    // of the monkey patched versions. without this, we'll
+    // see duplicate visualizations
+    this.deetcodeInstance.undoMonkeyPatchAll();
     const nativeCopy = this.transformDeetToNative(instance);
     if (nativeCopy) {
       const fn = this.renderFn(name, nativeCopy);
       fn();
     }
-    DeetCode.monkeyPatchAll();
+    this.deetcodeInstance.monkeyPatchAll();
   }
   transformDeetToNative(instance: DeetTreeNode) {
     return this.treeToHierarchy(instance);
@@ -2089,7 +2096,7 @@ export class DeetCode {
     window.ListNode = DeetListNode;
     window.TreeNode = DeetTreeNode;
     if (this.isAutoNativeEnabled) {
-      DeetCode.monkeyPatchAll();
+      this.monkeyPatchAll();
     }
   }
 
@@ -2101,7 +2108,8 @@ export class DeetCode {
     DeetCode.instance.renderQueue.push(fn);
   }
 
-  static monkeyPatchAll() {
+  monkeyPatchAll() {
+    DeetCode.setInstance(this);
     DeetSet.monkeyPatch();
     DeetMap.monkeyPatch();
     DeetArray.monkeyPatch();
@@ -2110,7 +2118,7 @@ export class DeetCode {
     DeetPriorityQueue.monkeyPatch();
   }
 
-  static undoMonkeyPatchAll() {
+  undoMonkeyPatchAll() {
     DeetSet.undoMonkeyPatch();
     DeetMap.undoMonkeyPatch();
     DeetArray.undoMonkeyPatch();
@@ -2217,12 +2225,12 @@ export class DeetVis {
   }
 
   enableNative() {
-    DeetCode.monkeyPatchAll();
+    this.deetcode.monkeyPatchAll();
     this.deetcode.isAutoNativeEnabled = true;
   }
 
   disableNative() {
-    DeetCode.undoMonkeyPatchAll();
+    this.deetcode.undoMonkeyPatchAll();
     this.deetcode.isAutoNativeEnabled = false;
   }
 }
