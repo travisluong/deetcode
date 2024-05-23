@@ -1,5 +1,47 @@
 // @ts-nocheck
 
+/**
+ * By Default, Deet Mode is enabled.
+ */
+
+const set1 = new Set([1, 2, 3]);
+set1.delete(3);
+set1.add(3);
+DeetVis.set("set1", set1);
+
+const linkedlist = new ListNode(1);
+linkedlist.next = new ListNode(2);
+linkedlist.next.next = new ListNode(3);
+linkedlist.next.next.next = new ListNode(4);
+linkedlist.next.next.next.next = linkedlist.next;
+const prev = linkedlist;
+const cur = linkedlist.next;
+DeetVis.linkedList("linkedlist", linkedlist, { prev, cur });
+
+DeetVis.bitwise("binary", 123);
+
+const rootNode = new TreeNode(6);
+rootNode.left = new TreeNode(2);
+rootNode.left.left = new TreeNode(0);
+rootNode.left.right = new TreeNode(4);
+rootNode.left.right.left = new TreeNode(3);
+rootNode.left.right.right = new TreeNode(5);
+rootNode.right = new TreeNode(8);
+rootNode.right.left = new TreeNode(7);
+rootNode.right.right = new TreeNode(9);
+rootNode.color = "green";
+DeetVis.tree("rootNode", rootNode);
+
+const treeFromArray = DeetVis.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
+DeetVis.tree("treeFromArray", treeFromArray);
+
+/**
+ * DeetCode supports auto visualizations of native JavaScript
+ * data structures. This experimental feature can be enabled
+ * with DeetVis.enableNative().
+ */
+DeetVis.enableNative();
+
 const map = new Map([
   [1, 1],
   [2, 2],
@@ -14,6 +56,8 @@ const numSet = new Set([1, 2, 3]);
 numSet.has(1);
 numSet.delete(3);
 numSet.add(3);
+
+DeetVis.set("numSet", numSet);
 
 const arr = new Array();
 arr.push(1);
@@ -52,28 +96,10 @@ pq.enqueue({ name: "baz", rank: 3 });
 pq.dequeue();
 pq.front();
 
-const linkedlist = new ListNode(1);
-linkedlist.next = new ListNode(2);
-linkedlist.next.next = new ListNode(3);
-linkedlist.next.next.next = new ListNode(4);
-linkedlist.next.next.next.next = linkedlist.next;
-const prev = linkedlist;
-const cur = linkedlist.next;
-DeetVis.linkedList("linkedlist", linkedlist, { prev, cur });
+/**
+ * Auto native visualization can be disabled DeetVis.disableNative().
+ */
+DeetVis.disableNative();
 
-DeetVis.bitwise("binary", 123);
-
-const rootNode = new TreeNode(6);
-rootNode.left = new TreeNode(2);
-rootNode.left.left = new TreeNode(0);
-rootNode.left.right = new TreeNode(4);
-rootNode.left.right.left = new TreeNode(3);
-rootNode.left.right.right = new TreeNode(5);
-rootNode.right = new TreeNode(8);
-rootNode.right.left = new TreeNode(7);
-rootNode.right.right = new TreeNode(9);
-rootNode.color = "green";
-DeetVis.tree("rootNode", rootNode);
-
-const treeFromArray = DeetVis.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
-DeetVis.tree("treeFromArray", treeFromArray);
+// This set will not be rendered in the visualization.
+const set3 = new Set([2, 3, 4]);

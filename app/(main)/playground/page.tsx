@@ -4,10 +4,10 @@ import { readFileAsString } from "@/lib/read-file-as-string";
 import { PlaygroundProblem } from "@/lib/types";
 import { removeFirstLine } from "@/lib/utils";
 
-const content = await readFileAsString("app/(main)/playground/example.ts");
-const code = removeFirstLine(content);
+export default async function Page() {
+  const content = await readFileAsString("app/(main)/playground/example.ts");
+  const code = removeFirstLine(content);
 
-export default function Page() {
   const problem: PlaygroundProblem = {
     solution: code,
   };

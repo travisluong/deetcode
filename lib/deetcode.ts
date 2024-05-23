@@ -1589,7 +1589,7 @@ export class DeetCode {
   interval?: any;
   snapshots: Node[] = [];
   snapshotIndex: number = 0;
-  visMode: VisMode = "deet";
+  isAutoNativeEnabled: boolean = false;
 
   static instance: DeetCode;
 
@@ -1728,7 +1728,7 @@ export class DeetCode {
   }
 
   init() {
-    if (this.visMode === "deet") {
+    if (!this.isAutoNativeEnabled) {
       window.MinPriorityQueue = MinPriorityQueueB;
       window.MaxPriorityQueue = MaxPriorityQueueB;
       window.PriorityQueue = PriorityQueueB;
@@ -1738,7 +1738,7 @@ export class DeetCode {
       window._ = _;
       window.ListNode = DeetListNode;
       window.TreeNode = DeetTreeNode;
-    } else if (this.visMode === "native") {
+    } else if (this.isAutoNativeEnabled) {
       DeetCode.monkeyPatchAll();
     }
   }
@@ -1848,11 +1848,11 @@ export const DeetVis = {
 
   enableNative() {
     DeetCode.monkeyPatchAll();
-    DeetCode.instance.visMode = "native";
+    DeetCode.instance.isAutoNativeEnabled = true;
   },
 
   disableNative() {
     DeetCode.undoMonkeyPatchAll();
-    DeetCode.instance.visMode = "deet";
+    DeetCode.instance.isAutoNativeEnabled = false;
   },
 };
