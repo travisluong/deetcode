@@ -3,21 +3,7 @@
 import { PlaygroundProblem, ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
 import { MouseEvent, useEffect, useRef } from "react";
-import {
-  DeetArray,
-  DeetCode,
-  DeetMap,
-  DeetMaxPriorityQueue,
-  DeetMinPriorityQueue,
-  DeetPriorityQueue,
-  DeetSet,
-  DeetTest,
-  DeetVis,
-  DirectionMode,
-  DeetListNode,
-  RenderMode,
-  DeetTreeNode,
-} from "@/lib/deetcode";
+import { DeetCode, DeetVis, DirectionMode, RenderMode } from "@/lib/deetcode";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -26,10 +12,6 @@ import {
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
-import {
-  MinPriorityQueue,
-  MaxPriorityQueue,
-} from "@datastructures-js/priority-queue";
 import _ from "lodash";
 
 export default function ProblemDetail({
@@ -95,6 +77,7 @@ export default function ProblemDetail({
         labelMode: labelMode,
         animationDelay: animationDelay,
       });
+      window.DeetVis = new DeetVis(dcInstance);
       DeetCode.setInstance(dcInstance);
       DeetCode.instance.startRenderLoop();
     }

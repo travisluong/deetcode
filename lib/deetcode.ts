@@ -23,7 +23,7 @@ declare global {
     MaxPriorityQueue: typeof MaxPriorityQueueB;
     PriorityQueue: typeof PriorityQueueB;
     DeetTest: typeof DeetTest;
-    DeetVis: typeof DeetVis;
+    DeetVis: DeetVis;
     DeetListNode: typeof DeetListNode;
     ListNode: typeof DeetListNode;
     TreeNode: typeof DeetTreeNode;
@@ -595,7 +595,7 @@ class DeetSetEngine implements DeetVisEngine {
   renderDelayed(name: string, instance: any): void {
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = this.renderFn(name, nativeCopy);
-    DeetCode.enqueue(fn);
+    this.deetcodeInstance.enqueue(fn);
   }
   renderNow(name: string, instance: any): void {
     const nativeCopy = this.transformDeetToNative(instance);
@@ -667,7 +667,7 @@ class DeetMapEngine implements DeetVisEngine {
   renderDelayed(name: string, instance: any): void {
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = this.renderFn(name, nativeCopy);
-    DeetCode.enqueue(fn);
+    this.deetcodeInstance.enqueue(fn);
   }
   renderNow(name: string, instance: any): void {
     DeetCode.undoMonkeyPatchAll();
@@ -763,7 +763,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
   }
   renderDelayed(options: DeetArrayOptions): void {
     const fn = this.renderFn(options);
-    DeetCode.enqueue(fn);
+    this.deetcodeInstance.enqueue(fn);
   }
   renderNow(options: DeetArrayOptions): void {
     const fn = this.renderFn(options);
@@ -984,7 +984,7 @@ class DeetListNodeEngine implements DeetVisEngine {
   renderDelayed(name: string, instance: DeetListNode): void {
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = this.renderFn(name, nativeCopy);
-    DeetCode.enqueue(fn);
+    this.deetcodeInstance.enqueue(fn);
   }
   renderNow(name: string, instance: DeetListNode) {
     DeetCode.undoMonkeyPatchAll();
@@ -1191,7 +1191,7 @@ class DeetBitwiseEngine implements DeetVisEngine {
   renderDelayed(name: string, instance: number): void {
     const nativeCopy = this.transformDeetToNative(instance);
     const fn = this.renderFn(name, nativeCopy);
-    DeetCode.enqueue(fn);
+    this.deetcodeInstance.enqueue(fn);
   }
   renderNow(name: string, instance: number): void {
     DeetCode.undoMonkeyPatchAll();
@@ -1329,7 +1329,7 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     const nativeCopy = this.transformDeetToNative(instance);
     if (nativeCopy) {
       const fn = this.renderFn(name, nativeCopy);
-      DeetCode.enqueue(fn);
+      this.deetcodeInstance.enqueue(fn);
     }
   }
   renderNow(name: string, instance: DeetTreeNode): void {
@@ -2085,13 +2085,16 @@ export class DeetCode {
     window.PriorityQueue = PriorityQueueB;
     window.DeetCode = DeetCode;
     window.DeetTest = DeetTest;
-    window.DeetVis = DeetVis;
     window._ = _;
     window.ListNode = DeetListNode;
     window.TreeNode = DeetTreeNode;
     if (this.isAutoNativeEnabled) {
       DeetCode.monkeyPatchAll();
     }
+  }
+
+  enqueue(fn: () => void) {
+    this.renderQueue.push(fn);
   }
 
   static enqueue(fn: () => void) {
@@ -2162,58 +2165,64 @@ export const DeetTest = {
  * types which are not extending the native types.
  * for example, ListNode, Bitwise, TreeNode.
  */
-export const DeetVis = {
+export class DeetVis {
+  deetcode: DeetCode;
+
+  constructor(deetcode: DeetCode) {
+    this.deetcode = deetcode;
+  }
+
   index(instance: DeetArray, obj: VisualizeIndexObj) {
     instance.engine.renderIndexFork(instance, obj);
-  },
+  }
 
   set(name: string, instance: Set<any>) {
-    DeetCode.instance.deetSetEngine.renderContainer(name);
-    DeetCode.instance.deetSetEngine.renderFork(name, instance);
-  },
+    this.deetcode.deetSetEngine.renderContainer(name);
+    this.deetcode.deetSetEngine.renderFork(name, instance);
+  }
 
   map(name: string, instance: Map<any, any>) {
-    DeetCode.instance.deetMapEngine.renderContainer(name);
-    DeetCode.instance.deetMapEngine.renderFork(name, instance);
-  },
+    this.deetcode.deetMapEngine.renderContainer(name);
+    this.deetcode.deetMapEngine.renderFork(name, instance);
+  }
 
   array(options: DeetArrayOptions) {
-    DeetCode.instance.deetArrayEngine.renderContainer(options);
-    DeetCode.instance.deetArrayEngine.renderFork(options);
-  },
+    this.deetcode.deetArrayEngine.renderContainer(options);
+    this.deetcode.deetArrayEngine.renderFork(options);
+  }
 
   linkedList(
     name: string,
     node: DeetListNode,
     pointers?: { [key: string]: DeetListNode | null }
   ) {
-    DeetCode.instance.listNodeEngine.clearAllPointers(node);
-    DeetCode.instance.listNodeEngine.addPointers(pointers);
-    DeetCode.instance.listNodeEngine.renderContainer(name);
-    DeetCode.instance.listNodeEngine.renderFork(name, node);
-  },
+    this.deetcode.listNodeEngine.clearAllPointers(node);
+    this.deetcode.listNodeEngine.addPointers(pointers);
+    this.deetcode.listNodeEngine.renderContainer(name);
+    this.deetcode.listNodeEngine.renderFork(name, node);
+  }
 
   bitwise(name: string, num: number) {
-    DeetCode.instance.bitwiseEngine.renderContainer(name);
-    DeetCode.instance.bitwiseEngine.renderFork(name, num);
-  },
+    this.deetcode.bitwiseEngine.renderContainer(name);
+    this.deetcode.bitwiseEngine.renderFork(name, num);
+  }
 
   tree(name: string, node: DeetTreeNode) {
-    DeetCode.instance.treeNodeEngine.renderContainer(name);
-    DeetCode.instance.treeNodeEngine.renderFork(name, node);
-  },
+    this.deetcode.treeNodeEngine.renderContainer(name);
+    this.deetcode.treeNodeEngine.renderFork(name, node);
+  }
 
   arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
-    return DeetCode.instance.treeNodeEngine.arrayToBinaryTree(array);
-  },
+    return this.deetcode.treeNodeEngine.arrayToBinaryTree(array);
+  }
 
   enableNative() {
     DeetCode.monkeyPatchAll();
-    DeetCode.instance.isAutoNativeEnabled = true;
-  },
+    this.deetcode.isAutoNativeEnabled = true;
+  }
 
   disableNative() {
     DeetCode.undoMonkeyPatchAll();
-    DeetCode.instance.isAutoNativeEnabled = false;
-  },
-};
+    this.deetcode.isAutoNativeEnabled = false;
+  }
+}
