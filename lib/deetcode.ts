@@ -540,15 +540,11 @@ class DeetSetEngine implements DeetVisEngine {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(name: string): HTMLElement {
-    if (this.containerRegistry.has(name)) {
-      return this.containerRegistry.get(name)!;
-    }
-    const label = DeetRender.renderLabel("Set " + name);
-    const container = DeetRender.renderContainer();
-    container.appendChild(label);
-    DeetRender.renderContainerFork(container);
-    this.containerRegistry.set(name, container);
-    return container;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      name: name,
+      label: "Set",
+    });
   }
   renderFork(name: string, instance: any): void {
     DeetRender.renderFork({
@@ -616,15 +612,11 @@ class DeetMapEngine implements DeetVisEngine {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(name: string): HTMLElement {
-    if (this.containerRegistry.has(name)) {
-      return this.containerRegistry.get(name)!;
-    }
-    const label = DeetRender.renderLabel("Map " + name);
-    const container = DeetRender.renderContainer();
-    container.appendChild(label);
-    DeetRender.renderContainerFork(container);
-    this.containerRegistry.set(name, container);
-    return container;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      name: name,
+      label: "Map",
+    });
   }
   renderFork(name: string, instance: any): void {
     DeetRender.renderFork({
@@ -704,6 +696,176 @@ class DeetMapEngine implements DeetVisEngine {
   }
 }
 
+class DeetArrayEngine implements DeetVisEngine {
+  deetcodeInstance: DeetCode;
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  constructor(deetcodeInstance: DeetCode) {
+    this.deetcodeInstance = deetcodeInstance;
+  }
+  emptyContainerRegistry(): void {
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(name: string): HTMLElement {
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      name: name,
+      label: "Array",
+    });
+  }
+  renderFork(name: string, instance: any): void {
+    DeetRender.renderFork({
+      dcInstance: this.deetcodeInstance,
+      delayedCallback: () => {
+        this.renderDelayed(name, instance);
+      },
+      nowCallback: () => {
+        this.renderNow(name, instance);
+      },
+    });
+  }
+  renderDelayed(name: string, instance: any): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = this.renderFn(name, nativeCopy);
+    DeetCode.enqueue(fn);
+  }
+  renderNow(name: string, instance: any): void {
+    const nativeCopy = this.transformDeetToNative(instance);
+    const fn = this.renderFn(name, nativeCopy);
+    fn();
+  }
+  transformDeetToNative(instance: any) {
+    let copy;
+    const arrayConstructor = this.getOriginalArrayConstructor();
+    copy = new arrayConstructor();
+    for (const item of instance) {
+      if (Array.isArray(item)) {
+        // handle 2d arrays
+        const newArr = new arrayConstructor();
+        for (const it of item) {
+          newArr.push(it);
+        }
+        copy.push(newArr);
+      } else {
+        // handle 1d arrays
+        copy.push(item);
+      }
+    }
+    return copy;
+  }
+  renderContent(name: string, instance: any): HTMLElement {
+    const div = document.createElement("div");
+    const label = DeetRender.renderLabel("Array " + name);
+    div.innerHTML = label.outerHTML;
+    if (instance.length === 0) {
+      return div;
+    }
+    if (this.is2DArray(instance)) {
+      const el = this.render2d(instance);
+      div.innerHTML += el.outerHTML;
+    } else {
+      const el = this.render1d(instance);
+      div.innerHTML += el.outerHTML;
+    }
+    return div;
+  }
+  renderFn(name: string, instance: any): () => void {
+    const fn = () => {
+      const el = this.renderContent(name, instance);
+      const container = this.containerRegistry.get(name);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    return fn;
+  }
+  getOriginalArrayConstructor() {
+    if (DeetArray.originalArray) {
+      return DeetArray.originalArray;
+    } else {
+      return Array;
+    }
+  }
+  is2DArray(arr: any) {
+    // Check if arr is an array
+    if (!Array.isArray(arr)) {
+      return false;
+    }
+
+    // Check if all elements of arr are arrays
+    for (let i = 0; i < arr.length; i++) {
+      if (!Array.isArray(arr[i])) {
+        return false;
+      }
+    }
+
+    // If all elements are arrays, it's a 2D array
+    return true;
+  }
+  render1d(arr: Array<any>) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+    const tbody = document.createElement("tbody");
+    const trBody = document.createElement("tr");
+    table.append(thead, tbody);
+    thead.append(trHead);
+    tbody.append(trBody);
+    for (const [index, value] of arr.entries()) {
+      const th = document.createElement("th");
+      const td = document.createElement("td");
+      th.innerHTML = index.toString();
+      if (value) {
+        td.innerHTML = value;
+      } else {
+        const div = document.createElement("div");
+        div.style.height = "25px";
+        td.appendChild(div);
+      }
+      trHead.append(th);
+      trBody.append(td);
+    }
+    return table;
+  }
+  render2d(arr: Array<Array<any>>) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
+    const theadTr = document.createElement("tr");
+    const th = document.createElement("th");
+    theadTr.appendChild(th);
+    table.append(thead, tbody);
+
+    for (let i = 0; i < this.getLengthOfLongestArray(arr); i++) {
+      const th = document.createElement("th");
+      th.innerHTML = i.toString();
+      theadTr.appendChild(th);
+    }
+    thead.appendChild(theadTr);
+
+    for (let i = 0; i < arr.length; i++) {
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      th.innerHTML = i.toString();
+      tr.appendChild(th);
+      for (let j = 0; j < arr[i].length; j++) {
+        const td = document.createElement("td");
+        td.innerHTML = arr[i][j];
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    return table;
+  }
+  getLengthOfLongestArray(arr: Array<Array<any>>) {
+    let max = Number.MIN_VALUE;
+    for (const a of arr) {
+      max = Math.max(max, a.length);
+    }
+    return max;
+  }
+}
+
 class DeetListNodeEngine implements DeetVisEngine {
   deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement> = new Map();
@@ -714,15 +876,11 @@ class DeetListNodeEngine implements DeetVisEngine {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(name: string): HTMLElement {
-    if (this.containerRegistry.has(name)) {
-      return this.containerRegistry.get(name)!;
-    }
-    const label = DeetRender.renderLabel("ListNode " + name);
-    const container = DeetRender.renderContainer();
-    container.appendChild(label);
-    DeetRender.renderContainerFork(container);
-    this.containerRegistry.set(name, container);
-    return container;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      name: name,
+      label: "ListNode",
+    });
   }
   renderFork(name: string, instance: DeetListNode): void {
     switch (this.deetcodeInstance.renderMode) {
@@ -925,16 +1083,11 @@ class DeetBitwiseEngine implements DeetVisEngine {
     }
   }
   renderContainer(name: string): HTMLElement {
-    if (this.containerRegistry.has(name)) {
-      return this.containerRegistry.get(name)!;
-    }
-
-    const label = DeetRender.renderLabel("Bitwise " + name);
-    const container = DeetRender.renderContainer();
-    container.appendChild(label);
-    DeetRender.renderContainerFork(container);
-    this.containerRegistry.set(name, container);
-    return container;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      name: name,
+      label: "Bitwise",
+    });
   }
   renderFork(name: string, instance: number): void {
     switch (this.deetcodeInstance.renderMode) {
@@ -1067,16 +1220,11 @@ class DeetTreeNodeEngine implements DeetVisEngine {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(name: string): HTMLElement {
-    if (this.containerRegistry.has(name)) {
-      return this.containerRegistry.get(name)!;
-    }
-
-    const label = DeetRender.renderLabel("TreeNode " + name);
-    const div = DeetRender.renderContainer();
-    div.appendChild(label);
-    DeetRender.renderContainerFork(div);
-    this.containerRegistry.set(name, div);
-    return div;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      name: name,
+      label: "TreeNode",
+    });
   }
   renderFork(name: string, instance: DeetTreeNode): void {
     switch (this.deetcodeInstance.renderMode) {
@@ -1279,10 +1427,21 @@ const DeetRender = {
         break;
     }
   },
-  renderContainer(): HTMLElement {
-    const div = document.createElement("div");
-    div.classList.add("deet-container");
-    return div;
+  renderContainer(options: {
+    containerRegistry: Map<string, HTMLElement>;
+    name: string;
+    label: string;
+  }): HTMLElement {
+    const container = document.createElement("div");
+    container.classList.add("deet-container");
+    if (options.containerRegistry.has(options.name)) {
+      return options.containerRegistry.get(options.name)!;
+    }
+    const label = DeetRender.renderLabel(`${options.label} ` + options.name);
+    container.appendChild(label);
+    DeetRender.renderContainerFork(container);
+    options.containerRegistry.set(options.name, container);
+    return container;
   },
   renderLabel(name: string): HTMLElement {
     const label = document.createElement("label");
@@ -1694,6 +1853,7 @@ export class DeetCode {
   priorityQueueEngine: NativePriorityQueueEngine;
   deetSetEngine: DeetSetEngine;
   deetMapEngine: DeetMapEngine;
+  deetArrayEngine: DeetArrayEngine;
   listNodeEngine: DeetListNodeEngine;
   bitwiseEngine: DeetBitwiseEngine;
   treeNodeEngine: DeetTreeNodeEngine;
@@ -1718,6 +1878,7 @@ export class DeetCode {
     this.priorityQueueEngine = new NativePriorityQueueEngine(this);
     this.deetSetEngine = new DeetSetEngine(this);
     this.deetMapEngine = new DeetMapEngine(this);
+    this.deetArrayEngine = new DeetArrayEngine(this);
     this.listNodeEngine = new DeetListNodeEngine(this);
     this.bitwiseEngine = new DeetBitwiseEngine(this);
     this.treeNodeEngine = new DeetTreeNodeEngine(this);
@@ -1781,6 +1942,9 @@ export class DeetCode {
 
   erase() {
     this.el.innerHTML = "";
+    this.deetSetEngine.emptyContainerRegistry();
+    this.deetMapEngine.emptyContainerRegistry();
+    this.deetArrayEngine.emptyContainerRegistry();
     this.listNodeEngine.emptyContainerRegistry();
     this.bitwiseEngine.emptyContainerRegistry();
     this.treeNodeEngine.emptyContainerRegistry();
@@ -1938,6 +2102,11 @@ export const DeetVis = {
   map(name: string, instance: Map<any, any>) {
     DeetCode.instance.deetMapEngine.renderContainer(name);
     DeetCode.instance.deetMapEngine.renderFork(name, instance);
+  },
+
+  array(name: string, instance: Array<any>) {
+    DeetCode.instance.deetArrayEngine.renderContainer(name);
+    DeetCode.instance.deetArrayEngine.renderFork(name, instance);
   },
 
   linkedList(

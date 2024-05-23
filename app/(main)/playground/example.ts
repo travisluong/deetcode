@@ -30,6 +30,19 @@ map1.set(3, 3);
 DeetVis.map("map1", map1);
 
 /**
+ * Array
+ */
+const arr1 = [1, 2, 3];
+DeetVis.array("arr1", arr1);
+
+const arr2 = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9],
+];
+DeetVis.array("arr2", arr2);
+
+/**
  * Linked List
  */
 const linkedList = new ListNode(1);
@@ -118,11 +131,11 @@ arr.push(3);
 arr.unshift(1);
 arr[0] = 8;
 
-const arr2 = new Array();
-arr2.push([1, 2, 3]);
-arr2.push([4, 5, 6]);
-arr2.push([7, 8, 9]);
-arr2[1][1] = 88;
+const arr3 = new Array();
+arr3.push([1, 2, 3]);
+arr3.push([4, 5, 6]);
+arr3.push([7, 8, 9]);
+arr3[1][1] = 88;
 
 const minheap = new MinPriorityQueue();
 minheap.enqueue(1);
