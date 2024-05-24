@@ -127,7 +127,10 @@ DeetVis.linkedList({
 /**
  * Bitwise
  */
-DeetVis.bitwise("binary", 123);
+DeetVis.bitwise({
+  name: "binary",
+  data: 123,
+});
 
 /**
  * Binary Tree

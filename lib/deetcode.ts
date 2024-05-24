@@ -75,6 +75,10 @@ interface DeetListNodeOptions extends DeetOptions {
   pointers?: { [key: string]: DeetListNode | null };
 }
 
+interface DeetBitwiseOptions extends DeetOptions {
+  data: number;
+}
+
 /**
  * the DeetVisEngine is for any types that are rendered
  * by the DeetVis class. it follows a similar structure
@@ -1166,43 +1170,40 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetBitwiseEngine implements DeetVisEngine {
-  deetcodeInstance: DeetCode;
+class DeetBitwiseEngine implements DeetVisEngineV2 {
   containerRegistry: Map<string, HTMLElement> = new Map();
-  constructor(deetcodeInstance: DeetCode) {
-    this.deetcodeInstance = deetcodeInstance;
-  }
   emptyContainerRegistry() {
     for (const key of this.containerRegistry.keys()) {
       this.containerRegistry.delete(key);
     }
   }
-  renderContainer(name: string): HTMLElement {
+  renderContainer(options: DeetBitwiseOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: name,
+      name: options.name,
       label: "Bitwise",
     });
   }
-  renderFork(name: string, instance: number): void {
-    switch (this.deetcodeInstance.renderMode) {
+  renderFork(options: DeetBitwiseOptions): void {
+    const { deetcode } = options;
+    switch (deetcode.renderMode) {
       case "animate":
-        this.renderDelayed(name, instance);
+        this.renderDelayed(options);
         break;
       case "debug":
-        this.renderNow(name, instance);
+        this.renderNow(options);
         break;
       case "snapshot":
-        this.renderNow(name, instance);
-        this.deetcodeInstance.takeSnapshot();
+        this.renderNow(options);
+        deetcode.takeSnapshot();
       default:
         break;
     }
   }
-  renderFn(name: string, nativeCopy: number): () => void {
+  renderFn(options: DeetBitwiseOptions): () => void {
     const fn = () => {
-      const el = this.renderContent(name, nativeCopy);
-      const container = this.containerRegistry.get(name);
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -1210,31 +1211,30 @@ class DeetBitwiseEngine implements DeetVisEngine {
 
     return fn;
   }
-  renderDelayed(name: string, instance: number): void {
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
-    this.deetcodeInstance.enqueue(fn);
+  renderDelayed(options: DeetBitwiseOptions): void {
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
   }
-  renderNow(name: string, instance: number): void {
-    this.deetcodeInstance.undoMonkeyPatchAll();
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
+  renderNow(options: DeetBitwiseOptions): void {
+    options.deetcode.undoMonkeyPatchAll();
+    const fn = this.renderFn(options);
     fn();
-    this.deetcodeInstance.monkeyPatchAll();
+    options.deetcode.monkeyPatchAll();
   }
   transformDeetToNative(instance: number) {
     return instance;
   }
-  renderContent(name: string, instance: number): HTMLElement {
+  renderContent(options: DeetBitwiseOptions): HTMLElement {
+    const { name, data } = options;
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel("Bitwise " + name + " " + instance);
+    const label = DeetRender.renderLabel("Bitwise " + name + " " + data);
     div.appendChild(label);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const thr = document.createElement("tr");
     const tbody = document.createElement("tbody");
     const tr = document.createElement("tr");
-    const binary = DeetBitwiseEngine.integerToBinary(instance);
+    const binary = DeetBitwiseEngine.integerToBinary(data);
     const arr = binary.split("");
     const n = arr.length;
     for (const [index, num] of arr.entries()) {
@@ -1252,6 +1252,9 @@ class DeetBitwiseEngine implements DeetVisEngine {
     table.appendChild(tbody);
     div.appendChild(table);
     return div;
+  }
+  copyData(options: DeetOptions) {
+    throw new Error("number type is a primitive and passed by value");
   }
   /**
    * Example usage:
@@ -1982,7 +1985,7 @@ export class DeetCode {
     this.deetMapEngine = new DeetMapEngine();
     this.deetArrayEngine = new DeetArrayEngine();
     this.listNodeEngine = new DeetListNodeEngine();
-    this.bitwiseEngine = new DeetBitwiseEngine(this);
+    this.bitwiseEngine = new DeetBitwiseEngine();
     this.treeNodeEngine = new DeetTreeNodeEngine(this);
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
@@ -2247,9 +2250,10 @@ export class DeetVis {
     this.deetcode.listNodeEngine.renderFork(options);
   }
 
-  bitwise(name: string, num: number) {
-    this.deetcode.bitwiseEngine.renderContainer(name);
-    this.deetcode.bitwiseEngine.renderFork(name, num);
+  bitwise(options: DeetBitwiseOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.bitwiseEngine.renderContainer(options);
+    this.deetcode.bitwiseEngine.renderFork(options);
   }
 
   tree(name: string, node: DeetTreeNode) {
