@@ -55,6 +55,14 @@ interface DeetOptions {
   copiedData: any;
 }
 
+interface DeetSetOptions extends DeetOptions {
+  data: Set<any>;
+}
+
+interface DeetMapOptions extends DeetOptions {
+  data: Map<any, any>;
+}
+
 interface DeetArrayOptions extends DeetOptions {
   data: Array<any>;
   copiedData: Array<any>;
@@ -266,7 +274,6 @@ class NativeSetEngine extends NativeEngine {
 
 class NativeMapEngine extends NativeEngine {
   transformDeetToNative(instance: DeetMap<any, any>): Map<any, any> {
-    debugger;
     let copy;
     if (DeetMap.originalMap) {
       copy = new DeetMap.originalMap([...instance.entries()]);
@@ -566,41 +573,39 @@ class NativePriorityQueueEngine extends NativeEngine {
   }
 }
 
-class DeetSetEngine implements DeetVisEngine {
-  deetcodeInstance: DeetCode;
+class DeetSetEngine implements DeetVisEngineV2 {
   containerRegistry: Map<string, HTMLElement> = new Map();
-  constructor(deetcodeInstance: DeetCode) {
-    this.deetcodeInstance = deetcodeInstance;
-  }
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
-  renderContainer(name: string): HTMLElement {
+  renderContainer(options: DeetSetOptions): HTMLElement {
+    const { name } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       name: name,
       label: "Set",
     });
   }
-  renderFork(name: string, instance: any): void {
+  renderFork(options: DeetSetOptions): void {
+    const { deetcode } = options;
     DeetRender.renderFork({
-      dcInstance: this.deetcodeInstance,
+      dcInstance: deetcode,
       delayedCallback: () => {
-        this.renderDelayed(name, instance);
+        this.renderDelayed(options);
       },
       nowCallback: () => {
-        this.renderNow(name, instance);
+        this.renderNow(options);
       },
     });
   }
-  renderDelayed(name: string, instance: any): void {
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
-    this.deetcodeInstance.enqueue(fn);
+  renderDelayed(options: DeetSetOptions): void {
+    const { data, deetcode } = options;
+    const fn = this.renderFn(options);
+    deetcode.enqueue(fn);
   }
-  renderNow(name: string, instance: any): void {
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
+  renderNow(options: DeetSetOptions): void {
+    const { data } = options;
+    const fn = this.renderFn(options);
     fn();
   }
   transformDeetToNative(instance: any) {
@@ -612,10 +617,11 @@ class DeetSetEngine implements DeetVisEngine {
     }
     return copy;
   }
-  renderContent(name: string, instance: any): HTMLElement {
+  renderContent(options: DeetSetOptions): HTMLElement {
+    const data = this.copyData(options);
     const div = document.createElement("div");
     const ul = document.createElement("ul");
-    for (const item of instance) {
+    for (const item of data) {
       const li = document.createElement("li");
       li.innerHTML = item;
       ul.appendChild(li);
@@ -626,56 +632,57 @@ class DeetSetEngine implements DeetVisEngine {
     div.appendChild(ul);
     return div;
   }
-  renderFn(name: string, instance: any): () => void {
+  renderFn(options: DeetSetOptions): () => void {
     const fn = () => {
-      const el = this.renderContent(name, instance);
-      const container = this.containerRegistry.get(name);
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
     };
     return fn;
   }
+  copyData(options: DeetOptions) {
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    options.copiedData = new Set([...options.data]);
+    return options.copiedData;
+  }
 }
 
-class DeetMapEngine implements DeetVisEngine {
-  deetcodeInstance: DeetCode;
+class DeetMapEngine implements DeetVisEngineV2 {
   containerRegistry: Map<string, HTMLElement> = new Map();
-  constructor(deetcodeInstance: DeetCode) {
-    this.deetcodeInstance = deetcodeInstance;
-  }
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
-  renderContainer(name: string): HTMLElement {
+  renderContainer(options: DeetMapOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: name,
+      name: options.name,
       label: "Map",
     });
   }
-  renderFork(name: string, instance: any): void {
+  renderFork(options: DeetMapOptions): void {
     DeetRender.renderFork({
-      dcInstance: this.deetcodeInstance,
+      dcInstance: options.deetcode,
       delayedCallback: () => {
-        this.renderDelayed(name, instance);
+        this.renderDelayed(options);
       },
       nowCallback: () => {
-        this.renderNow(name, instance);
+        this.renderNow(options);
       },
     });
   }
-  renderDelayed(name: string, instance: any): void {
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
-    this.deetcodeInstance.enqueue(fn);
+  renderDelayed(options: DeetMapOptions): void {
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
   }
-  renderNow(name: string, instance: any): void {
-    this.deetcodeInstance.undoMonkeyPatchAll();
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
+  renderNow(options: DeetMapOptions): void {
+    options.deetcode.undoMonkeyPatchAll();
+    const fn = this.renderFn(options);
     fn();
-    this.deetcodeInstance.monkeyPatchAll();
+    options.deetcode.monkeyPatchAll();
   }
   transformDeetToNative(instance: any) {
     let copy;
@@ -686,7 +693,8 @@ class DeetMapEngine implements DeetVisEngine {
     }
     return copy;
   }
-  renderContent(name: string, instance: any): HTMLElement {
+  renderContent(options: DeetMapOptions): HTMLElement {
+    const data = this.copyData(options);
     const div = document.createElement("div");
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -703,7 +711,7 @@ class DeetMapEngine implements DeetVisEngine {
     thKey.innerHTML = "key";
     thVal.innerHTML = "value";
 
-    for (const [key, value] of instance.entries()) {
+    for (const [key, value] of data.entries()) {
       const tr = document.createElement("tr");
       const tdKey = document.createElement("td");
       const tdVal = document.createElement("td");
@@ -720,15 +728,24 @@ class DeetMapEngine implements DeetVisEngine {
     div.append(table);
     return div;
   }
-  renderFn(name: string, instance: any): () => void {
+  renderFn(options: DeetMapOptions): () => void {
     const fn = () => {
-      const el = this.renderContent(name, instance);
-      const container = this.containerRegistry.get(name);
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
     };
     return fn;
+  }
+  copyData(options: DeetOptions) {
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    const { data } = options;
+    const copy = new Map([...data.entries()]);
+    options.copiedData = copy;
+    return options.copiedData;
   }
 }
 
@@ -1953,8 +1970,8 @@ export class DeetCode {
     this.minPriorityQueueEngine = new NativeMinPriorityQueueEngine(this);
     this.maxPriorityQueueEngine = new NativeMaxPriorityQueueEngine(this);
     this.priorityQueueEngine = new NativePriorityQueueEngine(this);
-    this.deetSetEngine = new DeetSetEngine(this);
-    this.deetMapEngine = new DeetMapEngine(this);
+    this.deetSetEngine = new DeetSetEngine();
+    this.deetMapEngine = new DeetMapEngine();
     this.deetArrayEngine = new DeetArrayEngine();
     this.listNodeEngine = new DeetListNodeEngine(this);
     this.bitwiseEngine = new DeetBitwiseEngine(this);
@@ -2196,14 +2213,16 @@ export class DeetVis {
     instance.engine.renderIndexFork(instance, obj);
   }
 
-  set(name: string, instance: Set<any>) {
-    this.deetcode.deetSetEngine.renderContainer(name);
-    this.deetcode.deetSetEngine.renderFork(name, instance);
+  set(options: DeetSetOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.deetSetEngine.renderContainer(options);
+    this.deetcode.deetSetEngine.renderFork(options);
   }
 
-  map(name: string, instance: Map<any, any>) {
-    this.deetcode.deetMapEngine.renderContainer(name);
-    this.deetcode.deetMapEngine.renderFork(name, instance);
+  map(options: DeetMapOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.deetMapEngine.renderContainer(options);
+    this.deetcode.deetMapEngine.renderFork(options);
   }
 
   array(options: DeetArrayOptions) {

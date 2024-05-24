@@ -10,12 +10,25 @@
  */
 
 /**
- * Set
+ * Deet Set
  */
 const set1 = new Set([1, 2, 3]);
 set1.delete(3);
 set1.add(3);
-DeetVis.set("set1", set1);
+DeetVis.set({
+  name: "set1",
+  data: set1,
+});
+
+/**
+ * Native Set
+ */
+DeetVis.enableNative();
+const set2 = new Set([1, 2, 3]);
+set2.has(1);
+set2.delete(3);
+set2.add(3);
+DeetVis.disableNative();
 
 /**
  * Map
@@ -27,7 +40,10 @@ const map1 = new Map([
 ]);
 map1.delete(3);
 map1.set(3, 3);
-DeetVis.map("map1", map1);
+DeetVis.map({
+  name: "map1",
+  data: map1,
+});
 
 /**
  * Array
@@ -55,6 +71,26 @@ DeetVis.array({
   name: "arr2",
   data: arr2,
 });
+
+/**
+ * Native Array
+ */
+DeetVis.enableNative();
+const arr3 = new Array();
+arr3.push(1);
+arr3.push(2);
+arr3.push(3);
+arr3.pop();
+arr3.shift();
+arr3.push(3);
+arr3.unshift(1);
+arr3[0] = 8;
+const arr4 = new Array();
+arr4.push([1, 2, 3]);
+arr4.push([4, 5, 6]);
+arr4.push([7, 8, 9]);
+arr4[1][1] = 88;
+DeetVis.disableNative();
 
 /**
  * Linked List
@@ -115,41 +151,23 @@ DeetVis.tree("treeFromArray", treeFromArray);
  */
 DeetVis.enableNative();
 
-const map = new Map([
+const map2 = new Map([
   [1, 1],
   [2, 2],
   [3, 3],
 ]);
-map.has(1);
-map.get(1);
-map.delete(3);
-map.set(3, 3);
-
-const numSet = new Set([1, 2, 3]);
-numSet.has(1);
-numSet.delete(3);
-numSet.add(3);
+map2.has(1);
+map2.get(1);
+map2.delete(3);
+map2.set(3, 3);
 
 /**
  * DeetVis still works even with Auto Native Visualization enabled
  */
-DeetVis.set("numSet", numSet);
-
-const arr = new Array();
-arr.push(1);
-arr.push(2);
-arr.push(3);
-arr.pop();
-arr.shift();
-arr.push(3);
-arr.unshift(1);
-arr[0] = 8;
-
-const arr3 = new Array();
-arr3.push([1, 2, 3]);
-arr3.push([4, 5, 6]);
-arr3.push([7, 8, 9]);
-arr3[1][1] = 88;
+DeetVis.set({
+  name: "set2",
+  data: set2,
+});
 
 const minheap = new MinPriorityQueue();
 minheap.enqueue(1);
