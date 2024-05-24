@@ -51,6 +51,7 @@ interface DeetConfig {
 interface DeetOptions {
   name: string;
   data: any;
+  deetcode: DeetCode;
   copiedData: any;
 }
 
@@ -94,7 +95,6 @@ interface DeetVisEngine {
  * on native structures
  */
 interface DeetVisEngineV2 {
-  deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement>;
   emptyContainerRegistry(): void;
   renderContainer(options: DeetOptions): HTMLElement;
@@ -266,6 +266,7 @@ class NativeSetEngine extends NativeEngine {
 
 class NativeMapEngine extends NativeEngine {
   transformDeetToNative(instance: DeetMap<any, any>): Map<any, any> {
+    debugger;
     let copy;
     if (DeetMap.originalMap) {
       copy = new DeetMap.originalMap([...instance.entries()]);
@@ -732,11 +733,7 @@ class DeetMapEngine implements DeetVisEngine {
 }
 
 class DeetArrayEngine implements DeetVisEngineV2 {
-  deetcodeInstance: DeetCode;
   containerRegistry: Map<string, HTMLElement> = new Map();
-  constructor(deetcodeInstance: DeetCode) {
-    this.deetcodeInstance = deetcodeInstance;
-  }
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
@@ -752,7 +749,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     // the copied data must be created here to avoid race condition
     this.copyData(options);
     DeetRender.renderFork({
-      dcInstance: this.deetcodeInstance,
+      dcInstance: options.deetcode,
       delayedCallback: () => {
         this.renderDelayed(options);
       },
@@ -763,7 +760,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
   }
   renderDelayed(options: DeetArrayOptions): void {
     const fn = this.renderFn(options);
-    this.deetcodeInstance.enqueue(fn);
+    options.deetcode.enqueue(fn);
   }
   renderNow(options: DeetArrayOptions): void {
     const fn = this.renderFn(options);
@@ -1958,7 +1955,7 @@ export class DeetCode {
     this.priorityQueueEngine = new NativePriorityQueueEngine(this);
     this.deetSetEngine = new DeetSetEngine(this);
     this.deetMapEngine = new DeetMapEngine(this);
-    this.deetArrayEngine = new DeetArrayEngine(this);
+    this.deetArrayEngine = new DeetArrayEngine();
     this.listNodeEngine = new DeetListNodeEngine(this);
     this.bitwiseEngine = new DeetBitwiseEngine(this);
     this.treeNodeEngine = new DeetTreeNodeEngine(this);
@@ -2122,6 +2119,9 @@ export class DeetCode {
   }
 
   monkeyPatchAll() {
+    if (!this.isAutoNativeEnabled) {
+      return;
+    }
     DeetSet.monkeyPatch();
     DeetMap.monkeyPatch();
     DeetArray.monkeyPatch();
@@ -2207,6 +2207,7 @@ export class DeetVis {
   }
 
   array(options: DeetArrayOptions) {
+    options.deetcode = this.deetcode;
     this.deetcode.deetArrayEngine.renderContainer(options);
     this.deetcode.deetArrayEngine.renderFork(options);
   }
@@ -2237,12 +2238,12 @@ export class DeetVis {
   }
 
   enableNative() {
-    this.deetcode.monkeyPatchAll();
     this.deetcode.isAutoNativeEnabled = true;
+    this.deetcode.monkeyPatchAll();
   }
 
   disableNative() {
-    this.deetcode.undoMonkeyPatchAll();
     this.deetcode.isAutoNativeEnabled = false;
+    this.deetcode.undoMonkeyPatchAll();
   }
 }
