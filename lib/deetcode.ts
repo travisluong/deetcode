@@ -67,13 +67,13 @@ interface DeetMapOptions extends DeetOptions {
 
 interface DeetArrayOptions extends DeetOptions {
   data: Array<any>;
-  copiedData: Array<any>;
+  copiedData?: Array<any>;
   indexObj?: { [key: string]: number };
 }
 
 interface DeetListNodeOptions extends DeetOptions {
   data: DeetListNode;
-  copiedData: Array<DeetListNodeRenderObj>;
+  copiedData?: Array<DeetListNodeRenderObj>;
   pointers?: { [key: string]: DeetListNode | null };
 }
 
@@ -83,7 +83,7 @@ interface DeetBitwiseOptions extends DeetOptions {
 
 interface DeetTreeOptions extends DeetOptions {
   data: DeetTreeNode;
-  copiedData: D3TreeNode | null;
+  copiedData?: D3TreeNode | null;
 }
 
 /**
@@ -147,6 +147,10 @@ interface AutoVisDataType {
   id: string;
   engine: DeetVisEngineV2;
   deetcode: DeetCode;
+}
+
+interface AutoVisArray {
+  engine: DeetArrayEngine;
 }
 
 type NativeDataStructure =
@@ -830,10 +834,9 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     return div;
   }
   renderFn(options: DeetArrayOptions): () => void {
-    const { name } = options;
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(name);
+      const container = this.containerRegistry.get(options.name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -962,11 +965,11 @@ class DeetArrayEngine implements DeetVisEngineV2 {
       return options.copiedData;
     }
     const { data } = options;
-    const copy = new Array();
+    const copy = [];
     for (const item of data) {
       if (Array.isArray(item)) {
         // handle 2d arrays
-        const newArr = new Array();
+        const newArr = [];
         for (const it of item) {
           newArr.push(it);
         }
@@ -1736,16 +1739,23 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
   }
 }
 
-export class DeetArray extends Array implements AutoVisDataType {
+export class DeetArray extends Array implements AutoVisArray {
   id: string;
+  engine: DeetArrayEngine;
+  deetcode: DeetCode;
   renderEnabled: boolean = false;
   static originalArray?: ArrayConstructor;
 
   constructor(...args: any) {
     super(...args);
-    this.engine = DeetCode.getInstance().arrayEngine;
-    this.container = this.engine.renderContainer(this);
-    this.engine.renderFork(this);
+    this.deetcode = DeetCode.getInstance();
+    this.id = this.deetcode.nanoid();
+    this.engine = this.deetcode.deetArrayEngine;
+    this.engine.renderContainer({
+      data: this,
+      name: this.id,
+      deetcode: this.deetcode,
+    });
     this.renderEnabled = true;
     return new Proxy(this, {
       get(target, key: any) {
@@ -1753,9 +1763,10 @@ export class DeetArray extends Array implements AutoVisDataType {
           return true;
         } else if (target[key] instanceof HTMLElement) {
           return target[key];
-        } else if (target[key] instanceof NativeArrayEngine) {
-          return target[key];
-        } else if (typeof target[key] === "object") {
+        } else if (Array.isArray(target[key])) {
+          // handle 2d array scenarios
+          // so that we can get that native-like
+          // behavior on 2d arrays
           return new Proxy(target[key], this);
         } else {
           return target[key];
@@ -1765,7 +1776,11 @@ export class DeetArray extends Array implements AutoVisDataType {
         console.log(target, prop, value);
         const res = Reflect.set(target, prop, value);
         if (this.renderEnabled) {
-          this.engine.renderFork(this);
+          this.engine.renderFork({
+            data: this,
+            name: this.id,
+            deetcode: this.deetcode,
+          });
         }
         return res;
       },
@@ -1773,10 +1788,13 @@ export class DeetArray extends Array implements AutoVisDataType {
   }
 
   push(value: any): number {
-    console.log("push", value);
     this.renderEnabled = false;
     const res = super.push(value);
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      data: this,
+      name: this.id,
+      deetcode: this.deetcode,
+    });
     this.renderEnabled = true;
     return res;
   }
@@ -1785,7 +1803,11 @@ export class DeetArray extends Array implements AutoVisDataType {
     console.log("unshift", value);
     this.renderEnabled = false;
     const res = super.unshift(value);
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      data: this,
+      name: this.id,
+      deetcode: this.deetcode,
+    });
     this.renderEnabled = true;
     return res;
   }
@@ -1794,7 +1816,11 @@ export class DeetArray extends Array implements AutoVisDataType {
     console.log("shift");
     this.renderEnabled = false;
     const res = super.shift();
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      data: this,
+      name: this.id,
+      deetcode: this.deetcode,
+    });
     this.renderEnabled = true;
     return res;
   }
@@ -1803,7 +1829,11 @@ export class DeetArray extends Array implements AutoVisDataType {
     console.log("pop");
     this.renderEnabled = false;
     const res = super.pop();
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      data: this,
+      name: this.id,
+      deetcode: this.deetcode,
+    });
     this.renderEnabled = true;
     return res;
   }
@@ -1811,14 +1841,13 @@ export class DeetArray extends Array implements AutoVisDataType {
   sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
     this.renderEnabled = false;
     const res = super.sort(compareFn);
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      name: this.id,
+      data: this,
+      deetcode: this.deetcode,
+    });
     this.renderEnabled = true;
     return res;
-  }
-
-  visIndex(obj: VisualizeIndexObj) {
-    throw new Error("this method is deprecated in favor of Deet.visIndex");
-    this.engine.renderIndexFork(this, obj);
   }
 
   static monkeyPatch() {
@@ -2279,10 +2308,6 @@ export class DeetVis {
 
   constructor(deetcode: DeetCode) {
     this.deetcode = deetcode;
-  }
-
-  index(instance: DeetArray, obj: VisualizeIndexObj) {
-    instance.engine.renderIndexFork(instance, obj);
   }
 
   set(options: DeetSetOptions) {
