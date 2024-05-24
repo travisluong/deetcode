@@ -157,8 +157,6 @@ type DeetDataStructure =
   | DeetMaxPriorityQueue
   | DeetPriorityQueue;
 
-type VisMode = "deet" | "native";
-
 abstract class NativeEngine {
   deetcodeInstance: DeetCode;
   constructor(deetcodeInstance: DeetCode) {
