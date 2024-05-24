@@ -1520,10 +1520,10 @@ const DeetRender = {
   },
   renderContainerFork(div: HTMLElement): void {
     const fn = () => {
-      DeetCode.instance.el?.appendChild(div);
+      DeetCode.getInstance().el?.appendChild(div);
     };
 
-    switch (DeetCode.instance.renderMode) {
+    switch (DeetCode.getInstance().renderMode) {
       case "animate":
         DeetCode.enqueue(fn);
         break;
@@ -1532,7 +1532,7 @@ const DeetRender = {
         break;
       case "snapshot":
         fn();
-        DeetCode.instance.takeSnapshot();
+        DeetCode.getInstance().takeSnapshot();
       default:
         break;
     }
@@ -1587,7 +1587,7 @@ export class DeetSet extends Set {
 
   constructor(iterable: any) {
     super();
-    this.engine = DeetCode.instance.setEngine;
+    this.engine = DeetCode.getInstance().setEngine;
     this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const item of iterable) {
@@ -1642,7 +1642,7 @@ export class DeetMap<K, V> extends Map<K, V> {
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
     this.renderEnabled = false;
-    this.engine = DeetCode.instance.mapEngine;
+    this.engine = DeetCode.getInstance().mapEngine;
     this.container = this.engine.renderContainer(this);
     if (iterable) {
       for (const [key, value] of iterable) {
@@ -1697,7 +1697,7 @@ export class DeetArray extends Array {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = DeetCode.instance.arrayEngine;
+    this.engine = DeetCode.getInstance().arrayEngine;
     this.container = this.engine.renderContainer(this);
     this.engine.renderFork(this);
     this.renderEnabled = true;
@@ -1798,7 +1798,7 @@ export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = DeetCode.instance.minPriorityQueueEngine;
+    this.engine = DeetCode.getInstance().minPriorityQueueEngine;
     this.container = this.engine.renderContainer(this);
     this.engine.renderFork(this);
   }
@@ -1837,7 +1837,7 @@ export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
 
   constructor(...args: any) {
     super(...args);
-    this.engine = DeetCode.instance.maxPriorityQueueEngine;
+    this.engine = DeetCode.getInstance().maxPriorityQueueEngine;
     this.container = this.engine.renderContainer(this);
   }
 
@@ -1875,7 +1875,7 @@ export class DeetPriorityQueue extends PriorityQueueB<any> {
 
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
-    this.engine = DeetCode.instance.priorityQueueEngine;
+    this.engine = DeetCode.getInstance().priorityQueueEngine;
     this.container = this.engine.renderContainer(this);
   }
 
@@ -1975,7 +1975,7 @@ export class DeetCode {
   snapshotIndex: number = 0;
   isAutoNativeEnabled: boolean = false;
 
-  static instance: DeetCode;
+  private static instance: DeetCode;
 
   constructor(config: DeetConfig) {
     this.selector = config.selector;
@@ -2148,7 +2148,7 @@ export class DeetCode {
   }
 
   static enqueue(fn: () => void) {
-    DeetCode.instance.renderQueue.push(fn);
+    DeetCode.getInstance().renderQueue.push(fn);
   }
 
   monkeyPatchAll() {
@@ -2173,7 +2173,11 @@ export class DeetCode {
   }
 
   static setInstance(deetcode: DeetCode) {
-    DeetCode.instance = deetcode;
+    this.instance = deetcode;
+  }
+
+  static getInstance() {
+    return this.instance;
   }
 }
 
@@ -2187,16 +2191,16 @@ export const DeetTest = {
         div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
           actual
         )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetCode.instance.el.appendChild(div);
+        DeetCode.getInstance().el.appendChild(div);
       } else {
         div.classList.add("deet-assert-fail");
         div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
           actual
         )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetCode.instance.el.appendChild(div);
+        DeetCode.getInstance().el.appendChild(div);
       }
     };
-    switch (DeetCode.instance.renderMode) {
+    switch (DeetCode.getInstance().renderMode) {
       case "animate":
         DeetCode.enqueue(fn);
         break;
@@ -2205,7 +2209,7 @@ export const DeetTest = {
         break;
       case "snapshot":
         fn();
-        DeetCode.instance.takeSnapshot();
+        DeetCode.getInstance().takeSnapshot();
       default:
         break;
     }
