@@ -143,7 +143,7 @@ interface RenderForkOptions {
   nowCallback(): void;
 }
 
-interface AutoVisEngine {
+interface AutoVisDataType {
   id: string;
 }
 
@@ -1591,14 +1591,14 @@ export type RenderMode = "animate" | "debug" | "snapshot";
 
 export type DirectionMode = "row" | "column";
 
-export class DeetSet extends Set implements AutoVisEngine {
+export class DeetSet extends Set implements AutoVisDataType {
   id: string;
   static originalSet?: SetConstructor;
 
   constructor(iterable: any) {
     super();
     const deetcode = DeetCode.getInstance();
-    this.id = nanoid(deetcode.nanoidSize);
+    this.id = deetcode.nanoid();
     deetcode.deetSetEngine.renderContainer({
       name: this.id,
       data: this,
@@ -1652,9 +1652,8 @@ export class DeetSet extends Set implements AutoVisEngine {
   }
 }
 
-export class DeetMap<K, V> extends Map<K, V> {
-  container: HTMLElement;
-  engine: NativeMapEngine;
+export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
+  id: string;
   renderEnabled: boolean;
   static originalMap?: MapConstructor;
 
@@ -1666,16 +1665,25 @@ export class DeetMap<K, V> extends Map<K, V> {
    */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
+    const deetcode = DeetCode.getInstance();
+    this.id = deetcode.nanoid();
     this.renderEnabled = false;
-    this.engine = DeetCode.getInstance().mapEngine;
-    this.container = this.engine.renderContainer(this);
+    deetcode.deetMapEngine.renderContainer({
+      name: this.id,
+      data: this,
+      deetcode: deetcode,
+    });
     if (iterable) {
       for (const [key, value] of iterable) {
         this.set(key, value);
       }
     }
     this.renderEnabled = true;
-    this.engine.renderFork(this);
+    deetcode.deetMapEngine.renderFork({
+      name: this.id,
+      data: this,
+      deetcode: deetcode,
+    });
   }
 
   has(value: any): boolean {
@@ -1685,7 +1693,12 @@ export class DeetMap<K, V> extends Map<K, V> {
   set(key: any, value: any): any {
     const res = super.set(key, value);
     if (this.renderEnabled) {
-      this.engine.renderFork(this);
+      const deetcode = DeetCode.getInstance();
+      deetcode.deetMapEngine.renderFork({
+        name: this.id,
+        data: this,
+        deetcode: deetcode,
+      });
     }
     return res;
   }
@@ -1693,7 +1706,12 @@ export class DeetMap<K, V> extends Map<K, V> {
   delete(key: any): any {
     const res = super.delete(key);
     if (this.renderEnabled) {
-      this.engine.renderFork(this);
+      const deetcode = DeetCode.getInstance();
+      deetcode.deetMapEngine.renderFork({
+        name: this.id,
+        data: this,
+        deetcode: deetcode,
+      });
     }
     return res;
   }
@@ -2197,6 +2215,10 @@ export class DeetCode {
     DeetMinPriorityQueue.undoMonkeyPatch();
     DeetMaxPriorityQueue.undoMonkeyPatch();
     DeetPriorityQueue.undoMonkeyPatch();
+  }
+
+  nanoid() {
+    return nanoid(this.nanoidSize);
   }
 
   static setInstance(deetcode: DeetCode) {
