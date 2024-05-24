@@ -1,6 +1,7 @@
 "use client";
 import _ from "lodash";
 import * as d3 from "d3";
+import { nanoid } from "nanoid";
 
 import {
   ICompare,
@@ -46,6 +47,7 @@ interface DeetConfig {
   directionMode?: DirectionMode;
   labelMode?: boolean;
   animationDelay?: number;
+  nanoidSize: number;
 }
 
 interface DeetOptions {
@@ -139,6 +141,10 @@ interface RenderForkOptions {
   dcInstance: DeetCode;
   delayedCallback(): void;
   nowCallback(): void;
+}
+
+interface AutoVisEngine {
+  id: string;
 }
 
 type NativeDataStructure =
@@ -631,6 +637,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
     return copy;
   }
   renderContent(options: DeetSetOptions): HTMLElement {
+    const { name } = options;
     const data = this.copyData(options);
     const div = document.createElement("div");
     const ul = document.createElement("ul");
@@ -659,7 +666,13 @@ class DeetSetEngine implements DeetVisEngineV2 {
     if (options.copiedData) {
       return options.copiedData;
     }
+    if (DeetCode.getInstance().isAutoNativeEnabled) {
+      DeetSet.undoMonkeyPatch();
+    }
     options.copiedData = new Set([...options.data]);
+    if (DeetCode.getInstance().isAutoNativeEnabled) {
+      DeetSet.monkeyPatch();
+    }
     return options.copiedData;
   }
 }
@@ -1578,15 +1591,16 @@ export type RenderMode = "animate" | "debug" | "snapshot";
 
 export type DirectionMode = "row" | "column";
 
-export class DeetSet extends Set {
-  container: HTMLElement;
+export class DeetSet extends Set implements AutoVisEngine {
+  id: string;
   static originalSet?: SetConstructor;
 
   constructor(iterable: any) {
     super();
     const deetcode = DeetCode.getInstance();
-    this.container = deetcode.deetSetEngine.renderContainer({
-      name: "Set",
+    this.id = nanoid(deetcode.nanoidSize);
+    deetcode.deetSetEngine.renderContainer({
+      name: this.id,
       data: this,
       deetcode: deetcode,
     });
@@ -1605,7 +1619,7 @@ export class DeetSet extends Set {
     const res = super.add(value);
     const deetcode = DeetCode.getInstance();
     deetcode.deetSetEngine.renderFork({
-      name: "Set",
+      name: this.id,
       data: this,
       deetcode: deetcode,
     });
@@ -1616,7 +1630,7 @@ export class DeetSet extends Set {
     const res = super.delete(value);
     const deetcode = DeetCode.getInstance();
     deetcode.deetSetEngine.renderFork({
-      name: "Set",
+      name: this.id,
       data: this,
       deetcode: deetcode,
     });
@@ -1985,6 +1999,7 @@ export class DeetCode {
   snapshots: Node[] = [];
   snapshotIndex: number = 0;
   isAutoNativeEnabled: boolean = false;
+  nanoidSize: number;
 
   private static instance: DeetCode;
 
@@ -2006,6 +2021,7 @@ export class DeetCode {
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
+    this.nanoidSize = config.nanoidSize || 10;
 
     const el = document.querySelector(config.selector);
 
