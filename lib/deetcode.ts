@@ -52,7 +52,7 @@ interface DeetOptions {
   name: string;
   data: any;
   deetcode: DeetCode;
-  copiedData: any;
+  copiedData?: any;
 }
 
 interface DeetSetOptions extends DeetOptions {
@@ -1580,13 +1580,16 @@ export type DirectionMode = "row" | "column";
 
 export class DeetSet extends Set {
   container: HTMLElement;
-  engine: NativeSetEngine;
   static originalSet?: SetConstructor;
 
   constructor(iterable: any) {
     super();
-    this.engine = DeetCode.getInstance().setEngine;
-    this.container = this.engine.renderContainer(this);
+    const deetcode = DeetCode.getInstance();
+    this.container = deetcode.deetSetEngine.renderContainer({
+      name: "Set",
+      data: this,
+      deetcode: deetcode,
+    });
     if (iterable) {
       for (const item of iterable) {
         this.add(item);
@@ -1600,13 +1603,23 @@ export class DeetSet extends Set {
 
   add(value: any): any {
     const res = super.add(value);
-    this.engine.renderFork(this);
+    const deetcode = DeetCode.getInstance();
+    deetcode.deetSetEngine.renderFork({
+      name: "Set",
+      data: this,
+      deetcode: deetcode,
+    });
     return res;
   }
 
   delete(value: any): any {
     const res = super.delete(value);
-    this.engine.renderFork(this);
+    const deetcode = DeetCode.getInstance();
+    deetcode.deetSetEngine.renderFork({
+      name: "Set",
+      data: this,
+      deetcode: deetcode,
+    });
     return res;
   }
 
