@@ -145,13 +145,19 @@ rootNode.right = new TreeNode(8);
 rootNode.right.left = new TreeNode(7);
 rootNode.right.right = new TreeNode(9);
 rootNode.color = "green";
-DeetVis.tree("rootNode", rootNode);
+DeetVis.tree({
+  name: "tree",
+  data: rootNode,
+});
 
 /**
  * LeetCode style array to binary tree syntax is supported
  */
 const treeFromArray = DeetVis.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
-DeetVis.tree("treeFromArray", treeFromArray);
+DeetVis.tree({
+  name: "tree from array",
+  data: treeFromArray,
+});
 
 /**
  * DeetCode supports auto visualizations of native JavaScript

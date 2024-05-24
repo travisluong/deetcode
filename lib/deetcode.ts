@@ -79,6 +79,11 @@ interface DeetBitwiseOptions extends DeetOptions {
   data: number;
 }
 
+interface DeetTreeOptions extends DeetOptions {
+  data: DeetTreeNode;
+  copiedData: D3TreeNode | null;
+}
+
 /**
  * the DeetVisEngine is for any types that are rendered
  * by the DeetVis class. it follows a similar structure
@@ -1308,75 +1313,75 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetTreeNodeEngine implements DeetVisEngine {
-  deetcodeInstance: DeetCode;
+class DeetTreeNodeEngine implements DeetVisEngineV2 {
   containerRegistry: Map<string, HTMLElement> = new Map();
-  constructor(deetcodeInstance: DeetCode) {
-    this.deetcodeInstance = deetcodeInstance;
-  }
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
-  renderContainer(name: string): HTMLElement {
+  renderContainer(options: DeetTreeOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: name,
+      name: options.name,
       label: "TreeNode",
     });
   }
-  renderFork(name: string, instance: DeetTreeNode): void {
-    switch (this.deetcodeInstance.renderMode) {
+  renderFork(options: DeetTreeOptions): void {
+    const { deetcode } = options;
+    switch (deetcode.renderMode) {
       case "animate":
-        this.renderDelayed(name, instance);
+        this.renderDelayed(options);
         break;
       case "debug":
-        this.renderNow(name, instance);
+        this.renderNow(options);
         break;
       case "snapshot":
-        this.renderNow(name, instance);
-        this.deetcodeInstance.takeSnapshot();
+        this.renderNow(options);
+        deetcode.takeSnapshot();
         break;
       default:
         break;
     }
   }
-  renderFn(name: string, instance: D3TreeNode): () => void {
+  renderFn(options: DeetTreeOptions): () => void {
     const fn = () => {
-      const el = this.renderContent(name, instance);
-      const container = this.containerRegistry.get(name);
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
     };
     return fn;
   }
-  renderDelayed(name: string, instance: DeetTreeNode): void {
+  renderDelayed(options: DeetTreeOptions): void {
     // this works even though the data types are monkey patched
     // because by the time it runs, the monkey patches would have
     // already been undone.
-    const nativeCopy = this.transformDeetToNative(instance);
-    if (nativeCopy) {
-      const fn = this.renderFn(name, nativeCopy);
-      this.deetcodeInstance.enqueue(fn);
-    }
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
   }
-  renderNow(name: string, instance: DeetTreeNode): void {
+  renderNow(options: DeetTreeOptions): void {
     // the undoing of monkeypatching is necessary here because
     // d3 requires the use of the original constructors instead
     // of the monkey patched versions. without this, we'll
     // see duplicate visualizations
-    this.deetcodeInstance.undoMonkeyPatchAll();
-    const nativeCopy = this.transformDeetToNative(instance);
-    if (nativeCopy) {
-      const fn = this.renderFn(name, nativeCopy);
-      fn();
-    }
-    this.deetcodeInstance.monkeyPatchAll();
+    const { deetcode } = options;
+    deetcode.undoMonkeyPatchAll();
+    const fn = this.renderFn(options);
+    fn();
+    deetcode.monkeyPatchAll();
   }
   transformDeetToNative(instance: DeetTreeNode) {
     return this.treeToHierarchy(instance);
   }
-  renderContent(name: string, data: D3TreeNode): HTMLElement {
+  copyData(options: DeetOptions) {
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    options.copiedData = this.treeToHierarchy(options.data);
+    return options.copiedData;
+  }
+  renderContent(options: DeetTreeOptions): HTMLElement {
+    const data = this.copyData(options);
     const div = document.createElement("div");
     div.classList.add("deetcode-treenode");
 
@@ -1986,7 +1991,7 @@ export class DeetCode {
     this.deetArrayEngine = new DeetArrayEngine();
     this.listNodeEngine = new DeetListNodeEngine();
     this.bitwiseEngine = new DeetBitwiseEngine();
-    this.treeNodeEngine = new DeetTreeNodeEngine(this);
+    this.treeNodeEngine = new DeetTreeNodeEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -2256,9 +2261,10 @@ export class DeetVis {
     this.deetcode.bitwiseEngine.renderFork(options);
   }
 
-  tree(name: string, node: DeetTreeNode) {
-    this.deetcode.treeNodeEngine.renderContainer(name);
-    this.deetcode.treeNodeEngine.renderFork(name, node);
+  tree(options: DeetTreeOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.treeNodeEngine.renderContainer(options);
+    this.deetcode.treeNodeEngine.renderFork(options);
   }
 
   arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
