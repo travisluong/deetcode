@@ -71,6 +71,10 @@ interface DeetArrayOptions extends DeetOptions {
   indexObj?: { [key: string]: number };
 }
 
+interface DeetMinPriorityQueueOptions extends DeetOptions {
+  data: MinPriorityQueueB<any>;
+}
+
 interface DeetListNodeOptions extends DeetOptions {
   data: DeetListNode;
   copiedData?: Array<DeetListNodeRenderObj>;
@@ -149,15 +153,15 @@ interface AutoVisDataType {
   deetcode: DeetCode;
 }
 
-interface AutoVisSet {
+interface AutoVisSet extends AutoVisDataType {
   engine: DeetSetEngine;
 }
 
-interface AutoVisMap {
+interface AutoVisMap extends AutoVisDataType {
   engine: DeetMapEngine;
 }
 
-interface AutoVisArray {
+interface AutoVisArray extends AutoVisDataType {
   engine: DeetArrayEngine;
 }
 
@@ -989,6 +993,69 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     }
     options.copiedData = copy;
     return copy;
+  }
+}
+
+class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  emptyContainerRegistry(): void {
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(options: DeetMinPriorityQueueOptions): HTMLElement {
+    const { name } = options;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      name: name,
+      label: "MinPriorityQueue",
+    });
+  }
+  renderFork(options: DeetMinPriorityQueueOptions): void {
+    this.copyData(options);
+    DeetRender.renderFork({
+      dcInstance: options.deetcode,
+      delayedCallback: () => {
+        this.renderDelayed(options);
+      },
+      nowCallback: () => {
+        this.renderNow(options);
+      },
+    });
+  }
+  renderDelayed(options: DeetMinPriorityQueueOptions): void {
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
+  }
+  renderNow(options: DeetMinPriorityQueueOptions): void {
+    const fn = this.renderFn(options);
+    fn();
+  }
+  renderContent(options: DeetMinPriorityQueueOptions): HTMLElement {
+    const arr = this.copyData(options);
+    const div = document.createElement("div");
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      li.innerHTML = item.toString();
+      ul.appendChild(li);
+    }
+    const label = document.createElement("label");
+    label.innerHTML = "MinPriorityQueue";
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
+  }
+  renderFn(options: DeetMinPriorityQueueOptions): () => void {
+    const fn = () => {
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.name);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    return fn;
+  }
+  copyData(options: DeetMinPriorityQueueOptions) {
+    return options.data.toArray();
   }
 }
 
@@ -2047,6 +2114,7 @@ export class DeetCode {
   deetSetEngine: DeetSetEngine;
   deetMapEngine: DeetMapEngine;
   deetArrayEngine: DeetArrayEngine;
+  deetMinPriorityQueueEngine: DeetMinPriorityQueueEngine;
   listNodeEngine: DeetListNodeEngine;
   bitwiseEngine: DeetBitwiseEngine;
   treeNodeEngine: DeetTreeNodeEngine;
@@ -2073,6 +2141,7 @@ export class DeetCode {
     this.deetSetEngine = new DeetSetEngine();
     this.deetMapEngine = new DeetMapEngine();
     this.deetArrayEngine = new DeetArrayEngine();
+    this.deetMinPriorityQueueEngine = new DeetMinPriorityQueueEngine();
     this.listNodeEngine = new DeetListNodeEngine();
     this.bitwiseEngine = new DeetBitwiseEngine();
     this.treeNodeEngine = new DeetTreeNodeEngine();
@@ -2143,6 +2212,7 @@ export class DeetCode {
     this.listNodeEngine.emptyContainerRegistry();
     this.bitwiseEngine.emptyContainerRegistry();
     this.treeNodeEngine.emptyContainerRegistry();
+    this.deetMinPriorityQueueEngine.emptyContainerRegistry();
   }
 
   takeSnapshot() {
@@ -2358,6 +2428,12 @@ export class DeetVis {
 
   arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
     return this.deetcode.treeNodeEngine.arrayToBinaryTree(array);
+  }
+
+  minPriorityQueue(options: DeetMinPriorityQueueOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.deetMinPriorityQueueEngine.renderContainer(options);
+    this.deetcode.deetMinPriorityQueueEngine.renderFork(options);
   }
 
   enableNative() {

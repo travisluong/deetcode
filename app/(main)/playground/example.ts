@@ -93,6 +93,20 @@ arr4[1][1] = 88;
 DeetVis.disableNative();
 
 /**
+ * MinPriorityQueue
+ */
+const minpq = new MinPriorityQueue();
+minpq.enqueue(1);
+DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+minpq.enqueue(2);
+DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+minpq.enqueue(3);
+DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+minpq.dequeue();
+DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+minpq.front();
+
+/**
  * Linked List
  */
 const linkedList = new ListNode(1);
