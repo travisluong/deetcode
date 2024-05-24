@@ -149,6 +149,14 @@ interface AutoVisDataType {
   deetcode: DeetCode;
 }
 
+interface AutoVisSet {
+  engine: DeetSetEngine;
+}
+
+interface AutoVisMap {
+  engine: DeetMapEngine;
+}
+
 interface AutoVisArray {
   engine: DeetArrayEngine;
 }
@@ -1596,9 +1604,9 @@ export type RenderMode = "animate" | "debug" | "snapshot";
 
 export type DirectionMode = "row" | "column";
 
-export class DeetSet extends Set implements AutoVisDataType {
+export class DeetSet extends Set implements AutoVisSet {
   id: string;
-  engine: DeetVisEngineV2;
+  engine: DeetSetEngine;
   deetcode: DeetCode;
   static originalSet?: SetConstructor;
 
@@ -1658,9 +1666,9 @@ export class DeetSet extends Set implements AutoVisDataType {
   }
 }
 
-export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
+export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
   id: string;
-  engine: DeetVisEngineV2;
+  engine: DeetMapEngine;
   deetcode: DeetCode;
   renderEnabled: boolean;
   static originalMap?: MapConstructor;
