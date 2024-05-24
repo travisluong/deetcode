@@ -145,6 +145,8 @@ interface RenderForkOptions {
 
 interface AutoVisDataType {
   id: string;
+  engine: DeetVisEngineV2;
+  deetcode: DeetCode;
 }
 
 type NativeDataStructure =
@@ -1593,16 +1595,19 @@ export type DirectionMode = "row" | "column";
 
 export class DeetSet extends Set implements AutoVisDataType {
   id: string;
+  engine: DeetVisEngineV2;
+  deetcode: DeetCode;
   static originalSet?: SetConstructor;
 
   constructor(iterable: any) {
     super();
-    const deetcode = DeetCode.getInstance();
-    this.id = deetcode.nanoid();
-    deetcode.deetSetEngine.renderContainer({
+    this.deetcode = DeetCode.getInstance();
+    this.id = this.deetcode.nanoid();
+    this.engine = this.deetcode.deetSetEngine;
+    this.engine.renderContainer({
       name: this.id,
       data: this,
-      deetcode: deetcode,
+      deetcode: this.deetcode,
     });
     if (iterable) {
       for (const item of iterable) {
@@ -1617,22 +1622,20 @@ export class DeetSet extends Set implements AutoVisDataType {
 
   add(value: any): any {
     const res = super.add(value);
-    const deetcode = DeetCode.getInstance();
-    deetcode.deetSetEngine.renderFork({
+    this.engine.renderFork({
       name: this.id,
       data: this,
-      deetcode: deetcode,
+      deetcode: this.deetcode,
     });
     return res;
   }
 
   delete(value: any): any {
     const res = super.delete(value);
-    const deetcode = DeetCode.getInstance();
-    deetcode.deetSetEngine.renderFork({
+    this.engine.renderFork({
       name: this.id,
       data: this,
-      deetcode: deetcode,
+      deetcode: this.deetcode,
     });
     return res;
   }
@@ -1654,6 +1657,8 @@ export class DeetSet extends Set implements AutoVisDataType {
 
 export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
   id: string;
+  engine: DeetVisEngineV2;
+  deetcode: DeetCode;
   renderEnabled: boolean;
   static originalMap?: MapConstructor;
 
@@ -1665,13 +1670,14 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
    */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
-    const deetcode = DeetCode.getInstance();
-    this.id = deetcode.nanoid();
+    this.deetcode = DeetCode.getInstance();
+    this.id = this.deetcode.nanoid();
+    this.engine = this.deetcode.deetMapEngine;
     this.renderEnabled = false;
-    deetcode.deetMapEngine.renderContainer({
+    this.engine.renderContainer({
       name: this.id,
       data: this,
-      deetcode: deetcode,
+      deetcode: this.deetcode,
     });
     if (iterable) {
       for (const [key, value] of iterable) {
@@ -1679,10 +1685,10 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
       }
     }
     this.renderEnabled = true;
-    deetcode.deetMapEngine.renderFork({
+    this.engine.renderFork({
       name: this.id,
       data: this,
-      deetcode: deetcode,
+      deetcode: this.deetcode,
     });
   }
 
@@ -1693,11 +1699,10 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
   set(key: any, value: any): any {
     const res = super.set(key, value);
     if (this.renderEnabled) {
-      const deetcode = DeetCode.getInstance();
-      deetcode.deetMapEngine.renderFork({
+      this.engine.renderFork({
         name: this.id,
         data: this,
-        deetcode: deetcode,
+        deetcode: this.deetcode,
       });
     }
     return res;
@@ -1706,11 +1711,10 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
   delete(key: any): any {
     const res = super.delete(key);
     if (this.renderEnabled) {
-      const deetcode = DeetCode.getInstance();
-      deetcode.deetMapEngine.renderFork({
+      this.engine.renderFork({
         name: this.id,
         data: this,
-        deetcode: deetcode,
+        deetcode: this.deetcode,
       });
     }
     return res;
@@ -1732,9 +1736,8 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisDataType {
   }
 }
 
-export class DeetArray extends Array {
-  container: HTMLElement;
-  engine: NativeArrayEngine;
+export class DeetArray extends Array implements AutoVisDataType {
+  id: string;
   renderEnabled: boolean = false;
   static originalArray?: ArrayConstructor;
 
