@@ -69,6 +69,12 @@ interface DeetArrayOptions extends DeetOptions {
   indexObj?: { [key: string]: number };
 }
 
+interface DeetListNodeOptions extends DeetOptions {
+  data: DeetListNode;
+  copiedData: Array<DeetListNodeRenderObj>;
+  pointers?: { [key: string]: DeetListNode | null };
+}
+
 /**
  * the DeetVisEngine is for any types that are rendered
  * by the DeetVis class. it follows a similar structure
@@ -953,94 +959,61 @@ class DeetArrayEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetListNodeEngine implements DeetVisEngine {
-  deetcodeInstance: DeetCode;
+class DeetListNodeEngine implements DeetVisEngineV2 {
   containerRegistry: Map<string, HTMLElement> = new Map();
-  constructor(deetcodeInstance: DeetCode) {
-    this.deetcodeInstance = deetcodeInstance;
-  }
   emptyContainerRegistry() {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
-  renderContainer(name: string): HTMLElement {
+  renderContainer(options: DeetListNodeOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: name,
+      name: options.name,
       label: "ListNode",
     });
   }
-  renderFork(name: string, instance: DeetListNode): void {
-    switch (this.deetcodeInstance.renderMode) {
+  renderFork(options: DeetListNodeOptions): void {
+    switch (options.deetcode.renderMode) {
       case "animate":
-        this.renderDelayed(name, instance);
+        this.renderDelayed(options);
         break;
       case "debug":
-        this.renderNow(name, instance);
+        this.renderNow(options);
         break;
       case "snapshot":
-        this.renderNow(name, instance);
-        this.deetcodeInstance.takeSnapshot();
+        this.renderNow(options);
+        options.deetcode.takeSnapshot();
         break;
       default:
         break;
     }
   }
-  renderFn(name: string, instance: any): () => void {
+  renderFn(options: DeetListNodeOptions): () => void {
     const fn = () => {
-      const el = this.renderContent(name, instance);
-      const container = this.containerRegistry.get(name);
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.name);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
     };
     return fn;
   }
-  renderDelayed(name: string, instance: DeetListNode): void {
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
-    this.deetcodeInstance.enqueue(fn);
+  renderDelayed(options: DeetListNodeOptions): void {
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
   }
-  renderNow(name: string, instance: DeetListNode) {
-    this.deetcodeInstance.undoMonkeyPatchAll();
-    const nativeCopy = this.transformDeetToNative(instance);
-    const fn = this.renderFn(name, nativeCopy);
-    fn();
-    this.deetcodeInstance.monkeyPatchAll();
-  }
-  /**
-   * need to create a copy of each node
-   * so that each animation frame doesn't pick up
-   * the current state of object
-   * @param instance
-   * @returns
-   */
-  transformDeetToNative(instance: DeetListNode): Array<DeetListNodeRenderObj> {
-    const res = [];
-    let cur: DeetListNode | null = instance;
-    // track the position of each node
-    DeetMap.undoMonkeyPatch();
-    const map = new Map<DeetListNode, number>();
-    DeetMap.monkeyPatch();
-    let index = 0;
-    while (cur && !map.has(cur)) {
-      const deetListNodeRenderObj: DeetListNodeRenderObj = {
-        val: cur.val,
-        pointers: [...cur.pointers],
-        pos: index,
-      };
-      res.push(deetListNodeRenderObj);
-      map.set(cur, index);
-      cur = cur.next;
-      // check for cycle here
-      if (cur && map.has(cur)) {
-        deetListNodeRenderObj.pos = map.get(cur) || index;
-      }
-      index++;
+  renderNow(options: DeetListNodeOptions) {
+    const { deetcode } = options;
+    if (deetcode.isAutoNativeEnabled) {
+      deetcode.undoMonkeyPatchAll();
     }
-
-    return res;
+    const fn = this.renderFn(options);
+    fn();
+    if (deetcode.isAutoNativeEnabled) {
+      deetcode.monkeyPatchAll();
+    }
   }
-  renderContent(name: string, arr: Array<DeetListNodeRenderObj>): HTMLElement {
+  renderContent(options: DeetListNodeOptions): HTMLElement {
+    const arr = this.copyData(options);
     const container = document.createElement("div");
     container.classList.add("deetcode-listnode");
 
@@ -1129,15 +1102,18 @@ class DeetListNodeEngine implements DeetVisEngine {
     }
     return container;
   }
-  clearAllPointers(node: DeetListNode) {
-    let cur: DeetListNode | null = node;
+  clearAllPointers(options: DeetListNodeOptions) {
+    let cur: DeetListNode | null = options.data;
     // TODO: this needs to be rewritten if monkey patching
     // becomes an optional feature.
     // since it is always on, we can assume the Set
     // constructor has been monkey patched
     DeetSet.undoMonkeyPatch();
     const set = new Set();
-    DeetSet.monkeyPatch();
+    // redo monkey patch if auto vis enabled
+    if (options.deetcode.isAutoNativeEnabled) {
+      DeetSet.monkeyPatch();
+    }
     while (cur && !set.has(cur)) {
       for (const val of cur.pointers) {
         cur.pointers.delete(val);
@@ -1146,7 +1122,8 @@ class DeetListNodeEngine implements DeetVisEngine {
       cur = cur.next;
     }
   }
-  addPointers(pointers: { [key: string]: DeetListNode | null } | undefined) {
+  addPointers(options: DeetListNodeOptions) {
+    const { pointers } = options;
     if (pointers) {
       // push pointer keys onto pointer arrays
       for (const [k, v] of Object.entries(pointers)) {
@@ -1155,6 +1132,37 @@ class DeetListNodeEngine implements DeetVisEngine {
         }
       }
     }
+  }
+  copyData(options: DeetOptions) {
+    const { deetcode } = options;
+    const res = [];
+    let cur: DeetListNode | null = options.data;
+    // track the position of each node
+    if (deetcode.isAutoNativeEnabled) {
+      DeetMap.undoMonkeyPatch();
+    }
+    const map = new Map<DeetListNode, number>();
+    if (deetcode.isAutoNativeEnabled) {
+      DeetMap.monkeyPatch();
+    }
+    let index = 0;
+    while (cur && !map.has(cur)) {
+      const deetListNodeRenderObj: DeetListNodeRenderObj = {
+        val: cur.val,
+        pointers: [...cur.pointers],
+        pos: index,
+      };
+      res.push(deetListNodeRenderObj);
+      map.set(cur, index);
+      cur = cur.next;
+      // check for cycle here
+      if (cur && map.has(cur)) {
+        deetListNodeRenderObj.pos = map.get(cur) || index;
+      }
+      index++;
+    }
+
+    return res;
   }
 }
 
@@ -1973,7 +1981,7 @@ export class DeetCode {
     this.deetSetEngine = new DeetSetEngine();
     this.deetMapEngine = new DeetMapEngine();
     this.deetArrayEngine = new DeetArrayEngine();
-    this.listNodeEngine = new DeetListNodeEngine(this);
+    this.listNodeEngine = new DeetListNodeEngine();
     this.bitwiseEngine = new DeetBitwiseEngine(this);
     this.treeNodeEngine = new DeetTreeNodeEngine(this);
     this.directionMode = config.directionMode || "row";
@@ -2231,15 +2239,12 @@ export class DeetVis {
     this.deetcode.deetArrayEngine.renderFork(options);
   }
 
-  linkedList(
-    name: string,
-    node: DeetListNode,
-    pointers?: { [key: string]: DeetListNode | null }
-  ) {
-    this.deetcode.listNodeEngine.clearAllPointers(node);
-    this.deetcode.listNodeEngine.addPointers(pointers);
-    this.deetcode.listNodeEngine.renderContainer(name);
-    this.deetcode.listNodeEngine.renderFork(name, node);
+  linkedList(options: DeetListNodeOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.listNodeEngine.clearAllPointers(options);
+    this.deetcode.listNodeEngine.addPointers(options);
+    this.deetcode.listNodeEngine.renderContainer(options);
+    this.deetcode.listNodeEngine.renderFork(options);
   }
 
   bitwise(name: string, num: number) {

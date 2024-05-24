@@ -101,21 +101,28 @@ linkedList.next.next = new ListNode(3);
 linkedList.next.next.next = new ListNode(4);
 const prev = linkedList;
 const cur = linkedList.next;
-DeetVis.linkedList("linked list", linkedList);
+DeetVis.linkedList({
+  name: "linked list",
+  data: linkedList,
+});
 
 /**
  * Linked List Pointers
  */
-DeetVis.linkedList("with pointers", linkedList, {
-  prev: prev,
-  cur: cur,
+DeetVis.linkedList({
+  name: "with pointers",
+  data: linkedList,
+  pointers: { prev: prev, cur: cur },
 });
 
 /**
  * Linked List Cycle
  */
 linkedList.next.next.next.next = linkedList.next;
-DeetVis.linkedList("with cycle", linkedList);
+DeetVis.linkedList({
+  name: "with cycle",
+  data: linkedList,
+});
 
 /**
  * Bitwise
@@ -151,15 +158,15 @@ DeetVis.tree("treeFromArray", treeFromArray);
  */
 DeetVis.enableNative();
 
-const map2 = new Map([
-  [1, 1],
-  [2, 2],
-  [3, 3],
-]);
-map2.has(1);
-map2.get(1);
-map2.delete(3);
-map2.set(3, 3);
+// const map2 = new Map([
+//   [1, 1],
+//   [2, 2],
+//   [3, 3],
+// ]);
+// map2.has(1);
+// map2.get(1);
+// map2.delete(3);
+// map2.set(3, 3);
 
 /**
  * DeetVis still works even with Auto Native Visualization enabled
