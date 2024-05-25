@@ -619,7 +619,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
     const { id } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: id,
+      id: id,
       label: "Set",
     });
   }
@@ -703,7 +703,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetMapOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.id,
+      id: options.id,
       label: "Map",
     });
   }
@@ -766,7 +766,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
       tbody.appendChild(tr);
     }
 
-    const label = DeetRender.renderLabel("Map " + name);
+    const label = DeetRender.renderLabel("Map " + options.id);
 
     div.append(label);
     div.append(table);
@@ -802,7 +802,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     const { id } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: id,
+      id: id,
       label: "Array",
     });
   }
@@ -1005,7 +1005,7 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
     const { id } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: id,
+      id: id,
       label: "MinPriorityQueue",
     });
   }
@@ -1038,8 +1038,7 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
       li.innerHTML = item.toString();
       ul.appendChild(li);
     }
-    const label = document.createElement("label");
-    label.innerHTML = "MinPriorityQueue";
+    const label = DeetRender.renderLabel("MinPriorityQueue " + options.id);
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -1067,7 +1066,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetListNodeOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.id,
+      id: options.id,
       label: "ListNode",
     });
   }
@@ -1149,7 +1148,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
       .append("text")
       .attr("class", "linked-list-label")
       .attr("transform", "translate(15, 15)")
-      .text("Linked List " + name);
+      .text("Linked List " + options.id);
 
     // Draw arrows
     for (let i = 0; i < arr.length - 1; i++) {
@@ -1276,7 +1275,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetBitwiseOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.id,
+      id: options.id,
       label: "Bitwise",
     });
   }
@@ -1412,7 +1411,7 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetTreeOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.id,
+      id: options.id,
       label: "TreeNode",
     });
   }
@@ -1489,7 +1488,7 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
 
     svg
       .append("text")
-      .text("TreeNode " + name)
+      .text("TreeNode " + options.id)
       .attr("transform", "translate(0, 20)");
 
     // @ts-ignore
@@ -1630,18 +1629,19 @@ const DeetRender = {
   },
   renderContainer(options: {
     containerRegistry: Map<string, HTMLElement>;
-    name: string;
+    id: string;
     label: string;
   }): HTMLElement {
-    if (options.containerRegistry.has(options.name)) {
-      return options.containerRegistry.get(options.name)!;
+    const { id, label } = options;
+    if (options.containerRegistry.has(id)) {
+      return options.containerRegistry.get(id)!;
     }
     const container = document.createElement("div");
     container.classList.add("deet-container");
-    const label = DeetRender.renderLabel(`${options.label} ` + options.name);
-    container.appendChild(label);
+    const labelEl = DeetRender.renderLabel(`${label} ` + id);
+    container.appendChild(labelEl);
     DeetRender.renderContainerFork(container);
-    options.containerRegistry.set(options.name, container);
+    options.containerRegistry.set(id, container);
     return container;
   },
   renderLabel(name: string): HTMLElement {
