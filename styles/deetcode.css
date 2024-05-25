@@ -52,6 +52,15 @@
   align-items: center;
 }
 
+.deet-label {
+  display: flex;
+  gap: 5px;
+}
+
+.deet-label-id {
+  color: darkgray;
+}
+
 .deetcode-hide-labels label {
   display: none;
 }

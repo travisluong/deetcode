@@ -620,7 +620,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       id: id,
-      label: "Set",
+      dataType: "Set",
     });
   }
   renderFork(options: DeetSetOptions): void {
@@ -664,8 +664,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
       li.innerHTML = item;
       ul.appendChild(li);
     }
-    const label = document.createElement("label");
-    label.innerHTML = "Set " + id;
+    const label = DeetRender.renderLabel({ dataType: "Set", id: id });
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -704,7 +703,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       id: options.id,
-      label: "Map",
+      dataType: "Map",
     });
   }
   renderFork(options: DeetMapOptions): void {
@@ -766,7 +765,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
       tbody.appendChild(tr);
     }
 
-    const label = DeetRender.renderLabel("Map " + options.id);
+    const label = DeetRender.renderLabel({ dataType: "Map", id: options.id });
 
     div.append(label);
     div.append(table);
@@ -803,7 +802,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       id: id,
-      label: "Array",
+      dataType: "Array",
     });
   }
   renderFork(options: DeetArrayOptions): void {
@@ -831,7 +830,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     const { id, indexObj } = options;
     const data = this.copyData(options);
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel("Array " + id);
+    const label = DeetRender.renderLabel({ dataType: "Array", id: options.id });
     div.innerHTML = label.outerHTML;
     if (data.length === 0) {
       return div;
@@ -1006,7 +1005,7 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       id: id,
-      label: "MinPriorityQueue",
+      dataType: "MinPriorityQueue",
     });
   }
   renderFork(options: DeetMinPriorityQueueOptions): void {
@@ -1038,7 +1037,10 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
       li.innerHTML = item.toString();
       ul.appendChild(li);
     }
-    const label = DeetRender.renderLabel("MinPriorityQueue " + options.id);
+    const label = DeetRender.renderLabel({
+      dataType: "MinPriorityQueue",
+      id: options.id,
+    });
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -1067,7 +1069,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       id: options.id,
-      label: "ListNode",
+      dataType: "ListNode",
     });
   }
   renderFork(options: DeetListNodeOptions): void {
@@ -1116,6 +1118,12 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     const container = document.createElement("div");
     container.classList.add("deetcode-listnode");
 
+    const label = DeetRender.renderLabel({
+      dataType: "ListNode",
+      id: options.id,
+    });
+    container.appendChild(label);
+
     // Declare the chart dimensions and margins.
     const width = 800;
     const height = 100;
@@ -1143,12 +1151,6 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
       .attr("text-anchor", "middle")
       .attr("dy", "2.75em")
       .text((d) => d.pointers.join(","));
-
-    svg
-      .append("text")
-      .attr("class", "linked-list-label")
-      .attr("transform", "translate(15, 15)")
-      .text("Linked List " + options.id);
 
     // Draw arrows
     for (let i = 0; i < arr.length - 1; i++) {
@@ -1276,7 +1278,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       id: options.id,
-      label: "Bitwise",
+      dataType: "Bitwise",
     });
   }
   renderFork(options: DeetBitwiseOptions): void {
@@ -1322,7 +1324,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
   renderContent(options: DeetBitwiseOptions): HTMLElement {
     const { id, data } = options;
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel("Bitwise " + id + " " + data);
+    const label = DeetRender.renderLabel({ dataType: "Bitwise", id: id });
     div.appendChild(label);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -1412,7 +1414,7 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
       id: options.id,
-      label: "TreeNode",
+      dataType: "TreeNode",
     });
   }
   renderFork(options: DeetTreeOptions): void {
@@ -1475,6 +1477,12 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
     const div = document.createElement("div");
     div.classList.add("deetcode-treenode");
 
+    const label = DeetRender.renderLabel({
+      dataType: "TreeNode",
+      id: options.id,
+    });
+    div.appendChild(label);
+
     const width = 800;
 
     const tree = d3.tree().nodeSize([50, 40]);
@@ -1485,11 +1493,6 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
     const height = root.height * 40 + 22;
     const svg = d3.create("svg").attr("width", width).attr("height", height);
     const g = svg.append("g").attr("transform", "translate(400,10)");
-
-    svg
-      .append("text")
-      .text("TreeNode " + options.id)
-      .attr("transform", "translate(0, 20)");
 
     // @ts-ignore
     tree(root);
@@ -1630,23 +1633,38 @@ const DeetRender = {
   renderContainer(options: {
     containerRegistry: Map<string, HTMLElement>;
     id: string;
-    label: string;
+    dataType: string;
   }): HTMLElement {
-    const { id, label } = options;
+    const { id, dataType } = options;
     if (options.containerRegistry.has(id)) {
       return options.containerRegistry.get(id)!;
     }
     const container = document.createElement("div");
     container.classList.add("deet-container");
-    const labelEl = DeetRender.renderLabel(`${label} ` + id);
+    const labelEl = DeetRender.renderLabel({ id: id, dataType: dataType });
     container.appendChild(labelEl);
     DeetRender.renderContainerFork(container);
     options.containerRegistry.set(id, container);
     return container;
   },
-  renderLabel(name: string): HTMLElement {
+  renderLabel({ dataType, id }: { dataType: string; id: string }): HTMLElement {
     const label = document.createElement("label");
-    label.innerHTML = name;
+    label.classList.add("deet-label");
+
+    if (dataType) {
+      const dataTypeSpan = document.createElement("span");
+      dataTypeSpan.classList.add("deet-label-data-type");
+      dataTypeSpan.innerHTML = dataType;
+      label.appendChild(dataTypeSpan);
+    }
+
+    if (id) {
+      const idSpan = document.createElement("span");
+      idSpan.classList.add("deet-label-id");
+      idSpan.innerHTML = id;
+      label.appendChild(idSpan);
+    }
+
     return label;
   },
   renderFork(options: RenderForkOptions) {
