@@ -47,7 +47,7 @@ interface DeetConfig {
   directionMode?: DirectionMode;
   labelMode?: boolean;
   animationDelay?: number;
-  nanoidSize: number;
+  nanoidSize?: number;
 }
 
 interface DeetOptions {
@@ -74,6 +74,10 @@ interface DeetArrayOptions extends DeetOptions {
 
 interface DeetMinPriorityQueueOptions extends DeetOptions {
   data: MinPriorityQueueB<any>;
+}
+
+interface DeetMaxPriorityQueueOptions extends DeetOptions {
+  data: MaxPriorityQueueB<any>;
 }
 
 interface DeetListNodeOptions extends DeetOptions {
@@ -1074,6 +1078,73 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
     return fn;
   }
   copyData(options: DeetMinPriorityQueueOptions) {
+    return options.data.toArray();
+  }
+}
+
+class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  emptyContainerRegistry(): void {
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(options: DeetOptions): HTMLElement {
+    const { id, hideId } = options;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      id: id,
+      dataType: "MaxPriorityQueue",
+      hideId,
+    });
+  }
+  renderFork(options: DeetOptions): void {
+    this.copyData(options);
+    DeetRender.renderFork({
+      dcInstance: options.deetcode,
+      delayedCallback: () => {
+        this.renderDelayed(options);
+      },
+      nowCallback: () => {
+        this.renderNow(options);
+      },
+    });
+  }
+  renderDelayed(options: DeetOptions): void {
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
+  }
+  renderNow(options: DeetOptions): void {
+    const fn = this.renderFn(options);
+    fn();
+  }
+  renderContent(options: DeetOptions): HTMLElement {
+    const arr = this.copyData(options);
+    const div = document.createElement("div");
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      li.innerHTML = item.toString();
+      ul.appendChild(li);
+    }
+    const label = DeetRender.renderLabel({
+      dataType: "MaxPriorityQueue",
+      id: options.id,
+      hideId: options.hideId,
+    });
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
+  }
+  renderFn(options: DeetOptions): () => void {
+    const fn = () => {
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.id);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    return fn;
+  }
+  copyData(options: DeetOptions) {
     return options.data.toArray();
   }
 }
@@ -2187,6 +2258,7 @@ export class DeetCode {
   deetMapEngine: DeetMapEngine;
   deetArrayEngine: DeetArrayEngine;
   deetMinPriorityQueueEngine: DeetMinPriorityQueueEngine;
+  deetMaxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   listNodeEngine: DeetListNodeEngine;
   bitwiseEngine: DeetBitwiseEngine;
   treeNodeEngine: DeetTreeNodeEngine;
@@ -2214,6 +2286,7 @@ export class DeetCode {
     this.deetMapEngine = new DeetMapEngine();
     this.deetArrayEngine = new DeetArrayEngine();
     this.deetMinPriorityQueueEngine = new DeetMinPriorityQueueEngine();
+    this.deetMaxPriorityQueueEngine = new DeetMaxPriorityQueueEngine();
     this.listNodeEngine = new DeetListNodeEngine();
     this.bitwiseEngine = new DeetBitwiseEngine();
     this.treeNodeEngine = new DeetTreeNodeEngine();
@@ -2506,6 +2579,12 @@ export class DeetVis {
     options.deetcode = this.deetcode;
     this.deetcode.deetMinPriorityQueueEngine.renderContainer(options);
     this.deetcode.deetMinPriorityQueueEngine.renderFork(options);
+  }
+
+  maxPriorityQueue(options: DeetMaxPriorityQueueOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.deetMaxPriorityQueueEngine.renderContainer(options);
+    this.deetcode.deetMaxPriorityQueueEngine.renderFork(options);
   }
 
   enableAutoVis() {

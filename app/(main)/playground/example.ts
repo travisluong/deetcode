@@ -105,6 +105,20 @@ DeetVis.minPriorityQueue({ id: "minpq", data: minpq });
 minpq.front();
 
 /**
+ * MaxPriorityQueue
+ */
+const maxpq = new MaxPriorityQueue();
+maxpq.enqueue(1);
+DeetVis.maxPriorityQueue({ id: "maxpq", data: maxpq });
+maxpq.enqueue(2);
+DeetVis.maxPriorityQueue({ id: "maxpq", data: maxpq });
+maxpq.enqueue(3);
+DeetVis.maxPriorityQueue({ id: "maxpq", data: maxpq });
+maxpq.dequeue();
+DeetVis.maxPriorityQueue({ id: "maxpq", data: maxpq });
+maxpq.front();
+
+/**
  * Linked List
  */
 const linkedList = new ListNode(1);
