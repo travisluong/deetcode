@@ -10,7 +10,7 @@
  */
 
 /**
- * Deet Set
+ * Set
  */
 const set1 = new Set([1, 2, 3]);
 set1.delete(3);
@@ -18,10 +18,10 @@ set1.add(3);
 DeetVis.set({ id: "set1", data: set1 });
 
 /**
- * Native Set
+ * Auto Vis Set
  */
 DeetVis.enableAutoVis();
-const set2 = new Set([1, 2, 3]);
+const set2 = new Set([4, 5, 6]);
 set2.has(1);
 set2.delete(3);
 set2.add(3);
@@ -38,6 +38,21 @@ const map1 = new Map([
 map1.delete(3);
 map1.set(3, 3);
 DeetVis.map({ id: "map1", data: map1 });
+
+/**
+ * Auto Vis Map
+ */
+DeetVis.enableAutoVis();
+const map2 = new Map([
+  [1, 1],
+  [2, 2],
+  [3, 3],
+]);
+map2.has(1);
+map2.get(1);
+map2.delete(3);
+map2.set(3, 3);
+DeetVis.disableAutoVis();
 
 /**
  * Array
