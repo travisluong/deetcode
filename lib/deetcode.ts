@@ -683,11 +683,11 @@ class DeetSetEngine implements DeetVisEngineV2 {
     if (options.copiedData) {
       return options.copiedData;
     }
-    if (DeetCode.getInstance().isAutoNativeEnabled) {
+    if (DeetCode.getInstance().isAutoVisEnabled) {
       DeetSet.undoMonkeyPatch();
     }
     options.copiedData = new Set([...options.data]);
-    if (DeetCode.getInstance().isAutoNativeEnabled) {
+    if (DeetCode.getInstance().isAutoVisEnabled) {
       DeetSet.monkeyPatch();
     }
     return options.copiedData;
@@ -1104,12 +1104,12 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   }
   renderNow(options: DeetListNodeOptions) {
     const { deetcode } = options;
-    if (deetcode.isAutoNativeEnabled) {
+    if (deetcode.isAutoVisEnabled) {
       deetcode.undoMonkeyPatchAll();
     }
     const fn = this.renderFn(options);
     fn();
-    if (deetcode.isAutoNativeEnabled) {
+    if (deetcode.isAutoVisEnabled) {
       deetcode.monkeyPatchAll();
     }
   }
@@ -1212,7 +1212,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     DeetSet.undoMonkeyPatch();
     const set = new Set();
     // redo monkey patch if auto vis enabled
-    if (options.deetcode.isAutoNativeEnabled) {
+    if (options.deetcode.isAutoVisEnabled) {
       DeetSet.monkeyPatch();
     }
     while (cur && !set.has(cur)) {
@@ -1239,11 +1239,11 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     const res = [];
     let cur: DeetListNode | null = options.data;
     // track the position of each node
-    if (deetcode.isAutoNativeEnabled) {
+    if (deetcode.isAutoVisEnabled) {
       DeetMap.undoMonkeyPatch();
     }
     const map = new Map<DeetListNode, number>();
-    if (deetcode.isAutoNativeEnabled) {
+    if (deetcode.isAutoVisEnabled) {
       DeetMap.monkeyPatch();
     }
     let index = 0;
@@ -2142,7 +2142,7 @@ export class DeetCode {
   interval?: any;
   snapshots: Node[] = [];
   snapshotIndex: number = 0;
-  isAutoNativeEnabled: boolean = false;
+  isAutoVisEnabled: boolean = false;
   nanoidSize: number;
 
   private static instance: DeetCode;
@@ -2300,7 +2300,7 @@ export class DeetCode {
     window._ = _;
     window.ListNode = DeetListNode;
     window.TreeNode = DeetTreeNode;
-    if (this.isAutoNativeEnabled) {
+    if (this.isAutoVisEnabled) {
       this.monkeyPatchAll();
     }
 
@@ -2325,7 +2325,7 @@ export class DeetCode {
   }
 
   monkeyPatchAll() {
-    if (!this.isAutoNativeEnabled) {
+    if (!this.isAutoVisEnabled) {
       return;
     }
     DeetSet.monkeyPatch();
@@ -2454,13 +2454,13 @@ export class DeetVis {
     this.deetcode.deetMinPriorityQueueEngine.renderFork(options);
   }
 
-  enableNative() {
-    this.deetcode.isAutoNativeEnabled = true;
+  enableAutoVis() {
+    this.deetcode.isAutoVisEnabled = true;
     this.deetcode.monkeyPatchAll();
   }
 
-  disableNative() {
-    this.deetcode.isAutoNativeEnabled = false;
+  disableAutoVis() {
+    this.deetcode.isAutoVisEnabled = false;
     this.deetcode.undoMonkeyPatchAll();
   }
 }

@@ -20,12 +20,12 @@ DeetVis.set({ id: "set1", data: set1 });
 /**
  * Native Set
  */
-DeetVis.enableNative();
+DeetVis.enableAutoVis();
 const set2 = new Set([1, 2, 3]);
 set2.has(1);
 set2.delete(3);
 set2.add(3);
-DeetVis.disableNative();
+DeetVis.disableAutoVis();
 
 /**
  * Map
@@ -58,7 +58,7 @@ DeetVis.array({ id: "arr2", data: arr2 });
 /**
  * Native Array
  */
-DeetVis.enableNative();
+DeetVis.enableAutoVis();
 const arr3 = new Array();
 arr3.push(1);
 arr3.push(2);
@@ -73,7 +73,7 @@ arr4.push([1, 2, 3]);
 arr4.push([4, 5, 6]);
 arr4.push([7, 8, 9]);
 arr4[1][1] = 88;
-DeetVis.disableNative();
+DeetVis.disableAutoVis();
 
 /**
  * MinPriorityQueue
@@ -148,9 +148,9 @@ DeetVis.tree({ id: "tree from array", data: treeFromArray });
  * DeetCode supports auto visualizations of native JavaScript
  * data structures. This allows you to create visualizations without
  * having to call DeetVis. This experimental feature can be enabled
- * with DeetVis.enableNative().
+ * with DeetVis.enableAutoVis().
  */
-DeetVis.enableNative();
+DeetVis.enableAutoVis();
 
 // const map2 = new Map([
 //   [1, 1],
@@ -189,9 +189,9 @@ pq.dequeue();
 pq.front();
 
 /**
- * Auto native visualization can be disabled DeetVis.disableNative().
+ * Auto native visualization can be disabled DeetVis.disableAutoVis().
  */
-DeetVis.disableNative();
+DeetVis.disableAutoVis();
 
 // This set will not be rendered in the visualization.
 const set3 = new Set([2, 3, 4]);
