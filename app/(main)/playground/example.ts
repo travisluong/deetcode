@@ -15,10 +15,7 @@
 const set1 = new Set([1, 2, 3]);
 set1.delete(3);
 set1.add(3);
-DeetVis.set({
-  id: "set1",
-  data: set1,
-});
+DeetVis.set({ id: "set1", data: set1 });
 
 /**
  * Native Set
@@ -40,37 +37,23 @@ const map1 = new Map([
 ]);
 map1.delete(3);
 map1.set(3, 3);
-DeetVis.map({
-  id: "map1",
-  data: map1,
-});
+DeetVis.map({ id: "map1", data: map1 });
 
 /**
  * Array
  */
 const arr1 = [1, 2, 3];
-DeetVis.array({
-  id: "arr1",
-  data: arr1,
-  indexObj: { i: 0, j: 2 },
-});
+DeetVis.array({ id: "arr1", data: arr1, indexObj: { i: 0, j: 2 } });
 
 arr1.push(4);
-DeetVis.array({
-  id: "arr1",
-  data: arr1,
-  indexObj: { i: 1, j: 1 },
-});
+DeetVis.array({ id: "arr1", data: arr1, indexObj: { i: 1, j: 1 } });
 
 const arr2 = [
   [1, 2, 3],
   [4, 5, 6],
   [7, 8, 9],
 ];
-DeetVis.array({
-  id: "arr2",
-  data: arr2,
-});
+DeetVis.array({ id: "arr2", data: arr2 });
 
 /**
  * Native Array
@@ -115,10 +98,7 @@ linkedList.next.next = new ListNode(3);
 linkedList.next.next.next = new ListNode(4);
 const prev = linkedList;
 const cur = linkedList.next;
-DeetVis.linkedList({
-  id: "linked list",
-  data: linkedList,
-});
+DeetVis.linkedList({ id: "linked list", data: linkedList });
 
 /**
  * Linked List Pointers
@@ -133,10 +113,7 @@ DeetVis.linkedList({
  * Linked List Cycle
  */
 linkedList.next.next.next.next = linkedList.next;
-DeetVis.linkedList({
-  id: "with cycle",
-  data: linkedList,
-});
+DeetVis.linkedList({ id: "with cycle", data: linkedList });
 
 /**
  * Bitwise
@@ -159,19 +136,13 @@ rootNode.right = new TreeNode(8);
 rootNode.right.left = new TreeNode(7);
 rootNode.right.right = new TreeNode(9);
 rootNode.color = "green";
-DeetVis.tree({
-  id: "tree",
-  data: rootNode,
-});
+DeetVis.tree({ id: "tree", data: rootNode });
 
 /**
  * LeetCode style array to binary tree syntax is supported
  */
 const treeFromArray = DeetVis.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
-DeetVis.tree({
-  id: "tree from array",
-  data: treeFromArray,
-});
+DeetVis.tree({ id: "tree from array", data: treeFromArray });
 
 /**
  * DeetCode supports auto visualizations of native JavaScript
@@ -194,10 +165,7 @@ DeetVis.enableNative();
 /**
  * DeetVis still works even with Auto Native Visualization enabled
  */
-DeetVis.set({
-  id: "set2",
-  data: set2,
-});
+DeetVis.set({ id: "set2", data: set2 });
 
 const minheap = new MinPriorityQueue();
 minheap.enqueue(1);
