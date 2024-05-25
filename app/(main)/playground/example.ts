@@ -16,7 +16,7 @@ const set1 = new Set([1, 2, 3]);
 set1.delete(3);
 set1.add(3);
 DeetVis.set({
-  name: "set1",
+  id: "set1",
   data: set1,
 });
 
@@ -41,7 +41,7 @@ const map1 = new Map([
 map1.delete(3);
 map1.set(3, 3);
 DeetVis.map({
-  name: "map1",
+  id: "map1",
   data: map1,
 });
 
@@ -50,14 +50,14 @@ DeetVis.map({
  */
 const arr1 = [1, 2, 3];
 DeetVis.array({
-  name: "arr1",
+  id: "arr1",
   data: arr1,
   indexObj: { i: 0, j: 2 },
 });
 
 arr1.push(4);
 DeetVis.array({
-  name: "arr1",
+  id: "arr1",
   data: arr1,
   indexObj: { i: 1, j: 1 },
 });
@@ -68,7 +68,7 @@ const arr2 = [
   [7, 8, 9],
 ];
 DeetVis.array({
-  name: "arr2",
+  id: "arr2",
   data: arr2,
 });
 
@@ -97,13 +97,13 @@ DeetVis.disableNative();
  */
 const minpq = new MinPriorityQueue();
 minpq.enqueue(1);
-DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+DeetVis.minPriorityQueue({ id: "minpq", data: minpq });
 minpq.enqueue(2);
-DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+DeetVis.minPriorityQueue({ id: "minpq", data: minpq });
 minpq.enqueue(3);
-DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+DeetVis.minPriorityQueue({ id: "minpq", data: minpq });
 minpq.dequeue();
-DeetVis.minPriorityQueue({ name: "minpq", data: minpq });
+DeetVis.minPriorityQueue({ id: "minpq", data: minpq });
 minpq.front();
 
 /**
@@ -116,7 +116,7 @@ linkedList.next.next.next = new ListNode(4);
 const prev = linkedList;
 const cur = linkedList.next;
 DeetVis.linkedList({
-  name: "linked list",
+  id: "linked list",
   data: linkedList,
 });
 
@@ -124,7 +124,7 @@ DeetVis.linkedList({
  * Linked List Pointers
  */
 DeetVis.linkedList({
-  name: "with pointers",
+  id: "with pointers",
   data: linkedList,
   pointers: { prev: prev, cur: cur },
 });
@@ -134,7 +134,7 @@ DeetVis.linkedList({
  */
 linkedList.next.next.next.next = linkedList.next;
 DeetVis.linkedList({
-  name: "with cycle",
+  id: "with cycle",
   data: linkedList,
 });
 
@@ -142,7 +142,7 @@ DeetVis.linkedList({
  * Bitwise
  */
 DeetVis.bitwise({
-  name: "binary",
+  id: "binary",
   data: 123,
 });
 
@@ -160,7 +160,7 @@ rootNode.right.left = new TreeNode(7);
 rootNode.right.right = new TreeNode(9);
 rootNode.color = "green";
 DeetVis.tree({
-  name: "tree",
+  id: "tree",
   data: rootNode,
 });
 
@@ -169,7 +169,7 @@ DeetVis.tree({
  */
 const treeFromArray = DeetVis.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
 DeetVis.tree({
-  name: "tree from array",
+  id: "tree from array",
   data: treeFromArray,
 });
 
@@ -195,7 +195,7 @@ DeetVis.enableNative();
  * DeetVis still works even with Auto Native Visualization enabled
  */
 DeetVis.set({
-  name: "set2",
+  id: "set2",
   data: set2,
 });
 
@@ -214,9 +214,9 @@ maxheap.dequeue();
 maxheap.front();
 
 const pq = new PriorityQueue((a, b) => b.rank - a.rank);
-pq.enqueue({ name: "foo", rank: 1 });
-pq.enqueue({ name: "bar", rank: 2 });
-pq.enqueue({ name: "baz", rank: 3 });
+pq.enqueue({ id: "foo", rank: 1 });
+pq.enqueue({ id: "bar", rank: 2 });
+pq.enqueue({ id: "baz", rank: 3 });
 pq.dequeue();
 pq.front();
 

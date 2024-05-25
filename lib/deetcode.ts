@@ -51,7 +51,7 @@ interface DeetConfig {
 }
 
 interface DeetOptions {
-  name: string;
+  id: string;
   data: any;
   deetcode: DeetCode;
   copiedData?: any;
@@ -616,10 +616,10 @@ class DeetSetEngine implements DeetVisEngineV2 {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(options: DeetSetOptions): HTMLElement {
-    const { name } = options;
+    const { id } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: name,
+      name: id,
       label: "Set",
     });
   }
@@ -655,7 +655,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
     return copy;
   }
   renderContent(options: DeetSetOptions): HTMLElement {
-    const { name } = options;
+    const { id } = options;
     const data = this.copyData(options);
     const div = document.createElement("div");
     const ul = document.createElement("ul");
@@ -665,7 +665,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
       ul.appendChild(li);
     }
     const label = document.createElement("label");
-    label.innerHTML = "Set " + name;
+    label.innerHTML = "Set " + id;
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -673,7 +673,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
   renderFn(options: DeetSetOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(options.name);
+      const container = this.containerRegistry.get(options.id);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -703,7 +703,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetMapOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.name,
+      name: options.id,
       label: "Map",
     });
   }
@@ -775,7 +775,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
   renderFn(options: DeetMapOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(options.name);
+      const container = this.containerRegistry.get(options.id);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -799,10 +799,10 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(options: DeetArrayOptions): HTMLElement {
-    const { name } = options;
+    const { id } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: name,
+      name: id,
       label: "Array",
     });
   }
@@ -828,10 +828,10 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     fn();
   }
   renderContent(options: DeetArrayOptions): HTMLElement {
-    const { name, indexObj } = options;
+    const { id, indexObj } = options;
     const data = this.copyData(options);
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel("Array " + name);
+    const label = DeetRender.renderLabel("Array " + id);
     div.innerHTML = label.outerHTML;
     if (data.length === 0) {
       return div;
@@ -848,7 +848,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
   renderFn(options: DeetArrayOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(options.name);
+      const container = this.containerRegistry.get(options.id);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -1002,10 +1002,10 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
   renderContainer(options: DeetMinPriorityQueueOptions): HTMLElement {
-    const { name } = options;
+    const { id } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: name,
+      name: id,
       label: "MinPriorityQueue",
     });
   }
@@ -1047,7 +1047,7 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
   renderFn(options: DeetMinPriorityQueueOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(options.name);
+      const container = this.containerRegistry.get(options.id);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -1067,7 +1067,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetListNodeOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.name,
+      name: options.id,
       label: "ListNode",
     });
   }
@@ -1090,7 +1090,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   renderFn(options: DeetListNodeOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(options.name);
+      const container = this.containerRegistry.get(options.id);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -1276,7 +1276,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetBitwiseOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.name,
+      name: options.id,
       label: "Bitwise",
     });
   }
@@ -1299,7 +1299,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
   renderFn(options: DeetBitwiseOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(options.name);
+      const container = this.containerRegistry.get(options.id);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -1321,9 +1321,9 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
     return instance;
   }
   renderContent(options: DeetBitwiseOptions): HTMLElement {
-    const { name, data } = options;
+    const { id, data } = options;
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel("Bitwise " + name + " " + data);
+    const label = DeetRender.renderLabel("Bitwise " + id + " " + data);
     div.appendChild(label);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -1412,7 +1412,7 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
   renderContainer(options: DeetTreeOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
-      name: options.name,
+      name: options.id,
       label: "TreeNode",
     });
   }
@@ -1436,7 +1436,7 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
   renderFn(options: DeetTreeOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
-      const container = this.containerRegistry.get(options.name);
+      const container = this.containerRegistry.get(options.id);
       if (container) {
         container.innerHTML = el.outerHTML;
       }
@@ -1683,7 +1683,7 @@ export class DeetSet extends Set implements AutoVisSet {
     this.id = this.deetcode.nanoid();
     this.engine = this.deetcode.deetSetEngine;
     this.engine.renderContainer({
-      name: this.id,
+      id: this.id,
       data: this,
       deetcode: this.deetcode,
     });
@@ -1701,7 +1701,7 @@ export class DeetSet extends Set implements AutoVisSet {
   add(value: any): any {
     const res = super.add(value);
     this.engine.renderFork({
-      name: this.id,
+      id: this.id,
       data: this,
       deetcode: this.deetcode,
     });
@@ -1711,7 +1711,7 @@ export class DeetSet extends Set implements AutoVisSet {
   delete(value: any): any {
     const res = super.delete(value);
     this.engine.renderFork({
-      name: this.id,
+      id: this.id,
       data: this,
       deetcode: this.deetcode,
     });
@@ -1753,7 +1753,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
     this.engine = this.deetcode.deetMapEngine;
     this.renderEnabled = false;
     this.engine.renderContainer({
-      name: this.id,
+      id: this.id,
       data: this,
       deetcode: this.deetcode,
     });
@@ -1764,7 +1764,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
     }
     this.renderEnabled = true;
     this.engine.renderFork({
-      name: this.id,
+      id: this.id,
       data: this,
       deetcode: this.deetcode,
     });
@@ -1778,7 +1778,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
     const res = super.set(key, value);
     if (this.renderEnabled) {
       this.engine.renderFork({
-        name: this.id,
+        id: this.id,
         data: this,
         deetcode: this.deetcode,
       });
@@ -1790,7 +1790,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
     const res = super.delete(key);
     if (this.renderEnabled) {
       this.engine.renderFork({
-        name: this.id,
+        id: this.id,
         data: this,
         deetcode: this.deetcode,
       });
@@ -1828,7 +1828,7 @@ export class DeetArray extends Array implements AutoVisArray {
     this.engine = this.deetcode.deetArrayEngine;
     this.engine.renderContainer({
       data: this,
-      name: this.id,
+      id: this.id,
       deetcode: this.deetcode,
     });
     this.renderEnabled = true;
@@ -1853,7 +1853,7 @@ export class DeetArray extends Array implements AutoVisArray {
         if (this.renderEnabled) {
           this.engine.renderFork({
             data: this,
-            name: this.id,
+            id: this.id,
             deetcode: this.deetcode,
           });
         }
@@ -1867,7 +1867,7 @@ export class DeetArray extends Array implements AutoVisArray {
     const res = super.push(value);
     this.engine.renderFork({
       data: this,
-      name: this.id,
+      id: this.id,
       deetcode: this.deetcode,
     });
     this.renderEnabled = true;
@@ -1880,7 +1880,7 @@ export class DeetArray extends Array implements AutoVisArray {
     const res = super.unshift(value);
     this.engine.renderFork({
       data: this,
-      name: this.id,
+      id: this.id,
       deetcode: this.deetcode,
     });
     this.renderEnabled = true;
@@ -1893,7 +1893,7 @@ export class DeetArray extends Array implements AutoVisArray {
     const res = super.shift();
     this.engine.renderFork({
       data: this,
-      name: this.id,
+      id: this.id,
       deetcode: this.deetcode,
     });
     this.renderEnabled = true;
@@ -1906,7 +1906,7 @@ export class DeetArray extends Array implements AutoVisArray {
     const res = super.pop();
     this.engine.renderFork({
       data: this,
-      name: this.id,
+      id: this.id,
       deetcode: this.deetcode,
     });
     this.renderEnabled = true;
@@ -1917,7 +1917,7 @@ export class DeetArray extends Array implements AutoVisArray {
     this.renderEnabled = false;
     const res = super.sort(compareFn);
     this.engine.renderFork({
-      name: this.id,
+      id: this.id,
       data: this,
       deetcode: this.deetcode,
     });
