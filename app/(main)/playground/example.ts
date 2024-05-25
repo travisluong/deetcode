@@ -119,6 +119,20 @@ DeetVis.maxPriorityQueue({ id: "maxpq", data: maxpq });
 maxpq.front();
 
 /**
+ * PriorityQueue
+ */
+const pq = new PriorityQueue((a, b) => b.rank - a.rank);
+pq.enqueue({ name: "foo", rank: 1 });
+DeetVis.priorityQueue({ id: "pq", data: pq });
+pq.enqueue({ name: "bar", rank: 2 });
+DeetVis.priorityQueue({ id: "pq", data: pq });
+pq.enqueue({ name: "baz", rank: 3 });
+DeetVis.priorityQueue({ id: "pq", data: pq });
+pq.dequeue();
+DeetVis.priorityQueue({ id: "pq", data: pq });
+pq.front();
+
+/**
  * Linked List
  */
 const linkedList = new ListNode(1);
@@ -196,26 +210,26 @@ DeetVis.enableAutoVis();
  */
 DeetVis.set({ id: "set2", data: set2 });
 
-const minheap = new MinPriorityQueue();
-minheap.enqueue(1);
-minheap.enqueue(2);
-minheap.enqueue(3);
-minheap.dequeue();
-minheap.front();
+// const minheap = new MinPriorityQueue();
+// minheap.enqueue(1);
+// minheap.enqueue(2);
+// minheap.enqueue(3);
+// minheap.dequeue();
+// minheap.front();
 
-const maxheap = new MaxPriorityQueue();
-maxheap.enqueue(1);
-maxheap.enqueue(2);
-maxheap.enqueue(3);
-maxheap.dequeue();
-maxheap.front();
+// const maxheap = new MaxPriorityQueue();
+// maxheap.enqueue(1);
+// maxheap.enqueue(2);
+// maxheap.enqueue(3);
+// maxheap.dequeue();
+// maxheap.front();
 
-const pq = new PriorityQueue((a, b) => b.rank - a.rank);
-pq.enqueue({ id: "foo", rank: 1 });
-pq.enqueue({ id: "bar", rank: 2 });
-pq.enqueue({ id: "baz", rank: 3 });
-pq.dequeue();
-pq.front();
+// const pq = new PriorityQueue((a, b) => b.rank - a.rank);
+// pq.enqueue({ id: "foo", rank: 1 });
+// pq.enqueue({ id: "bar", rank: 2 });
+// pq.enqueue({ id: "baz", rank: 3 });
+// pq.dequeue();
+// pq.front();
 
 /**
  * Auto native visualization can be disabled DeetVis.disableAutoVis().

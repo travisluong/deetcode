@@ -7,6 +7,7 @@ import {
   ICompare,
   MaxPriorityQueue as MaxPriorityQueueB,
   MinPriorityQueue as MinPriorityQueueB,
+  PriorityQueue,
   PriorityQueue as PriorityQueueB,
 } from "@datastructures-js/priority-queue";
 
@@ -78,6 +79,10 @@ interface DeetMinPriorityQueueOptions extends DeetOptions {
 
 interface DeetMaxPriorityQueueOptions extends DeetOptions {
   data: MaxPriorityQueueB<any>;
+}
+
+interface DeetPriorityQueueOptions extends DeetOptions {
+  data: PriorityQueue<any>;
 }
 
 interface DeetListNodeOptions extends DeetOptions {
@@ -1087,7 +1092,7 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
   }
-  renderContainer(options: DeetOptions): HTMLElement {
+  renderContainer(options: DeetMaxPriorityQueueOptions): HTMLElement {
     const { id, hideId } = options;
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
@@ -1096,7 +1101,7 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
       hideId,
     });
   }
-  renderFork(options: DeetOptions): void {
+  renderFork(options: DeetMaxPriorityQueueOptions): void {
     this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
@@ -1108,15 +1113,15 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
       },
     });
   }
-  renderDelayed(options: DeetOptions): void {
+  renderDelayed(options: DeetMaxPriorityQueueOptions): void {
     const fn = this.renderFn(options);
     options.deetcode.enqueue(fn);
   }
-  renderNow(options: DeetOptions): void {
+  renderNow(options: DeetMaxPriorityQueueOptions): void {
     const fn = this.renderFn(options);
     fn();
   }
-  renderContent(options: DeetOptions): HTMLElement {
+  renderContent(options: DeetMaxPriorityQueueOptions): HTMLElement {
     const arr = this.copyData(options);
     const div = document.createElement("div");
     const ul = document.createElement("ul");
@@ -1134,7 +1139,7 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
     div.appendChild(ul);
     return div;
   }
-  renderFn(options: DeetOptions): () => void {
+  renderFn(options: DeetMaxPriorityQueueOptions): () => void {
     const fn = () => {
       const el = this.renderContent(options);
       const container = this.containerRegistry.get(options.id);
@@ -1144,7 +1149,75 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
     };
     return fn;
   }
-  copyData(options: DeetOptions) {
+  copyData(options: DeetMaxPriorityQueueOptions) {
+    return options.data.toArray();
+  }
+}
+
+class DeetPriorityQueueEngine implements DeetVisEngineV2 {
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  emptyContainerRegistry(): void {
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(options: DeetPriorityQueueOptions): HTMLElement {
+    const { id, hideId } = options;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      id: id,
+      dataType: "MinPriorityQueue",
+      hideId,
+    });
+  }
+  renderFork(options: DeetPriorityQueueOptions): void {
+    this.copyData(options);
+    DeetRender.renderFork({
+      dcInstance: options.deetcode,
+      delayedCallback: () => {
+        this.renderDelayed(options);
+      },
+      nowCallback: () => {
+        this.renderNow(options);
+      },
+    });
+  }
+  renderDelayed(options: DeetPriorityQueueOptions): void {
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
+  }
+  renderNow(options: DeetPriorityQueueOptions): void {
+    const fn = this.renderFn(options);
+    fn();
+  }
+  renderContent(options: DeetPriorityQueueOptions): HTMLElement {
+    const arr = this.copyData(options);
+    const div = document.createElement("div");
+    const ul = document.createElement("ul");
+    for (const item of arr) {
+      const li = document.createElement("li");
+      let html = "";
+      for (const [key, value] of Object.entries(item)) {
+        html += `${key}: ${value}<br>`;
+      }
+      li.innerHTML = html;
+      ul.appendChild(li);
+    }
+    const label = document.createElement("label");
+    label.innerHTML = "PriorityQueue";
+    div.appendChild(label);
+    div.appendChild(ul);
+    return div;
+  }
+  renderFn(options: DeetPriorityQueueOptions): () => void {
+    const fn = () => {
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.id);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    return fn;
+  }
+  copyData(options: DeetPriorityQueueOptions) {
     return options.data.toArray();
   }
 }
@@ -2259,6 +2332,7 @@ export class DeetCode {
   deetArrayEngine: DeetArrayEngine;
   deetMinPriorityQueueEngine: DeetMinPriorityQueueEngine;
   deetMaxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
+  deetPriorityQueueEngine: DeetPriorityQueueEngine;
   listNodeEngine: DeetListNodeEngine;
   bitwiseEngine: DeetBitwiseEngine;
   treeNodeEngine: DeetTreeNodeEngine;
@@ -2287,6 +2361,7 @@ export class DeetCode {
     this.deetArrayEngine = new DeetArrayEngine();
     this.deetMinPriorityQueueEngine = new DeetMinPriorityQueueEngine();
     this.deetMaxPriorityQueueEngine = new DeetMaxPriorityQueueEngine();
+    this.deetPriorityQueueEngine = new DeetPriorityQueueEngine();
     this.listNodeEngine = new DeetListNodeEngine();
     this.bitwiseEngine = new DeetBitwiseEngine();
     this.treeNodeEngine = new DeetTreeNodeEngine();
@@ -2585,6 +2660,12 @@ export class DeetVis {
     options.deetcode = this.deetcode;
     this.deetcode.deetMaxPriorityQueueEngine.renderContainer(options);
     this.deetcode.deetMaxPriorityQueueEngine.renderFork(options);
+  }
+
+  priorityQueue(options: DeetPriorityQueueOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.deetPriorityQueueEngine.renderContainer(options);
+    this.deetcode.deetPriorityQueueEngine.renderFork(options);
   }
 
   enableAutoVis() {
