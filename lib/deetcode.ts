@@ -241,7 +241,6 @@ class DeetObjectEngine extends DeetBaseEngine {
 class DeetSetEngine extends DeetBaseEngine {
   dataTypeLabel: string = "Set";
   renderContent(opts: DeetSetOptions): HTMLElement {
-    const { id, hideId } = opts;
     const data = this.copyData(opts);
     const div = document.createElement("div");
     const ul = document.createElement("ul");
@@ -325,7 +324,6 @@ class DeetMapEngine extends DeetBaseEngine {
 class DeetArrayEngine extends DeetBaseEngine {
   dataTypeLabel: string = "Array";
   renderContent(opts: DeetArrayOptions): HTMLElement {
-    const { id, indexes: indexObj, hideId } = opts;
     const data = this.copyData(opts);
     const div = document.createElement("div");
     const label = this.renderLabel(opts);
@@ -341,13 +339,6 @@ class DeetArrayEngine extends DeetBaseEngine {
       div.innerHTML += el.outerHTML;
     }
     return div;
-  }
-  getOriginalArrayConstructor() {
-    if (DeetArray.originalArray) {
-      return DeetArray.originalArray;
-    } else {
-      return Array;
-    }
   }
   is2DArray(arr: Array<any>) {
     // Check if arr is an array
@@ -366,7 +357,6 @@ class DeetArrayEngine extends DeetBaseEngine {
     return true;
   }
   render1d(opts: DeetArrayOptions) {
-    const { indexes: indexObj } = opts;
     const data = this.copyData(opts);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -390,7 +380,7 @@ class DeetArrayEngine extends DeetBaseEngine {
       trHead.append(th);
       trBody.append(td);
     }
-    if (indexObj) {
+    if (opts.indexes) {
       const tfoot = this.renderArrayIndex(opts);
       if (tfoot) {
         table.append(tfoot);
@@ -438,13 +428,12 @@ class DeetArrayEngine extends DeetBaseEngine {
     return max;
   }
   renderArrayIndex(opts: DeetArrayOptions): HTMLElement | null {
-    const { indexes: indexObj } = opts;
-    if (!indexObj) {
+    if (!opts.indexes) {
       return null;
     }
     const data = this.copyData(opts);
     let tfoot = document.createElement("tfoot");
-    for (const [key, value] of Object.entries(indexObj)) {
+    for (const [key, value] of Object.entries(opts.indexes)) {
       const tr = document.createElement("tr");
       for (let i = 0; i < data.length; i++) {
         const th = document.createElement("th");
@@ -685,16 +674,10 @@ class DeetListNodeEngine extends DeetBaseEngine {
     }
   }
   copyData(opts: DeetOptions) {
-    const { deetEngine: deetcode } = opts;
     const res = [];
     let cur: DeetListNode | null = opts.data;
-    if (deetcode.isAutoVisEnabled) {
-      DeetMap.undoMonkeyPatch();
-    }
-    const map = new Map<DeetListNode, number>();
-    if (deetcode.isAutoVisEnabled) {
-      DeetMap.monkeyPatch();
-    }
+    const originalMap = DeetMap.getOriginalConstructor();
+    const map = new originalMap<DeetListNode, number>();
     let index = 0;
     while (cur && !map.has(cur)) {
       const deetListNodeRenderObj: DeetListNodeRenderObj = {
@@ -719,7 +702,6 @@ class DeetListNodeEngine extends DeetBaseEngine {
 class DeetBitwiseEngine extends DeetBaseEngine {
   dataTypeLabel: string = "Bitwise";
   renderContent(opts: DeetBitwiseOptions): HTMLElement {
-    const { id, data, hideId } = opts;
     const div = document.createElement("div");
     const label = this.renderLabel(opts);
     div.appendChild(label);
@@ -728,7 +710,7 @@ class DeetBitwiseEngine extends DeetBaseEngine {
     const thr = document.createElement("tr");
     const tbody = document.createElement("tbody");
     const tr = document.createElement("tr");
-    const binary = DeetBitwiseEngine.integerToBinary(data);
+    const binary = DeetBitwiseEngine.integerToBinary(opts.data);
     const arr = binary.split("");
     const n = arr.length;
     for (const [index, num] of arr.entries()) {
