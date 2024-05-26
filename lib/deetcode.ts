@@ -955,20 +955,15 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetBitwiseOptions): void {
-    const { deetcode } = options;
-    switch (deetcode.renderMode) {
-      case "animate":
+    DeetRender.renderFork({
+      dcInstance: options.deetcode,
+      delayedCallback: () => {
         this.renderDelayed(options);
-        break;
-      case "debug":
+      },
+      nowCallback: () => {
         this.renderNow(options);
-        break;
-      case "snapshot":
-        this.renderNow(options);
-        deetcode.takeSnapshot();
-      default:
-        break;
-    }
+      },
+    });
   }
   renderFn(options: DeetBitwiseOptions): () => void {
     const fn = () => {
@@ -1096,21 +1091,15 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetTreeOptions): void {
-    const { deetcode } = options;
-    switch (deetcode.renderMode) {
-      case "animate":
+    DeetRender.renderFork({
+      dcInstance: options.deetcode,
+      delayedCallback: () => {
         this.renderDelayed(options);
-        break;
-      case "debug":
+      },
+      nowCallback: () => {
         this.renderNow(options);
-        break;
-      case "snapshot":
-        this.renderNow(options);
-        deetcode.takeSnapshot();
-        break;
-      default:
-        break;
-    }
+      },
+    });
   }
   renderFn(options: DeetTreeOptions): () => void {
     const fn = () => {
