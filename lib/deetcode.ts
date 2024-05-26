@@ -125,12 +125,6 @@ interface D3TreeNode {
   color?: string;
 }
 
-interface RenderForkOptions {
-  dcInstance: DeetCode;
-  delayedCallback(): void;
-  nowCallback(): void;
-}
-
 interface AutoVisDataType {
   id: string;
   engine: DeetVisEngineV2;
@@ -1392,7 +1386,11 @@ const DeetRender = {
 
     return label;
   },
-  renderFork(options: RenderForkOptions) {
+  renderFork(options: {
+    dcInstance: DeetCode;
+    delayedCallback(): void;
+    nowCallback(): void;
+  }) {
     switch (options.dcInstance.renderMode) {
       case "animate":
         options.delayedCallback();
