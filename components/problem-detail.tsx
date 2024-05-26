@@ -2,8 +2,13 @@
 
 import { PlaygroundProblem, ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
-import { MouseEvent, useEffect, useRef, useState } from "react";
-import { DeetCode, DeetVis, DirectionMode, RenderMode } from "@/lib/deetcode";
+import { MouseEvent, useEffect, useRef } from "react";
+import {
+  DeetEngine,
+  DeetCode,
+  DirectionMode,
+  RenderMode,
+} from "@/lib/deetcode";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -71,15 +76,15 @@ export default function ProblemDetail({
       );
       const animationDelay = parseInt(animationDelayStr || "1000");
 
-      const dcInstance = new DeetCode({
+      const deetEngine = new DeetEngine({
         selector: "#deetcode",
         renderMode: renderMode,
         directionMode: directionMode,
         labelMode: labelMode,
         animationDelay: animationDelay,
       });
-      setInstance(dcInstance);
-      window.DeetVis = new DeetVis(dcInstance);
+      setInstance(deetEngine);
+      window.DeetCode = new DeetCode(deetEngine);
     }
   }, []);
 

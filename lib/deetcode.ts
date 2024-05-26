@@ -12,8 +12,7 @@ import {
 
 declare global {
   interface Window {
-    dcInstance: DeetCode;
-    DeetCode: typeof DeetCode;
+    DeetEngine: typeof DeetEngine;
     DeetSet: typeof DeetSet;
     DeetMap: typeof DeetMap;
     DeetArray: typeof DeetArray;
@@ -24,7 +23,7 @@ declare global {
     MaxPriorityQueue: typeof MaxPriorityQueue;
     PriorityQueue: typeof PriorityQueue;
     DeetTest: typeof DeetTest;
-    DeetVis: DeetVis;
+    DeetCode: DeetCode;
     DeetListNode: typeof DeetListNode;
     ListNode: typeof DeetListNode;
     TreeNode: typeof DeetTreeNode;
@@ -49,7 +48,7 @@ interface DeetConfig {
 interface DeetOptions {
   id: string;
   data: any;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
   copiedData?: any;
   hideId: boolean;
 }
@@ -129,7 +128,7 @@ interface D3TreeNode {
 interface AutoVisDataType {
   id: string;
   engine: DeetVisEngineV2;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
 }
 
 interface AutoVisSet extends AutoVisDataType {
@@ -172,7 +171,7 @@ class DeetObjectEngine implements DeetVisEngineV2 {
   }
   renderFork(opts: DeetObjectOptions): void {
     this.copyData(opts);
-    const { deetcode } = opts;
+    const { deetEngine: deetcode } = opts;
     DeetRender.renderFork({
       dcInstance: deetcode,
       delayedCallback: () => {
@@ -185,7 +184,7 @@ class DeetObjectEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetObjectOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetObjectOptions): void {
     const fn = this.renderFn(opts);
@@ -266,7 +265,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
   }
   renderFork(opts: DeetSetOptions): void {
     this.copyData(opts);
-    const { deetcode } = opts;
+    const { deetEngine: deetcode } = opts;
     DeetRender.renderFork({
       dcInstance: deetcode,
       delayedCallback: () => {
@@ -279,7 +278,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetSetOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetSetOptions): void {
     const fn = this.renderFn(opts);
@@ -340,7 +339,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetMapOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -351,13 +350,13 @@ class DeetMapEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetMapOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetMapOptions): void {
-    opts.deetcode.undoMonkeyPatchAll();
+    opts.deetEngine.undoMonkeyPatchAll();
     const fn = this.renderFn(opts);
     fn();
-    opts.deetcode.monkeyPatchAll();
+    opts.deetEngine.monkeyPatchAll();
   }
   renderContent(opts: DeetMapOptions): HTMLElement {
     const data = this.copyData(opts);
@@ -437,7 +436,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetArrayOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -448,7 +447,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetArrayOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetArrayOptions): void {
     const fn = this.renderFn(opts);
@@ -644,7 +643,7 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetMinPriorityQueueOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -655,7 +654,7 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetMinPriorityQueueOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetMinPriorityQueueOptions): void {
     const fn = this.renderFn(opts);
@@ -716,7 +715,7 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetMaxPriorityQueueOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -727,7 +726,7 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetMaxPriorityQueueOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetMaxPriorityQueueOptions): void {
     const fn = this.renderFn(opts);
@@ -788,7 +787,7 @@ class DeetPriorityQueueEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetPriorityQueueOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -799,7 +798,7 @@ class DeetPriorityQueueEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetPriorityQueueOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetPriorityQueueOptions): void {
     const fn = this.renderFn(opts);
@@ -863,7 +862,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetListNodeOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -884,10 +883,10 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetListNodeOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetListNodeOptions) {
-    const { deetcode } = opts;
+    const { deetEngine: deetcode } = opts;
     if (deetcode.isAutoVisEnabled) {
       deetcode.undoMonkeyPatchAll();
     }
@@ -997,7 +996,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     DeetSet.undoMonkeyPatch();
     const set = new Set();
     // redo monkey patch if auto vis enabled
-    if (opts.deetcode.isAutoVisEnabled) {
+    if (opts.deetEngine.isAutoVisEnabled) {
       DeetSet.monkeyPatch();
     }
     while (cur && !set.has(cur)) {
@@ -1019,7 +1018,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     }
   }
   copyData(opts: DeetOptions) {
-    const { deetcode } = opts;
+    const { deetEngine: deetcode } = opts;
     const res = [];
     let cur: DeetListNode | null = opts.data;
     if (deetcode.isAutoVisEnabled) {
@@ -1068,7 +1067,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetBitwiseOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -1090,13 +1089,13 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
   }
   renderDelayed(opts: DeetBitwiseOptions): void {
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetBitwiseOptions): void {
-    opts.deetcode.undoMonkeyPatchAll();
+    opts.deetEngine.undoMonkeyPatchAll();
     const fn = this.renderFn(opts);
     fn();
-    opts.deetcode.monkeyPatchAll();
+    opts.deetEngine.monkeyPatchAll();
   }
   transformDeetToNative(instance: number) {
     return instance;
@@ -1205,7 +1204,7 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
   renderFork(opts: DeetTreeOptions): void {
     this.copyData(opts);
     DeetRender.renderFork({
-      dcInstance: opts.deetcode,
+      dcInstance: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -1229,14 +1228,14 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
     // because by the time it runs, the monkey patches would have
     // already been undone.
     const fn = this.renderFn(opts);
-    opts.deetcode.enqueue(fn);
+    opts.deetEngine.enqueue(fn);
   }
   renderNow(opts: DeetTreeOptions): void {
     // the undoing of monkeypatching is necessary here because
     // d3 requires the use of the original constructors instead
     // of the monkey patched versions. without this, we'll
     // see duplicate visualizations
-    const { deetcode } = opts;
+    const { deetEngine: deetcode } = opts;
     deetcode.undoMonkeyPatchAll();
     const fn = this.renderFn(opts);
     fn();
@@ -1394,19 +1393,19 @@ const DeetRender = {
   },
   renderContainerFork(div: HTMLElement): void {
     const fn = () => {
-      DeetCode.getInstance().el?.appendChild(div);
+      DeetEngine.getInstance().el?.appendChild(div);
     };
 
-    switch (DeetCode.getInstance().renderMode) {
+    switch (DeetEngine.getInstance().renderMode) {
       case "animate":
-        DeetCode.enqueue(fn);
+        DeetEngine.enqueue(fn);
         break;
       case "debug":
         fn();
         break;
       case "snapshot":
         fn();
-        DeetCode.getInstance().takeSnapshot();
+        DeetEngine.getInstance().takeSnapshot();
       default:
         break;
     }
@@ -1461,7 +1460,7 @@ const DeetRender = {
     return label;
   },
   renderFork(opts: {
-    dcInstance: DeetCode;
+    dcInstance: DeetEngine;
     delayedCallback(): void;
     nowCallback(): void;
   }) {
@@ -1489,18 +1488,18 @@ export type DirectionMode = "row" | "column";
 export class DeetSet extends Set implements AutoVisSet {
   id: string;
   engine: DeetSetEngine;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
   static originalSet?: SetConstructor;
 
   constructor(iterable: any) {
     super();
-    this.deetcode = DeetCode.getInstance();
-    this.id = this.deetcode.nanoid();
-    this.engine = this.deetcode.deetSetEngine;
+    this.deetEngine = DeetEngine.getInstance();
+    this.id = this.deetEngine.nanoid();
+    this.engine = this.deetEngine.deetSetEngine;
     this.engine.renderContainer({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     if (iterable) {
@@ -1519,7 +1518,7 @@ export class DeetSet extends Set implements AutoVisSet {
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -1530,7 +1529,7 @@ export class DeetSet extends Set implements AutoVisSet {
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -1558,7 +1557,7 @@ export class DeetSet extends Set implements AutoVisSet {
 export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
   id: string;
   engine: DeetMapEngine;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
   renderEnabled: boolean;
   static originalMap?: MapConstructor;
 
@@ -1570,14 +1569,14 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
    */
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
-    this.deetcode = DeetCode.getInstance();
-    this.id = this.deetcode.nanoid();
-    this.engine = this.deetcode.deetMapEngine;
+    this.deetEngine = DeetEngine.getInstance();
+    this.id = this.deetEngine.nanoid();
+    this.engine = this.deetEngine.deetMapEngine;
     this.renderEnabled = false;
     this.engine.renderContainer({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     if (iterable) {
@@ -1589,7 +1588,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
   }
@@ -1604,7 +1603,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
       this.engine.renderFork({
         id: this.id,
         data: this,
-        deetcode: this.deetcode,
+        deetEngine: this.deetEngine,
         hideId: true,
       });
     }
@@ -1617,7 +1616,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
       this.engine.renderFork({
         id: this.id,
         data: this,
-        deetcode: this.deetcode,
+        deetEngine: this.deetEngine,
         hideId: true,
       });
     }
@@ -1647,19 +1646,19 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
 export class DeetArray extends Array implements AutoVisArray {
   id: string;
   engine: DeetArrayEngine;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
   renderEnabled: boolean = false;
   static originalArray?: ArrayConstructor;
 
   constructor(...args: any) {
     super(...args);
-    this.deetcode = DeetCode.getInstance();
-    this.id = this.deetcode.nanoid();
-    this.engine = this.deetcode.deetArrayEngine;
+    this.deetEngine = DeetEngine.getInstance();
+    this.id = this.deetEngine.nanoid();
+    this.engine = this.deetEngine.deetArrayEngine;
     this.engine.renderContainer({
       data: this,
       id: this.id,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.renderEnabled = true;
@@ -1685,7 +1684,7 @@ export class DeetArray extends Array implements AutoVisArray {
           this.engine.renderFork({
             data: this,
             id: this.id,
-            deetcode: this.deetcode,
+            deetEngine: this.deetEngine,
             hideId: true,
           });
         }
@@ -1700,7 +1699,7 @@ export class DeetArray extends Array implements AutoVisArray {
     this.engine.renderFork({
       data: this,
       id: this.id,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.renderEnabled = true;
@@ -1714,7 +1713,7 @@ export class DeetArray extends Array implements AutoVisArray {
     this.engine.renderFork({
       data: this,
       id: this.id,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.renderEnabled = true;
@@ -1728,7 +1727,7 @@ export class DeetArray extends Array implements AutoVisArray {
     this.engine.renderFork({
       data: this,
       id: this.id,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.renderEnabled = true;
@@ -1742,7 +1741,7 @@ export class DeetArray extends Array implements AutoVisArray {
     this.engine.renderFork({
       data: this,
       id: this.id,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.renderEnabled = true;
@@ -1755,7 +1754,7 @@ export class DeetArray extends Array implements AutoVisArray {
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.renderEnabled = true;
@@ -1788,24 +1787,24 @@ export class DeetMinPriorityQueue
 {
   id: string;
   engine: DeetMinPriorityQueueEngine;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
   static originalMinPriorityQueue?: typeof MinPriorityQueue;
 
   constructor(...args: any) {
     super(...args);
-    this.deetcode = DeetCode.getInstance();
-    this.id = this.deetcode.nanoid();
-    this.engine = this.deetcode.deetMinPriorityQueueEngine;
+    this.deetEngine = DeetEngine.getInstance();
+    this.id = this.deetEngine.nanoid();
+    this.engine = this.deetEngine.deetMinPriorityQueueEngine;
     this.engine.renderContainer({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
   }
@@ -1815,7 +1814,7 @@ export class DeetMinPriorityQueue
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -1826,7 +1825,7 @@ export class DeetMinPriorityQueue
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -1853,24 +1852,24 @@ export class DeetMaxPriorityQueue
 {
   id: string;
   engine: DeetMaxPriorityQueueEngine;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
   static originalMaxPriorityQueue?: typeof MaxPriorityQueue;
 
   constructor(...args: any) {
     super(...args);
-    this.deetcode = DeetCode.getInstance();
-    this.id = this.deetcode.nanoid();
-    this.engine = this.deetcode.deetMaxPriorityQueueEngine;
+    this.deetEngine = DeetEngine.getInstance();
+    this.id = this.deetEngine.nanoid();
+    this.engine = this.deetEngine.deetMaxPriorityQueueEngine;
     this.engine.renderContainer({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
   }
@@ -1880,7 +1879,7 @@ export class DeetMaxPriorityQueue
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -1891,7 +1890,7 @@ export class DeetMaxPriorityQueue
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -1918,24 +1917,24 @@ export class DeetPriorityQueue
 {
   id: string;
   engine: DeetPriorityQueueEngine;
-  deetcode: DeetCode;
+  deetEngine: DeetEngine;
   static originalPriorityQueue?: typeof PriorityQueue;
 
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
-    this.deetcode = DeetCode.getInstance();
-    this.id = this.deetcode.nanoid();
-    this.engine = this.deetcode.deetPriorityQueueEngine;
+    this.deetEngine = DeetEngine.getInstance();
+    this.id = this.deetEngine.nanoid();
+    this.engine = this.deetEngine.deetPriorityQueueEngine;
     this.engine.renderContainer({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
   }
@@ -1945,7 +1944,7 @@ export class DeetPriorityQueue
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -1956,7 +1955,7 @@ export class DeetPriorityQueue
     this.engine.renderFork({
       id: this.id,
       data: this,
-      deetcode: this.deetcode,
+      deetEngine: this.deetEngine,
       hideId: true,
     });
     return res;
@@ -2003,7 +2002,7 @@ export class DeetTreeNode {
   }
 }
 
-export class DeetCode {
+export class DeetEngine {
   el: Element;
   renderQueue: Array<() => void>;
   selector: string;
@@ -2027,7 +2026,7 @@ export class DeetCode {
   isAutoVisEnabled: boolean = false;
   nanoidSize: number;
 
-  private static instance: DeetCode;
+  private static instance: DeetEngine;
 
   constructor(config: DeetConfig) {
     this.selector = config.selector;
@@ -2169,12 +2168,12 @@ export class DeetCode {
   }
 
   init() {
-    DeetCode.setInstance(this);
+    DeetEngine.setInstance(this);
     this.emptySnapshots();
     window.MinPriorityQueue = MinPriorityQueue;
     window.MaxPriorityQueue = MaxPriorityQueue;
     window.PriorityQueue = PriorityQueue;
-    window.DeetCode = DeetCode;
+    window.DeetEngine = DeetEngine;
     window.DeetTest = DeetTest;
     window._ = _;
     window.ListNode = DeetListNode;
@@ -2201,7 +2200,7 @@ export class DeetCode {
   }
 
   static enqueue(fn: () => void) {
-    DeetCode.getInstance().renderQueue.push(fn);
+    DeetEngine.getInstance().renderQueue.push(fn);
   }
 
   monkeyPatchAll() {
@@ -2229,7 +2228,7 @@ export class DeetCode {
     return nanoid(this.nanoidSize);
   }
 
-  static setInstance(deetcode: DeetCode) {
+  static setInstance(deetcode: DeetEngine) {
     this.instance = deetcode;
   }
 
@@ -2248,19 +2247,19 @@ export const DeetTest = {
         div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
           actual
         )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetCode.getInstance().el.appendChild(div);
+        DeetEngine.getInstance().el.appendChild(div);
       } else {
         div.classList.add("deet-assert-fail");
         div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
           actual
         )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetCode.getInstance().el.appendChild(div);
+        DeetEngine.getInstance().el.appendChild(div);
       }
     };
     DeetRender.renderFork({
-      dcInstance: DeetCode.getInstance(),
+      dcInstance: DeetEngine.getInstance(),
       delayedCallback() {
-        DeetCode.getInstance().enqueue(fn);
+        DeetEngine.getInstance().enqueue(fn);
       },
       nowCallback() {
         fn();
@@ -2275,86 +2274,86 @@ export const DeetTest = {
  * types which are not extending the native types.
  * for example, ListNode, Bitwise, TreeNode.
  */
-export class DeetVis {
-  deetcode: DeetCode;
+export class DeetCode {
+  deetEngine: DeetEngine;
 
-  constructor(deetcode: DeetCode) {
-    this.deetcode = deetcode;
+  constructor(deetEngine: DeetEngine) {
+    this.deetEngine = deetEngine;
   }
 
   object(opts: DeetObjectOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetObjectEngine.renderContainer(opts);
-    this.deetcode.deetObjectEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetObjectEngine.renderContainer(opts);
+    this.deetEngine.deetObjectEngine.renderFork(opts);
   }
 
   set(opts: DeetSetOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetSetEngine.renderContainer(opts);
-    this.deetcode.deetSetEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetSetEngine.renderContainer(opts);
+    this.deetEngine.deetSetEngine.renderFork(opts);
   }
 
   map(opts: DeetMapOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetMapEngine.renderContainer(opts);
-    this.deetcode.deetMapEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetMapEngine.renderContainer(opts);
+    this.deetEngine.deetMapEngine.renderFork(opts);
   }
 
   array(opts: DeetArrayOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetArrayEngine.renderContainer(opts);
-    this.deetcode.deetArrayEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetArrayEngine.renderContainer(opts);
+    this.deetEngine.deetArrayEngine.renderFork(opts);
   }
 
   linkedList(opts: DeetListNodeOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetListNodeEngine.clearAllPointers(opts);
-    this.deetcode.deetListNodeEngine.addPointers(opts);
-    this.deetcode.deetListNodeEngine.renderContainer(opts);
-    this.deetcode.deetListNodeEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetListNodeEngine.clearAllPointers(opts);
+    this.deetEngine.deetListNodeEngine.addPointers(opts);
+    this.deetEngine.deetListNodeEngine.renderContainer(opts);
+    this.deetEngine.deetListNodeEngine.renderFork(opts);
   }
 
   bitwise(opts: DeetBitwiseOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetBitwiseEngine.renderContainer(opts);
-    this.deetcode.deetBitwiseEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetBitwiseEngine.renderContainer(opts);
+    this.deetEngine.deetBitwiseEngine.renderFork(opts);
   }
 
   tree(opts: DeetTreeOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetTreeNodeEngine.renderContainer(opts);
-    this.deetcode.deetTreeNodeEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetTreeNodeEngine.renderContainer(opts);
+    this.deetEngine.deetTreeNodeEngine.renderFork(opts);
   }
 
   arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
-    return this.deetcode.deetTreeNodeEngine.arrayToBinaryTree(array);
+    return this.deetEngine.deetTreeNodeEngine.arrayToBinaryTree(array);
   }
 
   minPriorityQueue(opts: DeetMinPriorityQueueOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetMinPriorityQueueEngine.renderContainer(opts);
-    this.deetcode.deetMinPriorityQueueEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetMinPriorityQueueEngine.renderContainer(opts);
+    this.deetEngine.deetMinPriorityQueueEngine.renderFork(opts);
   }
 
   maxPriorityQueue(opts: DeetMaxPriorityQueueOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetMaxPriorityQueueEngine.renderContainer(opts);
-    this.deetcode.deetMaxPriorityQueueEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetMaxPriorityQueueEngine.renderContainer(opts);
+    this.deetEngine.deetMaxPriorityQueueEngine.renderFork(opts);
   }
 
   priorityQueue(opts: DeetPriorityQueueOptions) {
-    opts.deetcode = this.deetcode;
-    this.deetcode.deetPriorityQueueEngine.renderContainer(opts);
-    this.deetcode.deetPriorityQueueEngine.renderFork(opts);
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetPriorityQueueEngine.renderContainer(opts);
+    this.deetEngine.deetPriorityQueueEngine.renderFork(opts);
   }
 
   enableAutoVis() {
-    this.deetcode.isAutoVisEnabled = true;
-    this.deetcode.monkeyPatchAll();
+    this.deetEngine.isAutoVisEnabled = true;
+    this.deetEngine.monkeyPatchAll();
   }
 
   disableAutoVis() {
-    this.deetcode.isAutoVisEnabled = false;
-    this.deetcode.undoMonkeyPatchAll();
+    this.deetEngine.isAutoVisEnabled = false;
+    this.deetEngine.undoMonkeyPatchAll();
   }
 }

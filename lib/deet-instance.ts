@@ -1,13 +1,13 @@
 "use client";
 
-import { DeetCode } from "./deetcode";
+import { DeetEngine } from "./deetcode";
 
-let dc: DeetCode;
+let deetEngine: DeetEngine;
 
-export function setInstance(instance: DeetCode) {
-  dc = instance;
+export function setInstance(instance: DeetEngine) {
+  deetEngine = instance;
 }
 
 export function getInstance() {
-  return dc;
+  return deetEngine;
 }
