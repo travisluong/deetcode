@@ -1889,9 +1889,9 @@ export class DeetCode {
   deetMinPriorityQueueEngine: DeetMinPriorityQueueEngine;
   deetMaxPriorityQueueEngine: DeetMaxPriorityQueueEngine;
   deetPriorityQueueEngine: DeetPriorityQueueEngine;
-  listNodeEngine: DeetListNodeEngine;
-  bitwiseEngine: DeetBitwiseEngine;
-  treeNodeEngine: DeetTreeNodeEngine;
+  deetListNodeEngine: DeetListNodeEngine;
+  deetBitwiseEngine: DeetBitwiseEngine;
+  deetTreeNodeEngine: DeetTreeNodeEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
   animationDelay: number;
@@ -1912,9 +1912,9 @@ export class DeetCode {
     this.deetMinPriorityQueueEngine = new DeetMinPriorityQueueEngine();
     this.deetMaxPriorityQueueEngine = new DeetMaxPriorityQueueEngine();
     this.deetPriorityQueueEngine = new DeetPriorityQueueEngine();
-    this.listNodeEngine = new DeetListNodeEngine();
-    this.bitwiseEngine = new DeetBitwiseEngine();
-    this.treeNodeEngine = new DeetTreeNodeEngine();
+    this.deetListNodeEngine = new DeetListNodeEngine();
+    this.deetBitwiseEngine = new DeetBitwiseEngine();
+    this.deetTreeNodeEngine = new DeetTreeNodeEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -1979,9 +1979,9 @@ export class DeetCode {
     this.deetSetEngine.emptyContainerRegistry();
     this.deetMapEngine.emptyContainerRegistry();
     this.deetArrayEngine.emptyContainerRegistry();
-    this.listNodeEngine.emptyContainerRegistry();
-    this.bitwiseEngine.emptyContainerRegistry();
-    this.treeNodeEngine.emptyContainerRegistry();
+    this.deetListNodeEngine.emptyContainerRegistry();
+    this.deetBitwiseEngine.emptyContainerRegistry();
+    this.deetTreeNodeEngine.emptyContainerRegistry();
     this.deetMinPriorityQueueEngine.emptyContainerRegistry();
   }
 
@@ -2174,26 +2174,26 @@ export class DeetVis {
 
   linkedList(options: DeetListNodeOptions) {
     options.deetcode = this.deetcode;
-    this.deetcode.listNodeEngine.clearAllPointers(options);
-    this.deetcode.listNodeEngine.addPointers(options);
-    this.deetcode.listNodeEngine.renderContainer(options);
-    this.deetcode.listNodeEngine.renderFork(options);
+    this.deetcode.deetListNodeEngine.clearAllPointers(options);
+    this.deetcode.deetListNodeEngine.addPointers(options);
+    this.deetcode.deetListNodeEngine.renderContainer(options);
+    this.deetcode.deetListNodeEngine.renderFork(options);
   }
 
   bitwise(options: DeetBitwiseOptions) {
     options.deetcode = this.deetcode;
-    this.deetcode.bitwiseEngine.renderContainer(options);
-    this.deetcode.bitwiseEngine.renderFork(options);
+    this.deetcode.deetBitwiseEngine.renderContainer(options);
+    this.deetcode.deetBitwiseEngine.renderFork(options);
   }
 
   tree(options: DeetTreeOptions) {
     options.deetcode = this.deetcode;
-    this.deetcode.treeNodeEngine.renderContainer(options);
-    this.deetcode.treeNodeEngine.renderFork(options);
+    this.deetcode.deetTreeNodeEngine.renderContainer(options);
+    this.deetcode.deetTreeNodeEngine.renderFork(options);
   }
 
   arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
-    return this.deetcode.treeNodeEngine.arrayToBinaryTree(array);
+    return this.deetcode.deetTreeNodeEngine.arrayToBinaryTree(array);
   }
 
   minPriorityQueue(options: DeetMinPriorityQueueOptions) {
