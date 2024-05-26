@@ -8,6 +8,7 @@ import {
   DeetCode,
   DirectionMode,
   RenderMode,
+  LabelMode,
 } from "@/lib/deetcode";
 import {
   ResizableHandle,
@@ -30,46 +31,15 @@ export default function ProblemDetail({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const renderModeStr = localStorage.getItem("deetcode-render-mode");
-      let renderMode: RenderMode = "debug";
-      switch (renderModeStr) {
-        case "animate":
-          renderMode = "animate";
-          break;
-        case "debug":
-          renderMode = "debug";
-          break;
-        case "snapshot":
-          renderMode = "snapshot";
-        default:
-          break;
-      }
-
-      let directionMode: DirectionMode = "row";
-      const directionModeStr = localStorage.getItem("deetcode-direction-mode");
-      switch (directionModeStr) {
-        case "row":
-          directionMode = "row";
-          break;
-        case "column":
-          directionMode = "column";
-          break;
-        default:
-          break;
-      }
-
-      let labelMode = false;
-      const labelModeStr = localStorage.getItem("deetcode-label-mode");
-      switch (labelModeStr) {
-        case "true":
-          labelMode = true;
-          break;
-        case "false":
-          labelMode = false;
-          break;
-        default:
-          break;
-      }
+      const renderMode =
+        (localStorage.getItem("deetcode-render-mode") as RenderMode) || "debug";
+      const directionMode =
+        (localStorage.getItem("deetcode-direction-mode") as DirectionMode) ||
+        "row";
+      const labelMode =
+        (localStorage.getItem("deetcode-label-mode") as LabelMode) === "true"
+          ? true
+          : false;
 
       const animationDelayStr = localStorage.getItem(
         "deetcode-animation-delay"

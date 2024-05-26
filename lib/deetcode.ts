@@ -1018,6 +1018,8 @@ export type RenderMode = "animate" | "debug" | "snapshot";
 
 export type DirectionMode = "row" | "column";
 
+export type LabelMode = "true" | "false";
+
 export class DeetSet extends Set implements AutoVisSet {
   id: string;
   engine: DeetSetEngine;
