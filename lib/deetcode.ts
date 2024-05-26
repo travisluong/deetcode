@@ -96,29 +96,6 @@ interface DeetTreeOptions extends DeetOptions {
   copiedData?: D3TreeNode | null;
 }
 
-/**
- * DeetVisEngineV2 differs from V1 in that
- * opts object is preferred over multiple parameters.
- * opts object is much easier to extend.
- * there is much value in having a consistent contract
- * in which all engines much comply, but
- * also the flexibility to adjust to diverging requirements
- * of each engine. furthermore the auto native types should
- * depend on the deet engines, as the deet engines operate
- * on native structures
- */
-interface DeetVisEngineV2 {
-  containerRegistry: Map<string, HTMLElement>;
-  emptyContainerRegistry(): void;
-  renderContainer(opts: DeetOptions): HTMLElement;
-  renderFork(opts: DeetOptions): void;
-  renderDelayed(opts: DeetOptions): void;
-  renderNow(opts: DeetOptions): void;
-  renderContent(opts: DeetOptions): HTMLElement;
-  renderFn(opts: DeetOptions): () => void;
-  copyData(opts: DeetOptions): any;
-}
-
 interface D3TreeNode {
   name: number;
   children: (D3TreeNode | null)[];
@@ -127,7 +104,7 @@ interface D3TreeNode {
 
 interface AutoVisDataType {
   id: string;
-  engine: DeetVisEngineV2;
+  engine: DeetBaseEngine;
   deetEngine: DeetEngine;
 }
 
@@ -156,9 +133,19 @@ interface AutoVisPriorityQueue extends AutoVisDataType {
 }
 
 abstract class DeetBaseEngine {
+  abstract dataTypeLabel: string;
   containerRegistry: Map<string, HTMLElement> = new Map();
   emptyContainerRegistry(): void {
     DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(opts: DeetOptions): HTMLElement {
+    const { id, hideId } = opts;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      id: id,
+      dataType: this.dataTypeLabel,
+      hideId: hideId,
+    });
   }
   renderFork(opts: DeetOptions): void {
     this.copyData(opts);
@@ -180,7 +167,7 @@ abstract class DeetBaseEngine {
     const fn = this.renderFn(opts);
     fn();
   }
-  renderFn(opts: DeetObjectOptions): () => void {
+  renderFn(opts: DeetOptions): () => void {
     const fn = () => {
       const el = this.renderContent(opts);
       const container = this.containerRegistry.get(opts.id);
@@ -194,16 +181,8 @@ abstract class DeetBaseEngine {
   abstract copyData(opts: DeetOptions): any;
 }
 
-class DeetObjectEngine extends DeetBaseEngine implements DeetVisEngineV2 {
-  renderContainer(opts: DeetObjectOptions): HTMLElement {
-    const { id, hideId } = opts;
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: id,
-      dataType: "Object",
-      hideId: hideId,
-    });
-  }
+class DeetObjectEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Object";
   renderContent(opts: DeetObjectOptions): HTMLElement {
     const data = this.copyData(opts);
     const div = document.createElement("div");
@@ -253,16 +232,8 @@ class DeetObjectEngine extends DeetBaseEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetSetEngine extends DeetBaseEngine implements DeetVisEngineV2 {
-  renderContainer(opts: DeetSetOptions): HTMLElement {
-    const { id, hideId } = opts;
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: id,
-      dataType: "Set",
-      hideId: hideId,
-    });
-  }
+class DeetSetEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Set";
   renderContent(opts: DeetSetOptions): HTMLElement {
     const { id, hideId } = opts;
     const data = this.copyData(opts);
@@ -292,7 +263,8 @@ class DeetSetEngine extends DeetBaseEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetMapEngine extends DeetBaseEngine implements DeetVisEngineV2 {
+class DeetMapEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Map";
   renderContainer(opts: DeetMapOptions): HTMLElement {
     return DeetRender.renderContainer({
       containerRegistry: this.containerRegistry,
@@ -352,16 +324,8 @@ class DeetMapEngine extends DeetBaseEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetArrayEngine extends DeetBaseEngine implements DeetVisEngineV2 {
-  renderContainer(opts: DeetArrayOptions): HTMLElement {
-    const { id, hideId } = opts;
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: id,
-      dataType: "Array",
-      hideId,
-    });
-  }
+class DeetArrayEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Array";
   renderContent(opts: DeetArrayOptions): HTMLElement {
     const { id, indexes: indexObj, hideId } = opts;
     const data = this.copyData(opts);
@@ -525,19 +489,8 @@ class DeetArrayEngine extends DeetBaseEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetMinPriorityQueueEngine
-  extends DeetBaseEngine
-  implements DeetVisEngineV2
-{
-  renderContainer(opts: DeetMinPriorityQueueOptions): HTMLElement {
-    const { id, hideId } = opts;
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: id,
-      dataType: "MinPriorityQueue",
-      hideId,
-    });
-  }
+class DeetMinPriorityQueueEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "MinPriorityQueue";
   renderContent(opts: DeetMinPriorityQueueOptions): HTMLElement {
     const arr = this.copyData(opts);
     const div = document.createElement("div");
@@ -566,19 +519,8 @@ class DeetMinPriorityQueueEngine
   }
 }
 
-class DeetMaxPriorityQueueEngine
-  extends DeetBaseEngine
-  implements DeetVisEngineV2
-{
-  renderContainer(opts: DeetMaxPriorityQueueOptions): HTMLElement {
-    const { id, hideId } = opts;
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: id,
-      dataType: "MaxPriorityQueue",
-      hideId,
-    });
-  }
+class DeetMaxPriorityQueueEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "MaxPriorityQueue";
   renderContent(opts: DeetMaxPriorityQueueOptions): HTMLElement {
     const arr = this.copyData(opts);
     const div = document.createElement("div");
@@ -607,19 +549,8 @@ class DeetMaxPriorityQueueEngine
   }
 }
 
-class DeetPriorityQueueEngine
-  extends DeetBaseEngine
-  implements DeetVisEngineV2
-{
-  renderContainer(opts: DeetPriorityQueueOptions): HTMLElement {
-    const { id, hideId } = opts;
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: id,
-      dataType: "MinPriorityQueue",
-      hideId,
-    });
-  }
+class DeetPriorityQueueEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "PriorityQueue";
   renderContent(opts: DeetPriorityQueueOptions): HTMLElement {
     const arr = this.copyData(opts);
     const div = document.createElement("div");
@@ -652,15 +583,8 @@ class DeetPriorityQueueEngine
   }
 }
 
-class DeetListNodeEngine extends DeetBaseEngine implements DeetVisEngineV2 {
-  renderContainer(opts: DeetListNodeOptions): HTMLElement {
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: opts.id,
-      dataType: "ListNode",
-      hideId: opts.hideId,
-    });
-  }
+class DeetListNodeEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "ListNode";
   renderContent(opts: DeetListNodeOptions): HTMLElement {
     const arr = this.copyData(opts);
     const container = document.createElement("div");
@@ -814,15 +738,8 @@ class DeetListNodeEngine extends DeetBaseEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetBitwiseEngine extends DeetBaseEngine implements DeetVisEngineV2 {
-  renderContainer(opts: DeetBitwiseOptions): HTMLElement {
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: opts.id,
-      dataType: "Bitwise",
-      hideId: opts.hideId,
-    });
-  }
+class DeetBitwiseEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Bitwise";
   renderContent(opts: DeetBitwiseOptions): HTMLElement {
     const { id, data, hideId } = opts;
     const div = document.createElement("div");
@@ -911,15 +828,8 @@ class DeetBitwiseEngine extends DeetBaseEngine implements DeetVisEngineV2 {
   }
 }
 
-class DeetTreeNodeEngine extends DeetBaseEngine implements DeetVisEngineV2 {
-  renderContainer(opts: DeetTreeOptions): HTMLElement {
-    return DeetRender.renderContainer({
-      containerRegistry: this.containerRegistry,
-      id: opts.id,
-      dataType: "TreeNode",
-      hideId: opts.hideId,
-    });
-  }
+class DeetTreeNodeEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "TreeNode";
   copyData(opts: DeetOptions) {
     if (opts.copiedData) {
       return opts.copiedData;
