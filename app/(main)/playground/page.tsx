@@ -13,12 +13,12 @@ export default async function Page() {
   };
 
   return (
-    <div className="flex flex-col gap-5 px-5 h-full">
-      <div className="flex justify-between">
-        <h1 className="font-brand">Playground</h1>
-        <Toolbar />
+    <div className="flex flex-col gap-2 h-full">
+      <h1 className="font-brand px-5">Playground</h1>
+      <Toolbar />
+      <div className="px-5 h-full">
+        <ProblemDetail problem={problem} />
       </div>
-      <ProblemDetail problem={problem} />
     </div>
   );
 }

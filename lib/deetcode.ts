@@ -1338,7 +1338,6 @@ const DeetRender = {
     }
 
     if (id && !hideId) {
-      debugger;
       const idSpan = document.createElement("span");
       idSpan.classList.add("deet-label-id");
       idSpan.innerHTML = id;

@@ -5,15 +5,14 @@ import { cn } from "@/lib/utils";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Toolbar from "./toolbar";
 
 export default function ProblemNav({ problem }: { problem: ProblemDB }) {
   const pathname = usePathname();
   const { slug } = problem;
 
   return (
-    <nav className="flex justify-between gap-5 mx-5 border-b border-gray-400 dark:border-gray-600">
-      <div className="flex gap-5">
+    <nav className="flex gap-5 mx-5 border-b border-gray-400 dark:border-gray-600">
+      <div className="flex gap-2">
         <Link
           className={cn(
             "border border-gray-400 dark:border-gray-600 p-1 border-b-0 rounded-t min-w-24 text-center",
@@ -52,9 +51,6 @@ export default function ProblemNav({ problem }: { problem: ProblemDB }) {
         >
           LeetCode <OpenInNewWindowIcon />
         </Link>
-      </div>
-      <div className="self-end">
-        <Toolbar />
       </div>
     </nav>
   );

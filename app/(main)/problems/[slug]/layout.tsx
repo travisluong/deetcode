@@ -30,7 +30,7 @@ export default async function Layout({
 
   return (
     <section className="flex flex-col h-full">
-      <div className="flex items-center mx-5 mb-5 gap-14">
+      <div className="flex items-center mx-5 gap-5">
         <h1 className="font-sans font-bold text-xl">{problem.name}</h1>
         <div>{category.name}</div>
         <div>
@@ -38,8 +38,8 @@ export default async function Layout({
             <DifficultyBadge difficulty={problem.difficulty} />
           )}
         </div>
+        <ProblemNav problem={problem} />
       </div>
-      <ProblemNav problem={problem} />
       {children}
     </section>
   );
