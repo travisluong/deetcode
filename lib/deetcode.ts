@@ -1194,7 +1194,6 @@ export class DeetArray extends Array implements AutoVisArray {
       deetEngine: this.deetEngine,
       hideId: true,
     });
-    this.renderEnabled = true;
     return new Proxy(this, {
       get(target, key: any) {
         if (key === "__isProxy") {
@@ -1211,7 +1210,6 @@ export class DeetArray extends Array implements AutoVisArray {
         }
       },
       set: (target, prop, value) => {
-        console.log(target, prop, value);
         const res = Reflect.set(target, prop, value);
         if (this.renderEnabled) {
           this.engine.renderFork({
@@ -1227,7 +1225,6 @@ export class DeetArray extends Array implements AutoVisArray {
   }
 
   push(value: any): number {
-    this.renderEnabled = false;
     const res = super.push(value);
     this.engine.renderFork({
       data: this,
@@ -1235,13 +1232,10 @@ export class DeetArray extends Array implements AutoVisArray {
       deetEngine: this.deetEngine,
       hideId: true,
     });
-    this.renderEnabled = true;
     return res;
   }
 
   unshift(value: any): number {
-    console.log("unshift", value);
-    this.renderEnabled = false;
     const res = super.unshift(value);
     this.engine.renderFork({
       data: this,
@@ -1249,13 +1243,10 @@ export class DeetArray extends Array implements AutoVisArray {
       deetEngine: this.deetEngine,
       hideId: true,
     });
-    this.renderEnabled = true;
     return res;
   }
 
   shift(): number {
-    console.log("shift");
-    this.renderEnabled = false;
     const res = super.shift();
     this.engine.renderFork({
       data: this,
@@ -1263,13 +1254,10 @@ export class DeetArray extends Array implements AutoVisArray {
       deetEngine: this.deetEngine,
       hideId: true,
     });
-    this.renderEnabled = true;
     return res;
   }
 
   pop() {
-    console.log("pop");
-    this.renderEnabled = false;
     const res = super.pop();
     this.engine.renderFork({
       data: this,
@@ -1277,12 +1265,10 @@ export class DeetArray extends Array implements AutoVisArray {
       deetEngine: this.deetEngine,
       hideId: true,
     });
-    this.renderEnabled = true;
     return res;
   }
 
   sort(compareFn?: ((a: any, b: any) => number) | undefined): this {
-    this.renderEnabled = false;
     const res = super.sort(compareFn);
     this.engine.renderFork({
       id: this.id,
@@ -1290,7 +1276,6 @@ export class DeetArray extends Array implements AutoVisArray {
       deetEngine: this.deetEngine,
       hideId: true,
     });
-    this.renderEnabled = true;
     return res;
   }
 
