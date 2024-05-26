@@ -642,7 +642,6 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetMinPriorityQueueOptions): void {
-    debugger;
     this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
@@ -1136,7 +1135,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
     return div;
   }
   copyData(options: DeetOptions) {
-    throw new Error("number type is a primitive and passed by value");
+    return options.data;
   }
   /**
    * Example usage:
