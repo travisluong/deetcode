@@ -22,11 +22,11 @@ declare global {
     MinPriorityQueue: typeof MinPriorityQueue;
     MaxPriorityQueue: typeof MaxPriorityQueue;
     PriorityQueue: typeof PriorityQueue;
-    DeetTest: typeof DeetTest;
-    DeetCode: DeetCode;
     DeetListNode: typeof DeetListNode;
     ListNode: typeof DeetListNode;
     TreeNode: typeof DeetTreeNode;
+    DeetTest: DeetTest;
+    DeetCode: DeetCode;
   }
 }
 
@@ -2174,7 +2174,7 @@ export class DeetEngine {
     window.MaxPriorityQueue = MaxPriorityQueue;
     window.PriorityQueue = PriorityQueue;
     window.DeetEngine = DeetEngine;
-    window.DeetTest = DeetTest;
+    window.DeetTest = new DeetTest(this);
     window._ = _;
     window.ListNode = DeetListNode;
     window.TreeNode = DeetTreeNode;
@@ -2237,8 +2237,13 @@ export class DeetEngine {
   }
 }
 
-export const DeetTest = {
+class DeetTest {
+  deetEngine: DeetEngine;
+  constructor(deetEngine: DeetEngine) {
+    this.deetEngine = deetEngine;
+  }
   equal(actual: any, expected: any) {
+    const deetEngine = this.deetEngine;
     const fn = () => {
       const div = document.createElement("div");
       div.classList.add("deet-assert");
@@ -2247,26 +2252,26 @@ export const DeetTest = {
         div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
           actual
         )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetEngine.getInstance().el.appendChild(div);
+        deetEngine.el.appendChild(div);
       } else {
         div.classList.add("deet-assert-fail");
         div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
           actual
         )}<br>Expected: ${JSON.stringify(expected)}`;
-        DeetEngine.getInstance().el.appendChild(div);
+        deetEngine.el.appendChild(div);
       }
     };
     DeetRender.renderFork({
-      dcInstance: DeetEngine.getInstance(),
+      dcInstance: deetEngine,
       delayedCallback() {
-        DeetEngine.getInstance().enqueue(fn);
+        deetEngine.enqueue(fn);
       },
       nowCallback() {
         fn();
       },
     });
-  },
-};
+  }
+}
 
 /**
  * the DeetVis class is a utility that can be used from
