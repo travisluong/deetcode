@@ -819,8 +819,11 @@ class DeetPriorityQueueEngine implements DeetVisEngineV2 {
       li.innerHTML = html;
       ul.appendChild(li);
     }
-    const label = document.createElement("label");
-    label.innerHTML = "PriorityQueue";
+    const label = DeetRender.renderLabel({
+      dataType: "PriorityQueue",
+      id: options.id,
+      hideId: options.hideId,
+    });
     div.appendChild(label);
     div.appendChild(ul);
     return div;
