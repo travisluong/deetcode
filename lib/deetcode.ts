@@ -65,7 +65,7 @@ interface DeetMapOptions extends DeetOptions {
 interface DeetArrayOptions extends DeetOptions {
   data: Array<any>;
   copiedData?: Array<any>;
-  indexObj?: { [key: string]: number };
+  indexes?: { [key: string]: number };
 }
 
 interface DeetMinPriorityQueueOptions extends DeetOptions {
@@ -362,7 +362,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     fn();
   }
   renderContent(options: DeetArrayOptions): HTMLElement {
-    const { id, indexObj, hideId } = options;
+    const { id, indexes: indexObj, hideId } = options;
     const data = this.copyData(options);
     const div = document.createElement("div");
     const label = DeetRender.renderLabel({
@@ -417,7 +417,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     return true;
   }
   render1d(options: DeetArrayOptions) {
-    const { indexObj } = options;
+    const { indexes: indexObj } = options;
     const data = this.copyData(options);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -489,7 +489,7 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     return max;
   }
   renderArrayIndex(options: DeetArrayOptions): HTMLElement | null {
-    const { indexObj } = options;
+    const { indexes: indexObj } = options;
     if (!indexObj) {
       return null;
     }
