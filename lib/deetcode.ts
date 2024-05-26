@@ -175,6 +175,18 @@ interface AutoVisArray extends AutoVisDataType {
   engine: DeetArrayEngine;
 }
 
+interface AutoVisMinPriorityQueue extends AutoVisDataType {
+  engine: DeetMinPriorityQueueEngine;
+}
+
+interface AutoVisMaxPriorityQueue extends AutoVisDataType {
+  engine: DeetMaxPriorityQueueEngine;
+}
+
+interface AutoVisPriorityQueue extends AutoVisDataType {
+  engine: DeetPriorityQueueEngine;
+}
+
 type NativeDataStructure =
   | Set<any>
   | Map<any, any>
@@ -2157,27 +2169,53 @@ export class DeetArray extends Array implements AutoVisArray {
   }
 }
 
-export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
-  container: HTMLElement;
-  engine: NativeMinPriorityQueueEngine;
+export class DeetMinPriorityQueue
+  extends MinPriorityQueueB<any>
+  implements AutoVisMinPriorityQueue
+{
+  id: string;
+  engine: DeetMinPriorityQueueEngine;
+  deetcode: DeetCode;
   static originalMinPriorityQueue?: typeof MinPriorityQueueB;
 
   constructor(...args: any) {
     super(...args);
-    this.engine = DeetCode.getInstance().minPriorityQueueEngine;
-    this.container = this.engine.renderContainer(this);
-    this.engine.renderFork(this);
+    this.deetcode = DeetCode.getInstance();
+    this.id = this.deetcode.nanoid();
+    this.engine = this.deetcode.deetMinPriorityQueueEngine;
+    this.engine.renderContainer({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
   }
 
   enqueue(value: any) {
     const res = super.enqueue(value);
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
     return res;
   }
 
   dequeue() {
     const res = super.dequeue();
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
     return res;
   }
 
@@ -2196,26 +2234,53 @@ export class DeetMinPriorityQueue extends MinPriorityQueueB<any> {
   }
 }
 
-export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
-  engine: NativeMaxPriorityQueueEngine;
-  container: HTMLElement;
+export class DeetMaxPriorityQueue
+  extends MaxPriorityQueueB<any>
+  implements AutoVisMaxPriorityQueue
+{
+  id: string;
+  engine: DeetMaxPriorityQueueEngine;
+  deetcode: DeetCode;
   static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
 
   constructor(...args: any) {
     super(...args);
-    this.engine = DeetCode.getInstance().maxPriorityQueueEngine;
-    this.container = this.engine.renderContainer(this);
+    this.deetcode = DeetCode.getInstance();
+    this.id = this.deetcode.nanoid();
+    this.engine = this.deetcode.deetMaxPriorityQueueEngine;
+    this.engine.renderContainer({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
   }
 
   enqueue(value: any) {
     const res = super.enqueue(value);
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
     return res;
   }
 
   dequeue() {
     const res = super.dequeue();
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
     return res;
   }
 
@@ -2234,45 +2299,54 @@ export class DeetMaxPriorityQueue extends MaxPriorityQueueB<any> {
   }
 }
 
-export class DeetPriorityQueue extends PriorityQueueB<any> {
-  engine: NativePriorityQueueEngine;
-  container: HTMLElement;
+export class DeetPriorityQueue
+  extends PriorityQueueB<any>
+  implements AutoVisPriorityQueue
+{
+  id: string;
+  engine: DeetPriorityQueueEngine;
+  deetcode: DeetCode;
   static originalPriorityQueue?: typeof PriorityQueueB;
 
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
-    this.engine = DeetCode.getInstance().priorityQueueEngine;
-    this.container = this.engine.renderContainer(this);
+    this.deetcode = DeetCode.getInstance();
+    this.id = this.deetcode.nanoid();
+    this.engine = this.deetcode.deetPriorityQueueEngine;
+    this.engine.renderContainer({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
   }
 
   enqueue(value: any) {
     const res = super.enqueue(value);
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
     return res;
   }
 
   dequeue() {
     const res = super.dequeue();
-    this.engine.renderFork(this);
+    this.engine.renderFork({
+      id: this.id,
+      data: this,
+      deetcode: this.deetcode,
+      hideId: true,
+    });
     return res;
-  }
-
-  render() {
-    if (this.container) {
-      this.container.innerHTML = "";
-    }
-    const arr = super.toArray();
-    const ul = document.createElement("ul");
-    for (const item of arr) {
-      const li = document.createElement("li");
-      let html = "";
-      for (const [key, value] of Object.entries(item)) {
-        html += `${key}: ${value}<br>`;
-      }
-      li.innerHTML = html;
-      ul.appendChild(li);
-    }
-    this.container?.appendChild(ul);
   }
 
   static monkeyPatch() {

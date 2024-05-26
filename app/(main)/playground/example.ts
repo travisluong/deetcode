@@ -210,26 +210,26 @@ DeetVis.enableAutoVis();
  */
 DeetVis.set({ id: "set2", data: set2 });
 
-// const minheap = new MinPriorityQueue();
-// minheap.enqueue(1);
-// minheap.enqueue(2);
-// minheap.enqueue(3);
-// minheap.dequeue();
-// minheap.front();
+const minpq2 = new MinPriorityQueue();
+minpq2.enqueue(1);
+minpq2.enqueue(2);
+minpq2.enqueue(3);
+minpq2.dequeue();
+minpq2.front();
 
-// const maxheap = new MaxPriorityQueue();
-// maxheap.enqueue(1);
-// maxheap.enqueue(2);
-// maxheap.enqueue(3);
-// maxheap.dequeue();
-// maxheap.front();
+const maxpq2 = new MaxPriorityQueue();
+maxpq2.enqueue(1);
+maxpq2.enqueue(2);
+maxpq2.enqueue(3);
+maxpq2.dequeue();
+maxpq2.front();
 
-// const pq = new PriorityQueue((a, b) => b.rank - a.rank);
-// pq.enqueue({ id: "foo", rank: 1 });
-// pq.enqueue({ id: "bar", rank: 2 });
-// pq.enqueue({ id: "baz", rank: 3 });
-// pq.dequeue();
-// pq.front();
+const pq2 = new PriorityQueue((a, b) => b.rank - a.rank);
+pq2.enqueue({ name: "foo", rank: 1 });
+pq2.enqueue({ name: "bar", rank: 2 });
+pq2.enqueue({ name: "baz", rank: 3 });
+pq2.dequeue();
+pq2.front();
 
 /**
  * Auto native visualization can be disabled DeetVis.disableAutoVis().
