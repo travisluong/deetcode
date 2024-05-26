@@ -54,6 +54,8 @@ interface DeetOptions {
   hideId: boolean;
 }
 
+interface DeetObjectOptions extends DeetOptions {}
+
 interface DeetSetOptions extends DeetOptions {
   data: Set<any>;
 }
@@ -152,6 +154,99 @@ interface AutoVisMaxPriorityQueue extends AutoVisDataType {
 
 interface AutoVisPriorityQueue extends AutoVisDataType {
   engine: DeetPriorityQueueEngine;
+}
+
+class DeetObjectEngine implements DeetVisEngineV2 {
+  containerRegistry: Map<string, HTMLElement> = new Map();
+  emptyContainerRegistry(): void {
+    DeetRender.emptyContainerRegistry(this.containerRegistry);
+  }
+  renderContainer(options: DeetObjectOptions): HTMLElement {
+    const { id, hideId } = options;
+    return DeetRender.renderContainer({
+      containerRegistry: this.containerRegistry,
+      id: id,
+      dataType: "Object",
+      hideId: hideId,
+    });
+  }
+  renderFork(options: DeetObjectOptions): void {
+    const { deetcode } = options;
+    DeetRender.renderFork({
+      dcInstance: deetcode,
+      delayedCallback: () => {
+        this.renderDelayed(options);
+      },
+      nowCallback: () => {
+        this.renderNow(options);
+      },
+    });
+  }
+  renderDelayed(options: DeetObjectOptions): void {
+    const fn = this.renderFn(options);
+    options.deetcode.enqueue(fn);
+  }
+  renderNow(options: DeetObjectOptions): void {
+    const fn = this.renderFn(options);
+    fn();
+  }
+  renderContent(options: DeetObjectOptions): HTMLElement {
+    const data = this.copyData(options);
+    const div = document.createElement("div");
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tr = document.createElement("tr");
+    const thKey = document.createElement("th");
+    const thVal = document.createElement("th");
+    const tbody = document.createElement("tbody");
+
+    table.append(thead);
+    thead.append(tr);
+    tr.append(thKey, thVal);
+    table.append(tbody);
+
+    thKey.innerHTML = "property";
+    thVal.innerHTML = "value";
+
+    for (const [key, value] of Object.entries(data)) {
+      const tr = document.createElement("tr");
+      const tdKey = document.createElement("td");
+      const tdVal = document.createElement("td");
+      tdKey.innerHTML = String(key);
+      tdVal.innerHTML = String(value);
+      tr.appendChild(tdKey);
+      tr.appendChild(tdVal);
+      tbody.appendChild(tr);
+    }
+
+    const label = DeetRender.renderLabel({
+      dataType: "Object",
+      id: options.id,
+      hideId: options.hideId,
+    });
+
+    div.append(label);
+    div.append(table);
+    return div;
+  }
+  renderFn(options: DeetObjectOptions): () => void {
+    const fn = () => {
+      const el = this.renderContent(options);
+      const container = this.containerRegistry.get(options.id);
+      if (container) {
+        container.innerHTML = el.outerHTML;
+      }
+    };
+    return fn;
+  }
+  copyData(options: DeetObjectOptions) {
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    const copy = { ...options.data };
+    options.copiedData = copy;
+    return copy;
+  }
 }
 
 class DeetSetEngine implements DeetVisEngineV2 {
@@ -1882,6 +1977,7 @@ export class DeetCode {
   renderQueue: Array<() => void>;
   selector: string;
   renderMode: RenderMode;
+  deetObjectEngine: DeetObjectEngine;
   deetSetEngine: DeetSetEngine;
   deetMapEngine: DeetMapEngine;
   deetArrayEngine: DeetArrayEngine;
@@ -1905,6 +2001,7 @@ export class DeetCode {
   constructor(config: DeetConfig) {
     this.selector = config.selector;
     this.renderMode = config.renderMode || "debug";
+    this.deetObjectEngine = new DeetObjectEngine();
     this.deetSetEngine = new DeetSetEngine();
     this.deetMapEngine = new DeetMapEngine();
     this.deetArrayEngine = new DeetArrayEngine();
@@ -2152,6 +2249,12 @@ export class DeetVis {
 
   constructor(deetcode: DeetCode) {
     this.deetcode = deetcode;
+  }
+
+  object(options: DeetObjectOptions) {
+    options.deetcode = this.deetcode;
+    this.deetcode.deetObjectEngine.renderContainer(options);
+    this.deetcode.deetObjectEngine.renderFork(options);
   }
 
   set(options: DeetSetOptions) {
