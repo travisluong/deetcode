@@ -5,10 +5,9 @@ import { nanoid } from "nanoid";
 
 import {
   ICompare,
-  MaxPriorityQueue as MaxPriorityQueueB,
-  MinPriorityQueue as MinPriorityQueueB,
+  MaxPriorityQueue,
+  MinPriorityQueue,
   PriorityQueue,
-  PriorityQueue as PriorityQueueB,
 } from "@datastructures-js/priority-queue";
 
 declare global {
@@ -21,9 +20,9 @@ declare global {
     DeetMinPriorityQueue: typeof DeetMinPriorityQueue;
     DeetMaxPriorityQueue: typeof DeetMaxPriorityQueue;
     DeetPriorityQueue: typeof DeetPriorityQueue;
-    MinPriorityQueue: typeof MinPriorityQueueB;
-    MaxPriorityQueue: typeof MaxPriorityQueueB;
-    PriorityQueue: typeof PriorityQueueB;
+    MinPriorityQueue: typeof MinPriorityQueue;
+    MaxPriorityQueue: typeof MaxPriorityQueue;
+    PriorityQueue: typeof PriorityQueue;
     DeetTest: typeof DeetTest;
     DeetVis: DeetVis;
     DeetListNode: typeof DeetListNode;
@@ -70,11 +69,11 @@ interface DeetArrayOptions extends DeetOptions {
 }
 
 interface DeetMinPriorityQueueOptions extends DeetOptions {
-  data: MinPriorityQueueB<any>;
+  data: MinPriorityQueue<any>;
 }
 
 interface DeetMaxPriorityQueueOptions extends DeetOptions {
-  data: MaxPriorityQueueB<any>;
+  data: MaxPriorityQueue<any>;
 }
 
 interface DeetPriorityQueueOptions extends DeetOptions {
@@ -1659,13 +1658,13 @@ export class DeetArray extends Array implements AutoVisArray {
 }
 
 export class DeetMinPriorityQueue
-  extends MinPriorityQueueB<any>
+  extends MinPriorityQueue<any>
   implements AutoVisMinPriorityQueue
 {
   id: string;
   engine: DeetMinPriorityQueueEngine;
   deetcode: DeetCode;
-  static originalMinPriorityQueue?: typeof MinPriorityQueueB;
+  static originalMinPriorityQueue?: typeof MinPriorityQueue;
 
   constructor(...args: any) {
     super(...args);
@@ -1710,7 +1709,7 @@ export class DeetMinPriorityQueue
 
   static monkeyPatch() {
     if (this.originalMinPriorityQueue === undefined) {
-      this.originalMinPriorityQueue = MinPriorityQueueB;
+      this.originalMinPriorityQueue = MinPriorityQueue;
     }
 
     window.MinPriorityQueue = DeetMinPriorityQueue;
@@ -1724,13 +1723,13 @@ export class DeetMinPriorityQueue
 }
 
 export class DeetMaxPriorityQueue
-  extends MaxPriorityQueueB<any>
+  extends MaxPriorityQueue<any>
   implements AutoVisMaxPriorityQueue
 {
   id: string;
   engine: DeetMaxPriorityQueueEngine;
   deetcode: DeetCode;
-  static originalMaxPriorityQueue?: typeof MaxPriorityQueueB;
+  static originalMaxPriorityQueue?: typeof MaxPriorityQueue;
 
   constructor(...args: any) {
     super(...args);
@@ -1775,7 +1774,7 @@ export class DeetMaxPriorityQueue
 
   static monkeyPatch() {
     if (this.originalMaxPriorityQueue === undefined) {
-      this.originalMaxPriorityQueue = MaxPriorityQueueB;
+      this.originalMaxPriorityQueue = MaxPriorityQueue;
     }
 
     window.MaxPriorityQueue = DeetMaxPriorityQueue;
@@ -1789,13 +1788,13 @@ export class DeetMaxPriorityQueue
 }
 
 export class DeetPriorityQueue
-  extends PriorityQueueB<any>
+  extends PriorityQueue<any>
   implements AutoVisPriorityQueue
 {
   id: string;
   engine: DeetPriorityQueueEngine;
   deetcode: DeetCode;
-  static originalPriorityQueue?: typeof PriorityQueueB;
+  static originalPriorityQueue?: typeof PriorityQueue;
 
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
@@ -1840,7 +1839,7 @@ export class DeetPriorityQueue
 
   static monkeyPatch() {
     if (this.originalPriorityQueue === undefined) {
-      this.originalPriorityQueue = PriorityQueueB;
+      this.originalPriorityQueue = PriorityQueue;
     }
 
     window.PriorityQueue = DeetPriorityQueue;
@@ -2045,9 +2044,9 @@ export class DeetCode {
   init() {
     DeetCode.setInstance(this);
     this.emptySnapshots();
-    window.MinPriorityQueue = MinPriorityQueueB;
-    window.MaxPriorityQueue = MaxPriorityQueueB;
-    window.PriorityQueue = PriorityQueueB;
+    window.MinPriorityQueue = MinPriorityQueue;
+    window.MaxPriorityQueue = MaxPriorityQueue;
+    window.PriorityQueue = PriorityQueue;
     window.DeetCode = DeetCode;
     window.DeetTest = DeetTest;
     window._ = _;
