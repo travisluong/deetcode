@@ -182,23 +182,12 @@ class DeetSetEngine implements DeetVisEngineV2 {
     });
   }
   renderDelayed(options: DeetSetOptions): void {
-    const { data, deetcode } = options;
     const fn = this.renderFn(options);
-    deetcode.enqueue(fn);
+    options.deetcode.enqueue(fn);
   }
   renderNow(options: DeetSetOptions): void {
-    const { data } = options;
     const fn = this.renderFn(options);
     fn();
-  }
-  transformDeetToNative(instance: any) {
-    let copy;
-    if (DeetSet.originalSet) {
-      copy = new DeetSet.originalSet([...instance.values()]);
-    } else {
-      copy = new Set([...instance.values()]);
-    }
-    return copy;
   }
   renderContent(options: DeetSetOptions): HTMLElement {
     const { id, hideId } = options;
@@ -277,15 +266,6 @@ class DeetMapEngine implements DeetVisEngineV2 {
     const fn = this.renderFn(options);
     fn();
     options.deetcode.monkeyPatchAll();
-  }
-  transformDeetToNative(instance: any) {
-    let copy;
-    if (DeetMap.originalMap) {
-      copy = new DeetMap.originalMap([...instance.entries()]);
-    } else {
-      copy = new Map([...instance.entries()]);
-    }
-    return copy;
   }
   renderContent(options: DeetMapOptions): HTMLElement {
     const data = this.copyData(options);
@@ -771,20 +751,15 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetListNodeOptions): void {
-    switch (options.deetcode.renderMode) {
-      case "animate":
+    DeetRender.renderFork({
+      dcInstance: options.deetcode,
+      delayedCallback: () => {
         this.renderDelayed(options);
-        break;
-      case "debug":
+      },
+      nowCallback: () => {
         this.renderNow(options);
-        break;
-      case "snapshot":
-        this.renderNow(options);
-        options.deetcode.takeSnapshot();
-        break;
-      default:
-        break;
-    }
+      },
+    });
   }
   renderFn(options: DeetListNodeOptions): () => void {
     const fn = () => {
@@ -925,7 +900,6 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
   addPointers(options: DeetListNodeOptions) {
     const { pointers } = options;
     if (pointers) {
-      // push pointer keys onto pointer arrays
       for (const [k, v] of Object.entries(pointers)) {
         if (v) {
           v.pointers.add(k);
@@ -937,7 +911,6 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     const { deetcode } = options;
     const res = [];
     let cur: DeetListNode | null = options.data;
-    // track the position of each node
     if (deetcode.isAutoVisEnabled) {
       DeetMap.undoMonkeyPatch();
     }
