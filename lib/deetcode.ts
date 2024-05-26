@@ -939,6 +939,9 @@ const DeetRender = {
       case "snapshot":
         fn();
         DeetEngine.getInstance().takeSnapshot();
+      case "loop":
+        fn();
+        DeetEngine.getInstance().takeSnapshot();
       default:
         break;
     }
@@ -1008,13 +1011,16 @@ const DeetRender = {
         opts.nowCallback();
         opts.deetEngine.takeSnapshot();
         break;
+      case "loop":
+        opts.nowCallback();
+        opts.deetEngine.takeSnapshot();
       default:
         break;
     }
   },
 };
 
-export type RenderMode = "animate" | "debug" | "snapshot";
+export type RenderMode = "animate" | "debug" | "snapshot" | "loop";
 
 export type DirectionMode = "row" | "column";
 
@@ -1589,8 +1595,21 @@ export class DeetEngine {
     this.interval = setInterval(() => {
       const fn = this.renderQueue.shift();
       if (!fn) return;
-      console.log(fn);
       fn();
+    }, delay);
+  }
+
+  startSnapshotLoop() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    const delay = this.animationDelay < 10 ? 10 : this.animationDelay;
+    this.interval = setInterval(() => {
+      this.snapshotIndex++;
+      this.el.innerHTML = "";
+      this.el.appendChild(
+        this.snapshots[this.snapshotIndex % this.snapshots.length]
+      );
     }, delay);
   }
 
@@ -1712,6 +1731,11 @@ export class DeetEngine {
     this.isAutoVisEnabled = false;
     if (this.renderMode === "snapshot") {
       this.initialSnapshot();
+    }
+
+    if (this.renderMode === "loop") {
+      this.initialSnapshot();
+      this.startSnapshotLoop();
     }
   }
 

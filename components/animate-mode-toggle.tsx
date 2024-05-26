@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { RenderMode } from "@/lib/deetcode";
 import { Button } from "./ui/button";
-import { CameraIcon, Crosshair2Icon, PlayIcon } from "@radix-ui/react-icons";
+import {
+  CameraIcon,
+  Crosshair2Icon,
+  LoopIcon,
+  PlayIcon,
+} from "@radix-ui/react-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,19 +21,9 @@ export default function AnimateModeToggle() {
   const [mode, setMode] = useState<RenderMode>("animate");
 
   useEffect(() => {
-    const renderMode = localStorage.getItem("deetcode-render-mode");
-    switch (renderMode) {
-      case "animate":
-        setMode("animate");
-        break;
-      case "debug":
-        setMode("debug");
-        break;
-      case "snapshot":
-        setMode("snapshot");
-      default:
-        break;
-    }
+    const renderMode =
+      (localStorage.getItem("deetcode-render-mode") as RenderMode) || "animate";
+    setMode(renderMode);
   }, []);
 
   function handleClick(mode: RenderMode) {
@@ -46,6 +41,9 @@ export default function AnimateModeToggle() {
         getInstance().changeRenderMode("snapshot");
         localStorage.setItem("deetcode-render-mode", "snapshot");
         break;
+      case "loop":
+        getInstance().changeRenderMode("loop");
+        localStorage.setItem("deetcode-render-mode", "loop");
       default:
         break;
     }
@@ -62,6 +60,7 @@ export default function AnimateModeToggle() {
           {mode === "snapshot" && (
             <CameraIcon className="h-[1.2rem] w-[1.2rem]" />
           )}
+          {mode === "loop" && <LoopIcon className="h-[1.2rem] w-[1.2rem]" />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -73,6 +72,9 @@ export default function AnimateModeToggle() {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleClick("snapshot")}>
           <CameraIcon className="h-[1.2rem] w-[1.2rem] mr-2" /> Snapshot Mode
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleClick("loop")}>
+          <LoopIcon className="h-[1.2rem] w-[1.2rem] mr-2" /> Loop Mode
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
