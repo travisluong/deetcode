@@ -135,8 +135,12 @@ interface AutoVisPriorityQueue extends AutoVisDataType {
 abstract class DeetBaseEngine {
   abstract dataTypeLabel: string;
   containerRegistry: Map<string, HTMLElement> = new Map();
+  abstract renderContent(opts: DeetOptions): HTMLElement;
+  abstract copyData(opts: DeetOptions): any;
   emptyContainerRegistry(): void {
-    DeetRender.emptyContainerRegistry(this.containerRegistry);
+    for (const key of this.containerRegistry.keys()) {
+      this.containerRegistry.delete(key);
+    }
   }
   renderContainer(opts: DeetOptions): HTMLElement {
     const { id, hideId } = opts;
@@ -177,8 +181,14 @@ abstract class DeetBaseEngine {
     };
     return fn;
   }
-  abstract renderContent(opts: DeetOptions): HTMLElement;
-  abstract copyData(opts: DeetOptions): any;
+  renderLabel(opts: DeetOptions) {
+    const label = DeetRender.renderLabel({
+      dataType: this.dataTypeLabel,
+      id: opts.id,
+      hideId: opts.hideId,
+    });
+    return label;
+  }
 }
 
 class DeetObjectEngine extends DeetBaseEngine {
@@ -212,11 +222,7 @@ class DeetObjectEngine extends DeetBaseEngine {
       tbody.appendChild(tr);
     }
 
-    const label = DeetRender.renderLabel({
-      dataType: "Object",
-      id: opts.id,
-      hideId: opts.hideId,
-    });
+    const label = this.renderLabel(opts);
 
     div.append(label);
     div.append(table);
@@ -244,11 +250,7 @@ class DeetSetEngine extends DeetBaseEngine {
       li.innerHTML = item;
       ul.appendChild(li);
     }
-    const label = DeetRender.renderLabel({
-      dataType: "Set",
-      id: id,
-      hideId: hideId,
-    });
+    const label = this.renderLabel(opts);
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -302,11 +304,7 @@ class DeetMapEngine extends DeetBaseEngine {
       tbody.appendChild(tr);
     }
 
-    const label = DeetRender.renderLabel({
-      dataType: "Map",
-      id: opts.id,
-      hideId: opts.hideId,
-    });
+    const label = this.renderLabel(opts);
 
     div.append(label);
     div.append(table);
@@ -330,11 +328,7 @@ class DeetArrayEngine extends DeetBaseEngine {
     const { id, indexes: indexObj, hideId } = opts;
     const data = this.copyData(opts);
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel({
-      dataType: "Array",
-      id: opts.id,
-      hideId,
-    });
+    const label = this.renderLabel(opts);
     div.innerHTML = label.outerHTML;
     if (data.length === 0) {
       return div;
@@ -500,11 +494,7 @@ class DeetMinPriorityQueueEngine extends DeetBaseEngine {
       li.innerHTML = item.toString();
       ul.appendChild(li);
     }
-    const label = DeetRender.renderLabel({
-      dataType: "MinPriorityQueue",
-      id: opts.id,
-      hideId: opts.hideId,
-    });
+    const label = this.renderLabel(opts);
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -530,11 +520,7 @@ class DeetMaxPriorityQueueEngine extends DeetBaseEngine {
       li.innerHTML = item.toString();
       ul.appendChild(li);
     }
-    const label = DeetRender.renderLabel({
-      dataType: "MaxPriorityQueue",
-      id: opts.id,
-      hideId: opts.hideId,
-    });
+    const label = this.renderLabel(opts);
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -564,11 +550,7 @@ class DeetPriorityQueueEngine extends DeetBaseEngine {
       li.innerHTML = html;
       ul.appendChild(li);
     }
-    const label = DeetRender.renderLabel({
-      dataType: "PriorityQueue",
-      id: opts.id,
-      hideId: opts.hideId,
-    });
+    const label = this.renderLabel(opts);
     div.appendChild(label);
     div.appendChild(ul);
     return div;
@@ -590,11 +572,7 @@ class DeetListNodeEngine extends DeetBaseEngine {
     const container = document.createElement("div");
     container.classList.add("deetcode-listnode");
 
-    const label = DeetRender.renderLabel({
-      dataType: "ListNode",
-      id: opts.id,
-      hideId: opts.hideId,
-    });
+    const label = this.renderLabel(opts);
     container.appendChild(label);
 
     // Declare the chart dimensions and margins.
@@ -743,11 +721,7 @@ class DeetBitwiseEngine extends DeetBaseEngine {
   renderContent(opts: DeetBitwiseOptions): HTMLElement {
     const { id, data, hideId } = opts;
     const div = document.createElement("div");
-    const label = DeetRender.renderLabel({
-      dataType: "Bitwise",
-      id: id,
-      hideId,
-    });
+    const label = this.renderLabel(opts);
     div.appendChild(label);
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -842,11 +816,7 @@ class DeetTreeNodeEngine extends DeetBaseEngine {
     const div = document.createElement("div");
     div.classList.add("deetcode-treenode");
 
-    const label = DeetRender.renderLabel({
-      dataType: "TreeNode",
-      id: opts.id,
-      hideId: opts.hideId,
-    });
+    const label = this.renderLabel(opts);
     div.appendChild(label);
 
     const width = 800;
@@ -972,11 +942,6 @@ class DeetTreeNodeEngine extends DeetBaseEngine {
  * common rendering functions used anywhere
  */
 const DeetRender = {
-  emptyContainerRegistry(containerRegistry: Map<string, HTMLElement>) {
-    for (const key of containerRegistry.keys()) {
-      containerRegistry.delete(key);
-    }
-  },
   renderContainerFork(div: HTMLElement): void {
     const fn = () => {
       DeetEngine.getInstance().el?.appendChild(div);
