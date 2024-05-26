@@ -2130,19 +2130,15 @@ export const DeetTest = {
         DeetCode.getInstance().el.appendChild(div);
       }
     };
-    switch (DeetCode.getInstance().renderMode) {
-      case "animate":
-        DeetCode.enqueue(fn);
-        break;
-      case "debug":
+    DeetRender.renderFork({
+      dcInstance: DeetCode.getInstance(),
+      delayedCallback() {
+        DeetCode.getInstance().enqueue(fn);
+      },
+      nowCallback() {
         fn();
-        break;
-      case "snapshot":
-        fn();
-        DeetCode.getInstance().takeSnapshot();
-      default:
-        break;
-    }
+      },
+    });
   },
 };
 

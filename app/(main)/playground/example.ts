@@ -238,3 +238,9 @@ DeetVis.disableAutoVis();
 
 // This set will not be rendered in the visualization.
 const set3 = new Set([2, 3, 4]);
+
+/**
+ * Assertions
+ */
+DeetTest.equal(true, true);
+DeetTest.equal(1, 2);
