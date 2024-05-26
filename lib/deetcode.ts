@@ -171,6 +171,7 @@ class DeetObjectEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetObjectOptions): void {
+    this.copyData(options);
     const { deetcode } = options;
     DeetRender.renderFork({
       dcInstance: deetcode,
@@ -264,6 +265,7 @@ class DeetSetEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetSetOptions): void {
+    this.copyData(options);
     const { deetcode } = options;
     DeetRender.renderFork({
       dcInstance: deetcode,
@@ -316,13 +318,8 @@ class DeetSetEngine implements DeetVisEngineV2 {
     if (options.copiedData) {
       return options.copiedData;
     }
-    if (DeetCode.getInstance().isAutoVisEnabled) {
-      DeetSet.undoMonkeyPatch();
-    }
-    options.copiedData = new Set([...options.data]);
-    if (DeetCode.getInstance().isAutoVisEnabled) {
-      DeetSet.monkeyPatch();
-    }
+    const originalSet = DeetSet.getOriginalConstructor();
+    options.copiedData = new originalSet([...options.data]);
     return options.copiedData;
   }
 }
@@ -341,6 +338,7 @@ class DeetMapEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetMapOptions): void {
+    this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
       delayedCallback: () => {
@@ -415,7 +413,8 @@ class DeetMapEngine implements DeetVisEngineV2 {
       return options.copiedData;
     }
     const { data } = options;
-    const copy = new Map([...data.entries()]);
+    const originalMap = DeetMap.getOriginalConstructor();
+    const copy = new originalMap([...data.entries()]);
     options.copiedData = copy;
     return options.copiedData;
   }
@@ -436,7 +435,6 @@ class DeetArrayEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetArrayOptions): void {
-    // the copied data must be created here to avoid race condition
     this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
@@ -644,6 +642,7 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetMinPriorityQueueOptions): void {
+    debugger;
     this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
@@ -692,7 +691,12 @@ class DeetMinPriorityQueueEngine implements DeetVisEngineV2 {
     return fn;
   }
   copyData(options: DeetMinPriorityQueueOptions) {
-    return options.data.toArray();
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    const arr = options.data.toArray();
+    options.copiedData = [...arr];
+    return options.copiedData;
   }
 }
 
@@ -759,7 +763,12 @@ class DeetMaxPriorityQueueEngine implements DeetVisEngineV2 {
     return fn;
   }
   copyData(options: DeetMaxPriorityQueueOptions) {
-    return options.data.toArray();
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    const arr = options.data.toArray();
+    options.copiedData = [...arr];
+    return options.copiedData;
   }
 }
 
@@ -827,7 +836,12 @@ class DeetPriorityQueueEngine implements DeetVisEngineV2 {
     return fn;
   }
   copyData(options: DeetPriorityQueueOptions) {
-    return options.data.toArray();
+    if (options.copiedData) {
+      return options.copiedData;
+    }
+    const arr = options.data.toArray();
+    options.copiedData = [...arr];
+    return options.copiedData;
   }
 }
 
@@ -845,6 +859,7 @@ class DeetListNodeEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetListNodeOptions): void {
+    this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
       delayedCallback: () => {
@@ -1049,6 +1064,7 @@ class DeetBitwiseEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetBitwiseOptions): void {
+    this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
       delayedCallback: () => {
@@ -1185,6 +1201,7 @@ class DeetTreeNodeEngine implements DeetVisEngineV2 {
     });
   }
   renderFork(options: DeetTreeOptions): void {
+    this.copyData(options);
     DeetRender.renderFork({
       dcInstance: options.deetcode,
       delayedCallback: () => {
@@ -1530,6 +1547,10 @@ export class DeetSet extends Set implements AutoVisSet {
       Set = this.originalSet;
     }
   }
+
+  static getOriginalConstructor() {
+    return this.originalSet || Set;
+  }
 }
 
 export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
@@ -1614,6 +1635,10 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
     if (this.originalMap) {
       Map = this.originalMap;
     }
+  }
+
+  static getOriginalConstructor() {
+    return this.originalMap || Map;
   }
 }
 
@@ -1748,6 +1773,10 @@ export class DeetArray extends Array implements AutoVisArray {
     if (this.originalArray) {
       Array = this.originalArray;
     }
+  }
+
+  static getOriginalConstructor() {
+    return this.originalArray || Array;
   }
 }
 
