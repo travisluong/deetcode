@@ -162,9 +162,8 @@ abstract class DeetBaseEngine {
   }
   renderFork(opts: DeetOptions): void {
     this.copyData(opts);
-    const { deetEngine: deetcode } = opts;
     DeetRender.renderFork({
-      dcInstance: deetcode,
+      deetEngine: opts.deetEngine,
       delayedCallback: () => {
         this.renderDelayed(opts);
       },
@@ -1137,11 +1136,11 @@ const DeetRender = {
     return label;
   },
   renderFork(opts: {
-    dcInstance: DeetEngine;
+    deetEngine: DeetEngine;
     delayedCallback(): void;
     nowCallback(): void;
   }) {
-    switch (opts.dcInstance.renderMode) {
+    switch (opts.deetEngine.renderMode) {
       case "animate":
         opts.delayedCallback();
         break;
@@ -1150,7 +1149,7 @@ const DeetRender = {
         break;
       case "snapshot":
         opts.nowCallback();
-        opts.dcInstance.takeSnapshot();
+        opts.deetEngine.takeSnapshot();
         break;
       default:
         break;
@@ -1939,7 +1938,7 @@ class DeetTest {
       }
     };
     DeetRender.renderFork({
-      dcInstance: deetEngine,
+      deetEngine: deetEngine,
       delayedCallback() {
         deetEngine.enqueue(fn);
       },
