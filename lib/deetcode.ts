@@ -2062,6 +2062,7 @@ export class DeetCode {
 
   end() {
     this.undoMonkeyPatchAll();
+    this.isAutoVisEnabled = false;
     if (this.renderMode === "snapshot") {
       this.initialSnapshot();
     }
