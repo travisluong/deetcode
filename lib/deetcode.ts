@@ -1219,14 +1219,12 @@ export class DeetArray extends Array implements AutoVisArray {
       },
       set: (target, prop, value) => {
         const res = Reflect.set(target, prop, value);
-        if (this.renderEnabled) {
-          this.engine.renderFork({
-            data: this,
-            id: this.id,
-            deetEngine: this.deetEngine,
-            hideId: true,
-          });
-        }
+        this.engine.renderFork({
+          data: this,
+          id: this.id,
+          deetEngine: this.deetEngine,
+          hideId: true,
+        });
         return res;
       },
     });
