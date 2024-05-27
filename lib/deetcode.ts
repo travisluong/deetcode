@@ -1658,7 +1658,8 @@ export class DeetEngine {
     }
     this.snapshotIndex--;
     this.el.innerHTML = "";
-    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    const snapshot = this.snapshots[this.snapshotIndex] as HTMLElement;
+    this.el.innerHTML = snapshot.innerHTML;
     return this.snapshotIndex;
   }
 
@@ -1668,14 +1669,16 @@ export class DeetEngine {
     }
     this.snapshotIndex++;
     this.el.innerHTML = "";
-    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    const snapshot = this.snapshots[this.snapshotIndex] as HTMLElement;
+    this.el.innerHTML = snapshot.innerHTML;
     return this.snapshotIndex;
   }
 
   initialSnapshot() {
     this.snapshotIndex = 0;
     this.el.innerHTML = "";
-    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    const snapshot = this.snapshots[this.snapshotIndex] as HTMLElement;
+    this.el.innerHTML = snapshot.innerHTML;
   }
 
   firstSnapshot() {
@@ -1684,7 +1687,8 @@ export class DeetEngine {
     }
     this.snapshotIndex = 0;
     this.el.innerHTML = "";
-    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    const snapshot = this.snapshots[this.snapshotIndex] as HTMLElement;
+    this.el.innerHTML = snapshot.innerHTML;
     return this.snapshotIndex;
   }
 
@@ -1694,7 +1698,8 @@ export class DeetEngine {
     }
     this.snapshotIndex = this.snapshots.length - 1;
     this.el.innerHTML = "";
-    this.el.appendChild(this.snapshots[this.snapshotIndex]);
+    const snapshot = this.snapshots[this.snapshotIndex] as HTMLElement;
+    this.el.innerHTML = snapshot.innerHTML;
     return this.snapshotIndex;
   }
 
