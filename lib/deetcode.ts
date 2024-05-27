@@ -173,7 +173,9 @@ abstract class DeetBaseEngine {
   }
   renderFn(opts: DeetOptions): () => void {
     const fn = () => {
+      opts.deetEngine.undoMonkeyPatchAll();
       const el = this.renderContent(opts);
+      opts.deetEngine.monkeyPatchAll();
       const container = this.containerRegistry.get(opts.id);
       if (container) {
         container.innerHTML = el.outerHTML;
@@ -938,10 +940,8 @@ const DeetRender = {
         break;
       case "snapshot":
         fn();
-        DeetEngine.getInstance().takeSnapshot();
       case "loop":
         fn();
-        DeetEngine.getInstance().takeSnapshot();
       default:
         break;
     }
@@ -1510,9 +1510,8 @@ export class DeetListNode {
   constructor(val: number = 0, next: DeetListNode | null = null) {
     this.val = val;
     this.next = next;
-    DeetSet.undoMonkeyPatch();
-    this.pointers = new Set();
-    DeetSet.monkeyPatch();
+    const originalSet = DeetSet.getOriginalConstructor();
+    this.pointers = new originalSet();
   }
 }
 
