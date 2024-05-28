@@ -372,7 +372,9 @@ class DeetArrayEngine extends DeetBaseEngine {
       const th = document.createElement("th");
       const td = document.createElement("td");
       th.innerHTML = index.toString();
-      if (value) {
+      if (_.isNumber(value)) {
+        td.innerHTML = value.toString();
+      } else if (_.isObject(value)) {
         td.innerHTML = JSON.stringify(value);
       } else {
         const div = document.createElement("div");
