@@ -66,7 +66,7 @@ interface DeetMapOptions extends DeetOptions {
 interface DeetArrayOptions extends DeetOptions {
   data: Array<any>;
   copiedData?: Array<any>;
-  indexes?: { [key: string]: number };
+  pointers?: { [key: string]: number };
 }
 
 interface DeetMinPriorityQueueOptions extends DeetOptions {
@@ -384,7 +384,7 @@ class DeetArrayEngine extends DeetBaseEngine {
       trHead.append(th);
       trBody.append(td);
     }
-    if (opts.indexes) {
+    if (opts.pointers) {
       const tfoot = this.renderArrayIndex(opts);
       if (tfoot) {
         table.append(tfoot);
@@ -432,12 +432,12 @@ class DeetArrayEngine extends DeetBaseEngine {
     return max;
   }
   renderArrayIndex(opts: DeetArrayOptions): HTMLElement | null {
-    if (!opts.indexes) {
+    if (!opts.pointers) {
       return null;
     }
     const data = this.copyData(opts);
     let tfoot = document.createElement("tfoot");
-    for (const [key, value] of Object.entries(opts.indexes)) {
+    for (const [key, value] of Object.entries(opts.pointers)) {
       const tr = document.createElement("tr");
       for (let i = 0; i < data.length; i++) {
         const th = document.createElement("th");
