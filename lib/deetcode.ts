@@ -715,6 +715,27 @@ class DeetListNodeEngine extends DeetBaseEngine {
 
     return res;
   }
+  arrayToLinkedList(array: number[]): DeetListNode {
+    if (array.length === 0) {
+      throw new Error("array must have at least one number");
+    }
+    const dummy = new DeetListNode();
+    let cur = dummy;
+    for (const num of array) {
+      cur.next = new DeetListNode(num);
+      cur = cur.next;
+    }
+    return dummy.next!;
+  }
+  linkedListToArray(listNode: DeetListNode) {
+    let cur: DeetListNode | null = listNode;
+    const arr = [];
+    while (cur) {
+      arr.push(cur.val);
+      cur = cur.next;
+    }
+    return arr;
+  }
 }
 
 class DeetBitwiseEngine extends DeetBaseEngine {
@@ -1932,5 +1953,13 @@ export class DeetCode {
   disableAutoVis() {
     this.deetEngine.isAutoVisEnabled = false;
     this.deetEngine.undoMonkeyPatchAll();
+  }
+
+  arrayToLinkedList(array: number[]): DeetListNode {
+    return this.deetEngine.deetListNodeEngine.arrayToLinkedList(array);
+  }
+
+  linkedListToArray(listNode: DeetListNode) {
+    return this.deetEngine.deetListNodeEngine.linkedListToArray(listNode);
   }
 }
