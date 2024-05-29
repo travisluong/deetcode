@@ -53,6 +53,11 @@ interface DeetOptions {
   hideId: boolean;
 }
 
+interface DeetStringOptions extends DeetOptions {
+  data: string;
+  pointers?: { [key: string]: number };
+}
+
 interface DeetObjectOptions extends DeetOptions {}
 
 interface DeetSetOptions extends DeetOptions {
@@ -358,6 +363,25 @@ class DeetArrayEngine extends DeetBaseEngine {
     // If all elements are arrays, it's a 2D array
     return true;
   }
+  renderCell(value: any): HTMLTableCellElement {
+    const td = document.createElement("td");
+    if (_.isUndefined(value)) {
+      td.innerHTML = "";
+    } else if (_.isString(value)) {
+      td.innerHTML = value;
+    } else if (_.isNumber(value)) {
+      td.innerHTML = value.toString();
+    } else if (_.isObject(value)) {
+      td.innerHTML = JSON.stringify(value);
+    } else if (_.isBoolean(value)) {
+      td.innerHTML = JSON.stringify(value);
+    } else {
+      const div = document.createElement("div");
+      div.style.height = "25px";
+      td.appendChild(div);
+    }
+    return td;
+  }
   render1d(opts: DeetArrayOptions) {
     const data = this.copyData(opts);
     const table = document.createElement("table");
@@ -370,17 +394,8 @@ class DeetArrayEngine extends DeetBaseEngine {
     tbody.append(trBody);
     for (const [index, value] of data.entries()) {
       const th = document.createElement("th");
-      const td = document.createElement("td");
       th.innerHTML = index.toString();
-      if (_.isNumber(value)) {
-        td.innerHTML = value.toString();
-      } else if (_.isObject(value)) {
-        td.innerHTML = JSON.stringify(value);
-      } else {
-        const div = document.createElement("div");
-        div.style.height = "25px";
-        td.appendChild(div);
-      }
+      const td = this.renderCell(value);
       trHead.append(th);
       trBody.append(td);
     }
@@ -415,8 +430,7 @@ class DeetArrayEngine extends DeetBaseEngine {
       th.innerHTML = i.toString();
       tr.appendChild(th);
       for (let j = 0; j < data[i].length; j++) {
-        const td = document.createElement("td");
-        td.innerHTML = data[i][j];
+        const td = this.renderCell(data[i][j]);
         tr.appendChild(td);
       }
       tbody.appendChild(tr);
@@ -1822,16 +1836,26 @@ class DeetTest {
 }
 
 /**
- * the DeetVis class is a utility that can be used from
- * the code editor. it is responsible for visualizing
- * types which are not extending the native types.
- * for example, ListNode, Bitwise, TreeNode.
+ * the DeetCode class is a utility that can be used from
+ * the code editor. it is the facade to all of the deet engines.
  */
 export class DeetCode {
   deetEngine: DeetEngine;
 
   constructor(deetEngine: DeetEngine) {
     this.deetEngine = deetEngine;
+  }
+
+  string(opts: DeetStringOptions) {
+    const arrOpts: DeetArrayOptions = {
+      data: opts.data.split(""),
+      pointers: opts.pointers,
+      id: opts.id,
+      hideId: false,
+      deetEngine: this.deetEngine,
+    };
+    this.deetEngine.deetArrayEngine.renderContainer(arrOpts);
+    this.deetEngine.deetArrayEngine.renderFork(arrOpts);
   }
 
   object(opts: DeetObjectOptions) {
