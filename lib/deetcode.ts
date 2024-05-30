@@ -1875,8 +1875,9 @@ export class DeetCode {
     opts?: DeetStringOptions
   ): void {
     if (typeof optsOrId === "string") {
+      const id = optsOrId;
       const arrOpts: DeetArrayOptions = {
-        id: optsOrId,
+        id: id,
         data: data ? data.split("") : [],
         deetEngine: this.deetEngine,
         pointers: opts?.pointers,
@@ -1884,7 +1885,8 @@ export class DeetCode {
       };
       this.deetEngine.deetArrayEngine.renderContainer(arrOpts);
       this.deetEngine.deetArrayEngine.renderFork(arrOpts);
-    } else if (typeof opts === "object") {
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
       const arrOpts: DeetArrayOptions = {
         data: opts.data.split(""),
         pointers: opts.pointers,
@@ -1897,22 +1899,67 @@ export class DeetCode {
     }
   }
 
-  object(opts: DeetObjectOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetObjectEngine.renderContainer(opts);
-    this.deetEngine.deetObjectEngine.renderFork(opts);
+  object(opts: DeetObjectOptions): void;
+  object(id: string, data: any): void;
+  object(optsOrId: DeetObjectOptions | string, data?: any) {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetObjectOptions = {
+        id: id,
+        data: data,
+        deetEngine: this.deetEngine,
+        hideId: false,
+      };
+      this.deetEngine.deetObjectEngine.renderContainer(opts);
+      this.deetEngine.deetObjectEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetObjectEngine.renderContainer(opts);
+      this.deetEngine.deetObjectEngine.renderFork(opts);
+    }
   }
 
-  set(opts: DeetSetOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetSetEngine.renderContainer(opts);
-    this.deetEngine.deetSetEngine.renderFork(opts);
+  set(opts: DeetSetOptions): void;
+  set(id: string, data: any): void;
+  set(optsOrId: DeetSetOptions | string, data?: any): void {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetSetOptions = {
+        id: id,
+        data: data,
+        deetEngine: this.deetEngine,
+        hideId: false,
+      };
+      this.deetEngine.deetSetEngine.renderContainer(opts);
+      this.deetEngine.deetSetEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetSetEngine.renderContainer(opts);
+      this.deetEngine.deetSetEngine.renderFork(opts);
+    }
   }
 
-  map(opts: DeetMapOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetMapEngine.renderContainer(opts);
-    this.deetEngine.deetMapEngine.renderFork(opts);
+  map(opts: DeetMapOptions): void;
+  map(id: string, data: Map<any, any>): void;
+  map(optsOrId: DeetMapOptions | string, data?: Map<any, any>): void {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetMapOptions = {
+        id: id,
+        data: data!,
+        hideId: false,
+        deetEngine: this.deetEngine,
+      };
+      this.deetEngine.deetMapEngine.renderContainer(opts);
+      this.deetEngine.deetMapEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetMapEngine.renderContainer(opts);
+      this.deetEngine.deetMapEngine.renderFork(opts);
+    }
   }
 
   array(opts: DeetArrayOptions): void;
@@ -1920,65 +1967,172 @@ export class DeetCode {
   array(
     optsOrId: DeetArrayOptions | string,
     data?: Array<any>,
-    opts?: DeetArrayOptions
+    options?: DeetArrayOptions
   ): void {
     if (typeof optsOrId === "string") {
-      const options = {
+      const opts = {
         id: optsOrId,
         deetEngine: this.deetEngine,
         data: data,
         hideId: false,
-        pointers: opts?.pointers,
+        pointers: options?.pointers,
       };
-      this.deetEngine.deetArrayEngine.renderContainer(options);
-      this.deetEngine.deetArrayEngine.renderFork(options);
-    } else if (typeof opts === "object") {
+      this.deetEngine.deetArrayEngine.renderContainer(opts);
+      this.deetEngine.deetArrayEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
       opts.deetEngine = this.deetEngine;
       this.deetEngine.deetArrayEngine.renderContainer(opts);
       this.deetEngine.deetArrayEngine.renderFork(opts);
     }
   }
 
-  linkedList(opts: DeetListNodeOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetListNodeEngine.clearAllPointers(opts);
-    this.deetEngine.deetListNodeEngine.addPointers(opts);
-    this.deetEngine.deetListNodeEngine.renderContainer(opts);
-    this.deetEngine.deetListNodeEngine.renderFork(opts);
+  linkedList(opts: DeetListNodeOptions): void;
+  linkedList(id: string, data: DeetListNode, opts: DeetListNodeOptions): void;
+  linkedList(
+    optsOrId: DeetListNodeOptions | string,
+    data?: DeetListNode,
+    options?: DeetListNodeOptions
+  ) {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetListNodeOptions = {
+        id: id,
+        data: data!,
+        deetEngine: this.deetEngine,
+        hideId: false,
+        pointers: options?.pointers,
+      };
+      this.deetEngine.deetListNodeEngine.clearAllPointers(opts);
+      this.deetEngine.deetListNodeEngine.addPointers(opts);
+      this.deetEngine.deetListNodeEngine.renderContainer(opts);
+      this.deetEngine.deetListNodeEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetListNodeEngine.clearAllPointers(opts);
+      this.deetEngine.deetListNodeEngine.addPointers(opts);
+      this.deetEngine.deetListNodeEngine.renderContainer(opts);
+      this.deetEngine.deetListNodeEngine.renderFork(opts);
+    }
   }
 
-  bitwise(opts: DeetBitwiseOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetBitwiseEngine.renderContainer(opts);
-    this.deetEngine.deetBitwiseEngine.renderFork(opts);
+  bitwise(opts: DeetBitwiseOptions): void;
+  bitwise(id: string, data: number): void;
+  bitwise(optsOrId: DeetBitwiseOptions | string, data?: number) {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetBitwiseOptions = {
+        id: id,
+        data: data!,
+        deetEngine: this.deetEngine,
+        hideId: false,
+      };
+      this.deetEngine.deetBitwiseEngine.renderContainer(opts);
+      this.deetEngine.deetBitwiseEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetBitwiseEngine.renderContainer(opts);
+      this.deetEngine.deetBitwiseEngine.renderFork(opts);
+    }
   }
 
-  tree(opts: DeetTreeOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetTreeNodeEngine.renderContainer(opts);
-    this.deetEngine.deetTreeNodeEngine.renderFork(opts);
+  tree(opts: DeetTreeOptions): void;
+  tree(id: string, data: DeetTreeNode): void;
+  tree(optsOrId: DeetTreeOptions | string, data?: DeetTreeNode): void {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetTreeOptions = {
+        id: id,
+        data: data!,
+        deetEngine: this.deetEngine,
+        hideId: false,
+      };
+      this.deetEngine.deetTreeNodeEngine.renderContainer(opts);
+      this.deetEngine.deetTreeNodeEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetTreeNodeEngine.renderContainer(opts);
+      this.deetEngine.deetTreeNodeEngine.renderFork(opts);
+    }
   }
 
   arrayToBinaryTree(array: (number | null)[]): DeetTreeNode | null {
     return this.deetEngine.deetTreeNodeEngine.arrayToBinaryTree(array);
   }
 
-  minPriorityQueue(opts: DeetMinPriorityQueueOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetMinPriorityQueueEngine.renderContainer(opts);
-    this.deetEngine.deetMinPriorityQueueEngine.renderFork(opts);
+  minPriorityQueue(opts: DeetMinPriorityQueueOptions): void;
+  minPriorityQueue(id: string, data: MinPriorityQueue<any>): void;
+  minPriorityQueue(
+    optsOrId: DeetMinPriorityQueueOptions | string,
+    data?: MinPriorityQueue<any>
+  ) {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetMinPriorityQueueOptions = {
+        id: id,
+        data: data!,
+        hideId: false,
+        deetEngine: this.deetEngine,
+      };
+      this.deetEngine.deetMinPriorityQueueEngine.renderContainer(opts);
+      this.deetEngine.deetMinPriorityQueueEngine.renderFork(opts);
+    } else {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetMinPriorityQueueEngine.renderContainer(opts);
+      this.deetEngine.deetMinPriorityQueueEngine.renderFork(opts);
+    }
   }
 
-  maxPriorityQueue(opts: DeetMaxPriorityQueueOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetMaxPriorityQueueEngine.renderContainer(opts);
-    this.deetEngine.deetMaxPriorityQueueEngine.renderFork(opts);
+  maxPriorityQueue(opts: DeetMaxPriorityQueueOptions): void;
+  maxPriorityQueue(id: string, data: MaxPriorityQueue<any>): void;
+  maxPriorityQueue(
+    optsOrId: DeetMaxPriorityQueueOptions | string,
+    data?: MaxPriorityQueue<any>
+  ): void {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetMaxPriorityQueueOptions = {
+        id: id,
+        data: data!,
+        hideId: false,
+        deetEngine: this.deetEngine,
+      };
+      this.deetEngine.deetMaxPriorityQueueEngine.renderContainer(opts);
+      this.deetEngine.deetMaxPriorityQueueEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetMaxPriorityQueueEngine.renderContainer(opts);
+      this.deetEngine.deetMaxPriorityQueueEngine.renderFork(opts);
+    }
   }
 
-  priorityQueue(opts: DeetPriorityQueueOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetPriorityQueueEngine.renderContainer(opts);
-    this.deetEngine.deetPriorityQueueEngine.renderFork(opts);
+  priorityQueue(opts: DeetPriorityQueueOptions): void;
+  priorityQueue(id: string, data: PriorityQueue<any>): void;
+  priorityQueue(
+    optsOrId: DeetPriorityQueueOptions | string,
+    data?: PriorityQueue<any>
+  ): void {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetMaxPriorityQueueOptions = {
+        id: id,
+        data: data!,
+        hideId: false,
+        deetEngine: this.deetEngine,
+      };
+      this.deetEngine.deetPriorityQueueEngine.renderContainer(opts);
+      this.deetEngine.deetPriorityQueueEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetPriorityQueueEngine.renderContainer(opts);
+      this.deetEngine.deetPriorityQueueEngine.renderFork(opts);
+    }
   }
 
   enableAutoVis() {

@@ -10,6 +10,17 @@
  */
 
 /**
+ * String
+ */
+
+DeetCode.string({ id: "string", data: "deetcode", pointers: { i: 0, j: 3 } });
+
+/**
+ * String Shorthand
+ */
+DeetCode.string("shorthand string", "deetcode", { pointers: { i: 1, j: 2 } });
+
+/**
  * Set
  */
 const set1 = new Set([1, 2, 3]);
