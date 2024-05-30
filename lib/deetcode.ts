@@ -1867,16 +1867,34 @@ export class DeetCode {
     this.deetEngine = deetEngine;
   }
 
-  string(opts: DeetStringOptions) {
-    const arrOpts: DeetArrayOptions = {
-      data: opts.data.split(""),
-      pointers: opts.pointers,
-      id: opts.id,
-      hideId: false,
-      deetEngine: this.deetEngine,
-    };
-    this.deetEngine.deetArrayEngine.renderContainer(arrOpts);
-    this.deetEngine.deetArrayEngine.renderFork(arrOpts);
+  string(opts: DeetStringOptions): void;
+  string(id: string, data: string, opts?: DeetStringOptions): void;
+  string(
+    optsOrId: DeetStringOptions | string,
+    data?: string,
+    opts?: DeetStringOptions
+  ): void {
+    if (typeof optsOrId === "string") {
+      const arrOpts: DeetArrayOptions = {
+        id: optsOrId,
+        data: data ? data.split("") : [],
+        deetEngine: this.deetEngine,
+        pointers: opts?.pointers,
+        hideId: false,
+      };
+      this.deetEngine.deetArrayEngine.renderContainer(arrOpts);
+      this.deetEngine.deetArrayEngine.renderFork(arrOpts);
+    } else if (typeof opts === "object") {
+      const arrOpts: DeetArrayOptions = {
+        data: opts.data.split(""),
+        pointers: opts.pointers,
+        id: opts.id,
+        hideId: false,
+        deetEngine: this.deetEngine,
+      };
+      this.deetEngine.deetArrayEngine.renderContainer(arrOpts);
+      this.deetEngine.deetArrayEngine.renderFork(arrOpts);
+    }
   }
 
   object(opts: DeetObjectOptions) {
