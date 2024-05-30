@@ -1910,6 +1910,7 @@ export class DeetCode {
         deetEngine: this.deetEngine,
         data: data,
         hideId: false,
+        pointers: opts?.pointers,
       };
       this.deetEngine.deetArrayEngine.renderContainer(options);
       this.deetEngine.deetArrayEngine.renderFork(options);

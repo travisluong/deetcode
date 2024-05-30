@@ -58,10 +58,10 @@ DeetCode.disableAutoVis();
  * Array
  */
 const arr1 = [1, 2, 3];
-DeetCode.array({ id: "arr1", data: arr1, indexObj: { i: 0, j: 2 } });
+DeetCode.array({ id: "arr1", data: arr1, pointers: { i: 0, j: 2 } });
 
 arr1.push(4);
-DeetCode.array({ id: "arr1", data: arr1, indexObj: { i: 1, j: 1 } });
+DeetCode.array({ id: "arr1", data: arr1, pointers: { i: 1, j: 1 } });
 
 const arr2 = [
   [1, 2, 3],
@@ -69,6 +69,11 @@ const arr2 = [
   [7, 8, 9],
 ];
 DeetCode.array({ id: "arr2", data: arr2 });
+
+/**
+ * Array shorthand
+ */
+DeetCode.array("arr1", arr1, { pointers: { i: 0, j: 1 } });
 
 /**
  * Native Array
