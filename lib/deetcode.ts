@@ -1897,10 +1897,27 @@ export class DeetCode {
     this.deetEngine.deetMapEngine.renderFork(opts);
   }
 
-  array(opts: DeetArrayOptions) {
-    opts.deetEngine = this.deetEngine;
-    this.deetEngine.deetArrayEngine.renderContainer(opts);
-    this.deetEngine.deetArrayEngine.renderFork(opts);
+  array(opts: DeetArrayOptions): void;
+  array(id: string, data: Array<any>, opts?: DeetArrayOptions): void;
+  array(
+    optsOrId: DeetArrayOptions | string,
+    data?: Array<any>,
+    opts?: DeetArrayOptions
+  ): void {
+    if (typeof optsOrId === "string") {
+      const options = {
+        id: optsOrId,
+        deetEngine: this.deetEngine,
+        data: data,
+        hideId: false,
+      };
+      this.deetEngine.deetArrayEngine.renderContainer(options);
+      this.deetEngine.deetArrayEngine.renderFork(options);
+    } else if (typeof opts === "object") {
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetArrayEngine.renderContainer(opts);
+      this.deetEngine.deetArrayEngine.renderFork(opts);
+    }
   }
 
   linkedList(opts: DeetListNodeOptions) {
