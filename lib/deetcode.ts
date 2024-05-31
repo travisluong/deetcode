@@ -101,8 +101,17 @@ interface DeetTreeOptions extends DeetOptions {
   copiedData?: D3TreeNode | null;
 }
 
+interface DeetTrie {
+  root: DeetTrieNode;
+}
+
+interface DeetTrieOptions extends DeetOptions {
+  data: DeetTrie;
+  copiedData?: D3TreeNode | null;
+}
+
 interface D3TreeNode {
-  name: number;
+  name: number | string;
   children: (D3TreeNode | null)[];
   color?: string;
 }
@@ -959,6 +968,100 @@ class DeetTreeNodeEngine extends DeetBaseEngine {
   }
 }
 
+class DeetTrieEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Trie";
+  renderContent(opts: DeetTrieOptions): HTMLElement {
+    const data = this.copyData(opts);
+    const div = document.createElement("div");
+    div.classList.add("deetcode-treenode");
+
+    const label = this.renderLabel(opts);
+    div.appendChild(label);
+
+    const width = 800;
+
+    const tree = d3.tree().nodeSize([50, 40]);
+
+    const root = d3.hierarchy(data);
+
+    // dynamic height based on the height of tree
+    const height = root.height * 40 + 22;
+    const svg = d3.create("svg").attr("width", width).attr("height", height);
+    const g = svg.append("g").attr("transform", "translate(400,10)");
+
+    // @ts-ignore
+    tree(root);
+
+    // Create straight line links
+    const link = g
+      .selectAll(".link")
+      .data(root.links())
+      .enter()
+      .append("line")
+      .attr("class", "link")
+      // @ts-ignore
+      .attr("x1", (d) => d.source.x)
+      // @ts-ignore
+      .attr("y1", (d) => d.source.y)
+      // @ts-ignore
+      .attr("x2", (d) => d.target.x)
+      // @ts-ignore
+      .attr("y2", (d) => d.target.y)
+      .style("stroke", (d) => d.target.data.color ?? "")
+      .attr("stroke-width", 2);
+
+    const node = g
+      .selectAll(".nodegroup")
+      .data(root.descendants())
+      .enter()
+      .append("g")
+      .attr("class", "nodegroup")
+      .attr("transform", (d) => `translate(${d.x},${d.y})`);
+
+    node
+      .append("circle")
+      .attr("r", 10)
+      .style("fill", (d) => d.data.color ?? "")
+      .attr("stroke-width", 0);
+
+    node
+      .append("text")
+      .attr("dy", 5)
+      .attr("x", 0)
+      .style("text-anchor", "middle")
+      .text((d) => d.data.name)
+      .attr("stroke-width", "1px");
+
+    const svgnode = svg.node();
+    if (svgnode) {
+      div.append(svgnode);
+    }
+
+    return div;
+  }
+  copyData(opts: DeetTrieOptions) {
+    if (opts.copiedData) {
+      return opts.copiedData;
+    }
+    opts.copiedData = this.trieToHierarchy(opts.data.root);
+    return opts.copiedData;
+  }
+  trieToHierarchy(node: DeetTrieNode, name: string = ""): D3TreeNode {
+    debugger;
+    const d3Node: D3TreeNode = {
+      name: name,
+      children: [],
+      color: node.color,
+    };
+
+    for (let [char, childNode] of Object.entries(node.children)) {
+      d3Node.children.push(this.trieToHierarchy(childNode, char));
+    }
+
+    return d3Node;
+  }
+}
+
 /**
  * common rendering functions used anywhere
  */
@@ -1562,6 +1665,12 @@ export class DeetTreeNode {
   }
 }
 
+export class DeetTrieNode {
+  children: { [key: string]: DeetTrieNode } = {};
+  isWord: boolean = false;
+  color?: string;
+}
+
 export class DeetEngine {
   el: Element;
   renderQueue: Array<() => void>;
@@ -1577,6 +1686,7 @@ export class DeetEngine {
   deetListNodeEngine: DeetListNodeEngine;
   deetBitwiseEngine: DeetBitwiseEngine;
   deetTreeNodeEngine: DeetTreeNodeEngine;
+  deetTrieEngine: DeetTrieEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
   animationDelay: number;
@@ -1601,6 +1711,7 @@ export class DeetEngine {
     this.deetListNodeEngine = new DeetListNodeEngine();
     this.deetBitwiseEngine = new DeetBitwiseEngine();
     this.deetTreeNodeEngine = new DeetTreeNodeEngine();
+    this.deetTrieEngine = new DeetTrieEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -2056,6 +2167,27 @@ export class DeetCode {
       opts.deetEngine = this.deetEngine;
       this.deetEngine.deetTreeNodeEngine.renderContainer(opts);
       this.deetEngine.deetTreeNodeEngine.renderFork(opts);
+    }
+  }
+
+  trie(opts: DeetTrieOptions): void;
+  trie(id: string, data: DeetTrie): void;
+  trie(optsOrId: DeetTrieOptions | string, data?: DeetTrie): void {
+    if (typeof optsOrId === "string") {
+      const id = optsOrId;
+      const opts: DeetTrieOptions = {
+        id: id,
+        data: data!,
+        deetEngine: this.deetEngine,
+        hideId: false,
+      };
+      this.deetEngine.deetTrieEngine.renderContainer(opts);
+      this.deetEngine.deetTrieEngine.renderFork(opts);
+    } else if (typeof optsOrId === "object") {
+      const opts = optsOrId;
+      opts.deetEngine = this.deetEngine;
+      this.deetEngine.deetTrieEngine.renderContainer(opts);
+      this.deetEngine.deetTrieEngine.renderFork(opts);
     }
   }
 
