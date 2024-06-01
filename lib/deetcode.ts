@@ -1856,7 +1856,15 @@ export class DeetEngine {
     this.snapshots = [];
   }
 
-  init() {
+  init(config?: Partial<DeetConfig>) {
+    if (config) {
+      if (config.animationDelay)
+        this.changeAnimationDelay(config.animationDelay);
+      if (config.directionMode) this.changeDirectionMode(config.directionMode);
+      if (config.labelMode) this.changeLabelMode(config.labelMode);
+      if (config.renderMode) this.changeRenderMode(config.renderMode);
+      if (config.nanoidSize) this.nanoidSize = config.nanoidSize;
+    }
     DeetEngine.setInstance(this);
     this.emptySnapshots();
     window.MinPriorityQueue = MinPriorityQueue;

@@ -1,4 +1,5 @@
 import ProblemDetail from "@/components/problem-detail";
+import ProblemDetailSandbox from "@/components/problem-detail-sandbox";
 import Toolbar from "@/components/toolbar";
 import { readFileAsString } from "@/lib/read-file-as-string";
 import { PlaygroundProblem } from "@/lib/types";
@@ -17,7 +18,8 @@ export default async function Page() {
       <h1 className="font-brand px-5">Playground</h1>
       <Toolbar />
       <div className="px-5 h-full">
-        <ProblemDetail problem={problem} />
+        {/* <ProblemDetail problem={problem} /> */}
+        <ProblemDetailSandbox problem={problem} />
       </div>
     </div>
   );
