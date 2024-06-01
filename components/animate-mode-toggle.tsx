@@ -15,7 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { getInstance } from "@/lib/deet-instance";
 
 export default function AnimateModeToggle() {
   const [mode, setMode] = useState<RenderMode>("animate");
@@ -30,19 +29,15 @@ export default function AnimateModeToggle() {
     setMode(mode);
     switch (mode) {
       case "animate":
-        getInstance().changeRenderMode("animate");
         localStorage.setItem("deetcode-render-mode", "animate");
         break;
       case "debug":
-        getInstance().changeRenderMode("debug");
         localStorage.setItem("deetcode-render-mode", "debug");
         break;
       case "snapshot":
-        getInstance().changeRenderMode("snapshot");
         localStorage.setItem("deetcode-render-mode", "snapshot");
         break;
       case "loop":
-        getInstance().changeRenderMode("loop");
         localStorage.setItem("deetcode-render-mode", "loop");
       default:
         break;

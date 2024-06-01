@@ -1047,7 +1047,6 @@ class DeetTrieEngine extends DeetBaseEngine {
     return opts.copiedData;
   }
   trieToHierarchy(node: DeetTrieNode, name: string = ""): D3TreeNode {
-    debugger;
     const d3Node: D3TreeNode = {
       name: name,
       children: [],
@@ -1080,6 +1079,7 @@ const DeetRender = {
         break;
       case "snapshot":
         fn();
+        break;
       case "loop":
         fn();
       default:
@@ -1772,6 +1772,7 @@ export class DeetEngine {
   }
 
   changeLabelMode(mode: boolean) {
+    console.log("mode", mode);
     if (mode) {
       this.el.classList.remove("deetcode-hide-labels");
     } else {
@@ -1781,7 +1782,6 @@ export class DeetEngine {
 
   changeAnimationDelay(delay: number) {
     this.animationDelay = delay;
-    this.startRenderLoop();
   }
 
   erase() {
@@ -1793,6 +1793,9 @@ export class DeetEngine {
     this.deetBitwiseEngine.emptyContainerRegistry();
     this.deetTreeNodeEngine.emptyContainerRegistry();
     this.deetMinPriorityQueueEngine.emptyContainerRegistry();
+    this.deetMaxPriorityQueueEngine.emptyContainerRegistry();
+    this.deetPriorityQueueEngine.emptyContainerRegistry();
+    this.deetTrieEngine.emptyContainerRegistry();
   }
 
   takeSnapshot() {
@@ -1857,14 +1860,17 @@ export class DeetEngine {
   }
 
   init(config?: Partial<DeetConfig>) {
+    clearInterval(this.interval);
     if (config) {
       if (config.animationDelay)
         this.changeAnimationDelay(config.animationDelay);
       if (config.directionMode) this.changeDirectionMode(config.directionMode);
-      if (config.labelMode) this.changeLabelMode(config.labelMode);
       if (config.renderMode) this.changeRenderMode(config.renderMode);
       if (config.nanoidSize) this.nanoidSize = config.nanoidSize;
+      this.changeLabelMode(config.labelMode ? true : false);
     }
+    this.undoMonkeyPatchAll();
+    this.erase();
     DeetEngine.setInstance(this);
     this.emptySnapshots();
     window.MinPriorityQueue = MinPriorityQueue;

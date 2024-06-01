@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { getInstance } from "@/lib/deet-instance";
 
 type DirectionMode = "row" | "column";
 
@@ -34,10 +33,8 @@ export default function DirectionModeToggle() {
     setMode(mode);
     if (mode === "row") {
       localStorage.setItem("deetcode-direction-mode", "row");
-      getInstance().changeDirectionMode("row");
     } else if (mode === "column") {
       localStorage.setItem("deetcode-direction-mode", "column");
-      getInstance().changeDirectionMode("column");
     }
   }
 

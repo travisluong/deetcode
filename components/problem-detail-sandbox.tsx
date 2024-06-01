@@ -30,6 +30,12 @@ export default function ProblemDetailSandbox({
     };
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("message", function (e) {
+      console.log("message in sandbox", e.data);
+    });
+  }, []);
+
   function handleClearCodeEvent() {
     //@ts-ignore
     editorRef.current.setValue("");

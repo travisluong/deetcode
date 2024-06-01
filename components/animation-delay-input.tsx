@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "./ui/input";
-import { getInstance } from "@/lib/deet-instance";
 
 export default function AnimationDelayInput() {
   const [delay, setDelay] = useState<string>("500");
@@ -16,13 +15,11 @@ export default function AnimationDelayInput() {
     const delayStr = e.target.value;
     if (!delayStr) {
       localStorage.setItem("deetcode-animation-delay", "0");
-      getInstance().changeAnimationDelay(0);
       setDelay("");
       return;
     }
     const delayInt = parseInt(e.target.value);
     localStorage.setItem("deetcode-animation-delay", delayStr);
-    getInstance().changeAnimationDelay(delayInt);
     setDelay(delayStr);
   }
 
