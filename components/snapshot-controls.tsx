@@ -13,6 +13,7 @@ import { getInstance } from "@/lib/deet-instance";
 export default function SnapshotControls() {
   const [snapshotIndex, setSnapshotIndex] = useState(0);
   const [snapshotLength, setSnapshotLength] = useState(0);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     document.addEventListener("deetcodeEvalCompleted", deetcodeEvalCompleted);
@@ -26,6 +27,7 @@ export default function SnapshotControls() {
   }, []);
 
   function deetcodeEvalCompleted() {
+    setShow(getInstance().renderMode === "snapshot");
     setSnapshotIndex(getInstance().snapshotIndex);
     setSnapshotLength(getInstance().snapshots.length);
   }
@@ -46,8 +48,12 @@ export default function SnapshotControls() {
     setSnapshotIndex(getInstance().lastSnapshot());
   }
 
+  if (!show) {
+    return null;
+  }
+
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 justify-center p-2">
       <Button
         variant="outline"
         onClick={firstSnapshot}
