@@ -1,4 +1,4 @@
-import ProblemDetail from "@/components/problem-detail";
+import ProblemDetailSandbox from "@/components/problem-detail-sandbox";
 import Toolbar from "@/components/toolbar";
 import { db } from "@/lib/db";
 import { problem } from "@/lib/schema";
@@ -19,7 +19,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
   return (
     <div className="flex flex-col p-2 h-full">
       <Toolbar />
-      <ProblemDetail problem={data} />
+      <ProblemDetailSandbox problem={data} />
     </div>
   );
 }
