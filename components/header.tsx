@@ -51,7 +51,7 @@ export default function Header() {
           >
             Playground
           </Link>
-          {session ? (
+          {session.status === "authenticated" ? (
             <Image
               width={30}
               height={230}
