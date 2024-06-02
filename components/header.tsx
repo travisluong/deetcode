@@ -5,8 +5,12 @@ import { ModeToggle } from "./mode-toggle";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { signIn, useSession } from "next-auth/react";
+import Image from "next/image";
 
 export default function Header() {
+  const session = useSession();
   const pathname = usePathname();
   return (
     <header className="p-3 flex justify-between border-b border-gray-400 dark:border-gray-800">
@@ -47,6 +51,17 @@ export default function Header() {
           >
             Playground
           </Link>
+          {session ? (
+            <Image
+              width={30}
+              height={230}
+              alt="avatar"
+              src={session.data?.user?.image!}
+              className="rounded-full"
+            />
+          ) : (
+            <Button onClick={() => signIn()}>Sign In</Button>
+          )}
         </nav>
         <ModeToggle />
       </div>
