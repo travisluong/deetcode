@@ -3,7 +3,6 @@ import {
   mysqlTable,
   text,
   varchar,
-  char,
   timestamp,
   unique,
   boolean,
@@ -12,11 +11,11 @@ import {
 import type { AdapterAccountType } from "next-auth/adapters";
 
 export const problem = mysqlTable("problem", {
-  id: char("id", { length: 36 })
+  id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
     .$defaultFn(() => crypto.randomUUID()),
-  category_id: char("category_id", { length: 36 }).references(
+  category_id: varchar("category_id", { length: 255 }).references(
     () => category.id
   ),
   name: varchar("name", { length: 255 }),
@@ -33,7 +32,7 @@ export const problem = mysqlTable("problem", {
 });
 
 export const category = mysqlTable("category", {
-  id: char("id", { length: 36 })
+  id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
     .$defaultFn(() => crypto.randomUUID()),
@@ -45,7 +44,7 @@ export const category = mysqlTable("category", {
 });
 
 export const problem_list = mysqlTable("problem_list", {
-  id: char("id", { length: 36 })
+  id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
     .$defaultFn(() => crypto.randomUUID()),
@@ -58,10 +57,10 @@ export const problem_list = mysqlTable("problem_list", {
 export const problem_to_list = mysqlTable(
   "problem_to_list",
   {
-    problem_id: char("problem_id", { length: 36 })
+    problem_id: varchar("problem_id", { length: 255 })
       .notNull()
       .references(() => problem.id),
-    list_id: char("list_id", { length: 36 })
+    list_id: varchar("list_id", { length: 255 })
       .notNull()
       .references(() => problem_list.id),
     created_at: timestamp("created_at").notNull().defaultNow(),
@@ -73,7 +72,7 @@ export const problem_to_list = mysqlTable(
 );
 
 export const sync_log = mysqlTable("sync_log", {
-  id: char("id", { length: 36 })
+  id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
     .$defaultFn(() => crypto.randomUUID()),
