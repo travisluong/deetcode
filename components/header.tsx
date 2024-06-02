@@ -1,13 +1,19 @@
 "use client";
 
-import { LightningBoltIcon } from "@radix-ui/react-icons";
+import { ExitIcon, LightningBoltIcon } from "@radix-ui/react-icons";
 import { ModeToggle } from "./mode-toggle";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export default function Header() {
   const session = useSession();
@@ -52,13 +58,24 @@ export default function Header() {
             Playground
           </Link>
           {session.status === "authenticated" ? (
-            <Image
-              width={30}
-              height={230}
-              alt="avatar"
-              src={session.data?.user?.image!}
-              className="rounded-full"
-            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost">
+                  <Image
+                    width={30}
+                    height={230}
+                    alt="avatar"
+                    src={session.data?.user?.image!}
+                    className="rounded-full"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <ExitIcon className="mr-2" /> Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Button onClick={() => signIn()}>Sign In</Button>
           )}
