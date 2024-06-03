@@ -32,7 +32,11 @@ export default async function SignInPage() {
           }}
         >
           <Button type="submit" className="flex items-center gap-2">
-            <GitHubLogoIcon /> <span>Sign in with {provider.name}</span>
+            {provider.id === "github" && <GitHubLogoIcon />}
+            {provider.id === "google" && (
+              <span className="font-bold text-lg">G</span>
+            )}
+            <span>Sign in with {provider.name}</span>
           </Button>
         </form>
       ))}
