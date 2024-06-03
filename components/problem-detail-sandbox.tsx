@@ -19,6 +19,19 @@ import {
   PlusIcon,
   ResetIcon,
 } from "@radix-ui/react-icons";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { useSession } from "next-auth/react";
+import createSolution, { CreateSolutionState } from "@/actions/create-solution";
+import { useFormState } from "react-dom";
 
 export default function ProblemDetailSandbox({
   problem,
@@ -28,6 +41,11 @@ export default function ProblemDetailSandbox({
   const editorRef = useRef(null);
   const { theme } = useTheme();
   const [isNew, setIsNew] = useState(false);
+  const session = useSession();
+  const initialState: CreateSolutionState = { errors: {} };
+  const [state, dispatch] = useFormState(createSolution, initialState);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
   useEffect(() => {
     document.addEventListener("clearCode", handleClearCodeEvent);
@@ -100,7 +118,10 @@ export default function ProblemDetailSandbox({
     editorRef.current.setValue(problem.solution);
   }
 
-  function share() {}
+  function handleShare() {
+    // @ts-ignore
+    setContent(editorRef.current.getValue());
+  }
 
   return (
     <div className="h-full w-full">
@@ -124,14 +145,81 @@ export default function ProblemDetailSandbox({
           <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
             <div className="flex flex-col gap-2 h-full w-full flex-grow">
               <div className="flex px-5 pt-2 justify-end gap-2">
-                {isNew && (
-                  <Button
-                    variant="secondary"
-                    className="flex gap-2"
-                    onClick={share}
-                  >
-                    <Pencil2Icon /> Share
-                  </Button>
+                {session.status === "unauthenticated" && isNew && (
+                  <Dialog>
+                    <DialogTrigger className="flex gap-2 items-center">
+                      <Pencil2Icon /> Share
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Share your solution</DialogTitle>
+                        <DialogDescription></DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div>
+                          Please sign in to save and share your solution.
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+                {session.status === "authenticated" && isNew && (
+                  <Dialog>
+                    <DialogTrigger
+                      className="flex gap-2 items-center"
+                      onClick={handleShare}
+                    >
+                      <Pencil2Icon /> Share
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Share your solution</DialogTitle>
+                        <DialogDescription></DialogDescription>
+                      </DialogHeader>
+                      <form action={dispatch} className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2">
+                          <Label htmlFor="title">Title</Label>
+                          <Input
+                            id="title"
+                            name="title"
+                            value={title}
+                            className="col-span-3"
+                            placeholder="Enter your title"
+                            onChange={(e) => setTitle(e.target.value)}
+                          />
+                          {state.errors?.title && (
+                            <div>
+                              {state.errors?.title?.map((error) => (
+                                <p key={error} className="text-red-500">
+                                  {error}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <Input type="hidden" name="content" value={content} />
+                        {state.errors?.content && (
+                          <div>
+                            <Label htmlFor="content">Content</Label>
+                            {state.errors?.content?.map((error) => (
+                              <p key={error} className="text-red-500">
+                                {error}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                        <div>
+                          <Button type="submit">Submit</Button>
+                        </div>
+                        {state.errors && state.message && (
+                          <p className="text-red-500">{state.message}</p>
+                        )}
+                        {!state.errors && state.message && (
+                          <p className="text-green-500">{state.message}</p>
+                        )}
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 )}
                 <Button
                   variant="secondary"
@@ -147,6 +235,7 @@ export default function ProblemDetailSandbox({
                 >
                   <PlusIcon /> New
                 </Button>
+
                 <Button className="flex gap-2" onClick={evaluate}>
                   <PlayIcon /> Run
                 </Button>

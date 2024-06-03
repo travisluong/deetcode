@@ -1,7 +1,7 @@
 import { problem_to_list } from "@/lib/schema";
 import { connection, db } from "./script-db";
 
-const problems = await db.query.problem.findMany();
+const problems = await db.query.problems.findMany();
 const problemList = await db.query.problem_list.findFirst();
 
 if (!problemList) {

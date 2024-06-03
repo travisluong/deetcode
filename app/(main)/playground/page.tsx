@@ -11,6 +11,7 @@ export default async function Page() {
 
   const problem: PlaygroundProblem = {
     solution: code,
+    default_code: "",
   };
 
   return (
