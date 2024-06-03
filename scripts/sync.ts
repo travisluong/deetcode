@@ -39,8 +39,8 @@ const categoryRes = await devDb.query.category.findMany({
 });
 
 // problem
-const problemRes = await devDb.query.problem.findMany({
-  where: gt(schema.problem.updated_at, lastSyncLog.started_at),
+const problemRes = await devDb.query.problems.findMany({
+  where: gt(schema.problems.updated_at, lastSyncLog.started_at),
 });
 
 // problem list
@@ -67,7 +67,7 @@ for (let category of categoryRes) {
 
 for (let problem of problemRes) {
   await prodDb
-    .insert(schema.problem)
+    .insert(schema.problems)
     .values(problem)
     .onDuplicateKeyUpdate({ set: { ...problem } });
 }

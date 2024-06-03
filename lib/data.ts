@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
-import { category, problem } from "./schema";
+import { category, problems } from "./schema";
 import { cache } from "react";
 
 export const getProblem = cache(async (slug: string) => {
-  const data = await db.query.problem.findFirst({
-    where: eq(problem.slug, slug),
+  const data = await db.query.problems.findFirst({
+    where: eq(problems.slug, slug),
   });
   return data;
 });

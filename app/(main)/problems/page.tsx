@@ -1,16 +1,16 @@
 import { db } from "@/lib/db";
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "@/components/problem-columns";
-import { category, problem } from "@/lib/schema";
+import { category, problems } from "@/lib/schema";
 import { asc, eq } from "drizzle-orm";
 import Link from "next/link";
 
 export default async function Page() {
   const data = await db
     .select()
-    .from(problem)
-    .innerJoin(category, eq(problem.category_id, category.id))
-    .orderBy(asc(problem.difficulty), asc(category.position));
+    .from(problems)
+    .innerJoin(category, eq(problems.category_id, category.id))
+    .orderBy(asc(problems.difficulty), asc(category.position));
 
   return (
     <div className="max-w-3xl m-auto flex flex-col gap-5">

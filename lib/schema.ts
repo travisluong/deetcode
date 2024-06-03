@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
-export const problem = mysqlTable("problem", {
+export const problems = mysqlTable("problem", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
@@ -59,7 +59,7 @@ export const problem_to_list = mysqlTable(
   {
     problem_id: varchar("problem_id", { length: 255 })
       .notNull()
-      .references(() => problem.id),
+      .references(() => problems.id),
     list_id: varchar("list_id", { length: 255 })
       .notNull()
       .references(() => problem_list.id),
