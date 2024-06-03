@@ -29,6 +29,7 @@ export const problems = mysqlTable("problem", {
   neetcode_notes: text("neetcode_notes"),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
+  default_code: text("default_code"),
 });
 
 export const category = mysqlTable("category", {

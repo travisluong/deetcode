@@ -2,7 +2,7 @@
 
 import { PlaygroundProblem, ProblemDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DirectionMode, RenderMode, LabelMode } from "@/lib/deetcode";
 import {
   ResizableHandle,
@@ -13,6 +13,12 @@ import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
 import _ from "lodash";
+import {
+  Pencil2Icon,
+  PlayIcon,
+  PlusIcon,
+  ResetIcon,
+} from "@radix-ui/react-icons";
 
 export default function ProblemDetailSandbox({
   problem,
@@ -21,6 +27,7 @@ export default function ProblemDetailSandbox({
 }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
+  const [isNew, setIsNew] = useState(false);
 
   useEffect(() => {
     document.addEventListener("clearCode", handleClearCodeEvent);
@@ -81,6 +88,20 @@ export default function ProblemDetailSandbox({
     frame.contentWindow.postMessage(message, "*");
   }
 
+  function plus() {
+    setIsNew(true);
+    // @ts-ignore
+    editorRef.current.setValue(problem.default_code);
+  }
+
+  function reset() {
+    setIsNew(false);
+    // @ts-ignore
+    editorRef.current.setValue(problem.solution);
+  }
+
+  function share() {}
+
   return (
     <div className="h-full w-full">
       <ResizablePanelGroup
@@ -102,9 +123,32 @@ export default function ProblemDetailSandbox({
         <ResizablePanel defaultSize={50}>
           <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
             <div className="flex flex-col gap-2 h-full w-full flex-grow">
-              <div className="flex px-5 pt-2 justify-end">
-                <Button className="cursor-pointer" onClick={evaluate}>
-                  Submit
+              <div className="flex px-5 pt-2 justify-end gap-2">
+                {isNew && (
+                  <Button
+                    variant="secondary"
+                    className="flex gap-2"
+                    onClick={share}
+                  >
+                    <Pencil2Icon /> Share
+                  </Button>
+                )}
+                <Button
+                  variant="secondary"
+                  className="flex gap-2"
+                  onClick={reset}
+                >
+                  <ResetIcon /> Reset
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="flex gap-2"
+                  onClick={plus}
+                >
+                  <PlusIcon /> New
+                </Button>
+                <Button className="flex gap-2" onClick={evaluate}>
+                  <PlayIcon /> Run
                 </Button>
               </div>
               <Editor

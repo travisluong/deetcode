@@ -1,0 +1,1 @@
+ALTER TABLE `problem` ADD `default_code` text;

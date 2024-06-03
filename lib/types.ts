@@ -10,4 +10,5 @@ export type ProblemCategoryRow = {
 
 export type PlaygroundProblem = {
   solution: string;
+  default_code: string;
 };

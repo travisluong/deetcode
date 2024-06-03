@@ -25,6 +25,16 @@ export default function ProblemNav({ problem }: { problem: ProblemDB }) {
         <Link
           className={cn(
             "border border-gray-400 dark:border-gray-600 p-1 border-b-0 rounded-t min-w-24 text-center",
+            pathname === `/problems/${slug}/solutions` &&
+              "bg-slate-200 dark:bg-slate-800"
+          )}
+          href={`/problems/${slug}/solutions`}
+        >
+          Solutions
+        </Link>
+        <Link
+          className={cn(
+            "border border-gray-400 dark:border-gray-600 p-1 border-b-0 rounded-t min-w-24 text-center",
             pathname === `/problems/${slug}/video` &&
               "bg-slate-200 dark:bg-slate-800"
           )}
@@ -40,7 +50,7 @@ export default function ProblemNav({ problem }: { problem: ProblemDB }) {
           )}
           href={`/problems/${slug}/notes`}
         >
-          Deetails
+          Notes
         </Link>
         <Link
           className={cn(
