@@ -169,11 +169,11 @@ export default function ProblemDetailSandbox({
                       className="flex gap-2 items-center"
                       onClick={handleShare}
                     >
-                      <Pencil2Icon /> Share
+                      <Pencil2Icon /> Share Solution
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Share your solution</DialogTitle>
+                        <DialogTitle>Share Solution</DialogTitle>
                         <DialogDescription></DialogDescription>
                       </DialogHeader>
                       <form action={dispatch} className="flex flex-col gap-2">

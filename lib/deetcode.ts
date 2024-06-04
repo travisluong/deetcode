@@ -1,7 +1,6 @@
 "use client";
 import _ from "lodash";
 import * as d3 from "d3";
-import { nanoid } from "nanoid";
 
 import {
   ICompare,
@@ -42,7 +41,6 @@ interface DeetConfig {
   directionMode?: DirectionMode;
   labelMode?: boolean;
   animationDelay?: number;
-  nanoidSize?: number;
 }
 
 interface DeetOptions {
@@ -1175,7 +1173,7 @@ export class DeetSet extends Set implements AutoVisSet {
   constructor(iterable: any) {
     super();
     this.deetEngine = DeetEngine.getInstance();
-    this.id = this.deetEngine.nanoid();
+    this.id = this.deetEngine.randomUUID();
     this.engine = this.deetEngine.deetSetEngine;
     this.engine.renderContainer({
       id: this.id,
@@ -1251,7 +1249,7 @@ export class DeetMap<K, V> extends Map<K, V> implements AutoVisMap {
   constructor(iterable?: readonly (readonly [K, V])[] | null) {
     super();
     this.deetEngine = DeetEngine.getInstance();
-    this.id = this.deetEngine.nanoid();
+    this.id = this.deetEngine.randomUUID();
     this.engine = this.deetEngine.deetMapEngine;
     this.renderEnabled = false;
     this.engine.renderContainer({
@@ -1334,7 +1332,7 @@ export class DeetArray extends Array implements AutoVisArray {
   constructor(...args: any) {
     super(...args);
     this.deetEngine = DeetEngine.getInstance();
-    this.id = this.deetEngine.nanoid();
+    this.id = this.deetEngine.randomUUID();
     this.engine = this.deetEngine.deetArrayEngine;
     this.engine.renderContainer({
       data: this,
@@ -1457,7 +1455,7 @@ export class DeetMinPriorityQueue
   constructor(...args: any) {
     super(...args);
     this.deetEngine = DeetEngine.getInstance();
-    this.id = this.deetEngine.nanoid();
+    this.id = this.deetEngine.randomUUID();
     this.engine = this.deetEngine.deetMinPriorityQueueEngine;
     this.engine.renderContainer({
       id: this.id,
@@ -1522,7 +1520,7 @@ export class DeetMaxPriorityQueue
   constructor(...args: any) {
     super(...args);
     this.deetEngine = DeetEngine.getInstance();
-    this.id = this.deetEngine.nanoid();
+    this.id = this.deetEngine.randomUUID();
     this.engine = this.deetEngine.deetMaxPriorityQueueEngine;
     this.engine.renderContainer({
       id: this.id,
@@ -1587,7 +1585,7 @@ export class DeetPriorityQueue
   constructor(compare: ICompare<any>, values?: any[] | undefined) {
     super(compare, values);
     this.deetEngine = DeetEngine.getInstance();
-    this.id = this.deetEngine.nanoid();
+    this.id = this.deetEngine.randomUUID();
     this.engine = this.deetEngine.deetPriorityQueueEngine;
     this.engine.renderContainer({
       id: this.id,
@@ -1694,7 +1692,6 @@ export class DeetEngine {
   snapshots: Node[] = [];
   snapshotIndex: number = 0;
   isAutoVisEnabled: boolean = false;
-  nanoidSize: number;
 
   private static instance: DeetEngine;
 
@@ -1715,7 +1712,6 @@ export class DeetEngine {
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
-    this.nanoidSize = config.nanoidSize || 10;
 
     const el = document.querySelector(config.selector);
 
@@ -1866,7 +1862,6 @@ export class DeetEngine {
         this.changeAnimationDelay(config.animationDelay);
       if (config.directionMode) this.changeDirectionMode(config.directionMode);
       if (config.renderMode) this.changeRenderMode(config.renderMode);
-      if (config.nanoidSize) this.nanoidSize = config.nanoidSize;
       this.changeLabelMode(config.labelMode ? true : false);
     }
     this.undoMonkeyPatchAll();
@@ -1932,8 +1927,8 @@ export class DeetEngine {
     DeetPriorityQueue.undoMonkeyPatch();
   }
 
-  nanoid() {
-    return nanoid(this.nanoidSize);
+  randomUUID() {
+    return crypto.randomUUID();
   }
 
   static setInstance(deetcode: DeetEngine) {
