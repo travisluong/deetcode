@@ -107,15 +107,15 @@ export default function ProblemDetailSandbox({
   }
 
   function plus() {
-    setIsNew(true);
     // @ts-ignore
     editorRef.current.setValue(problem.default_code);
+    setIsNew(true);
   }
 
   function reset() {
-    setIsNew(false);
     // @ts-ignore
     editorRef.current.setValue(problem.solution);
+    setIsNew(false);
   }
 
   function handleShare() {
@@ -208,14 +208,19 @@ export default function ProblemDetailSandbox({
                             ))}
                           </div>
                         )}
+                        <Input
+                          type="hidden"
+                          name="problem_id"
+                          value={problem.id}
+                        />
                         <div>
                           <Button type="submit">Submit</Button>
                         </div>
-                        {state.errors && state.message && (
+                        {state.message && (
                           <p className="text-red-500">{state.message}</p>
                         )}
-                        {!state.errors && state.message && (
-                          <p className="text-green-500">{state.message}</p>
+                        {!state.errors && !state.message && (
+                          <p className="text-green-500">Success</p>
                         )}
                       </form>
                     </DialogContent>

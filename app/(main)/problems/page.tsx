@@ -3,7 +3,6 @@ import { DataTable } from "@/components/ui/data-table";
 import { columns } from "@/components/problem-columns";
 import { category, problems } from "@/lib/schema";
 import { asc, eq } from "drizzle-orm";
-import Link from "next/link";
 
 export default async function Page() {
   const data = await db

@@ -22,6 +22,20 @@
       "when": 1717407265752,
       "tag": "0002_remarkable_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1717486613278,
+      "tag": "0003_messy_blob",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1717488905098,
+      "tag": "0004_neat_nextwave",
+      "breakpoints": true
     }
   ]
 }

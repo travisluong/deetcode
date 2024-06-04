@@ -1,0 +1,1 @@
+ALTER TABLE `solution` ADD `title` varchar(255);

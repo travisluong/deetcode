@@ -172,10 +172,13 @@ export const solutions = mysqlTable("solution", {
     .primaryKey()
     .notNull()
     .$defaultFn(() => crypto.randomUUID()),
-  problem_id: varchar("problem_id", { length: 255 }).references(
-    () => problems.id
-  ),
-  user_id: varchar("user_id", { length: 255 }).references(() => users.id),
+  problem_id: varchar("problem_id", { length: 255 })
+    .notNull()
+    .references(() => problems.id),
+  user_id: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  title: varchar("title", { length: 255 }),
   content: text("content"),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at").notNull().defaultNow(),
