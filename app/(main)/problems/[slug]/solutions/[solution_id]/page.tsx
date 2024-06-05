@@ -40,26 +40,7 @@ export default async function Page({
 
   return (
     <div className="flex flex-col p-2 h-full">
-      <div className="px-5 mb-2 flex justify-between">
-        <Link
-          className="flex gap-2 items-center text-primary"
-          href={`/problems/${problem.slug}/solutions`}
-        >
-          <ArrowLeftIcon /> All Solutions
-        </Link>
-        <div>{solution.title}</div>
-        <div className="flex gap-2 items-center">
-          <Image
-            src={user.image!}
-            alt="avatar"
-            width={30}
-            height={30}
-            className="rounded-full"
-          />
-          {user.name}
-        </div>
-      </div>
-      <Toolbar />
+      <Toolbar solution={solution} user={user} />
       <ProblemDetailSandbox problem={problem} solution={solution} />
     </div>
   );
