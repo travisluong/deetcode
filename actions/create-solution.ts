@@ -43,7 +43,7 @@ export default async function createSolution(
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: "Error",
+      message: "bad request",
     };
   }
 

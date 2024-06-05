@@ -34,6 +34,8 @@ import { Input } from "./ui/input";
 import { useSession } from "next-auth/react";
 import createSolution, { CreateSolutionState } from "@/actions/create-solution";
 import { useFormState } from "react-dom";
+import updateSolution from "@/actions/update-solution";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function ProblemDetailSandbox({
   problem,
@@ -50,6 +52,7 @@ export default function ProblemDetailSandbox({
   const [state, dispatch] = useFormState(createSolution, initialState);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     document.addEventListener("clearCode", handleClearCodeEvent);
@@ -125,6 +128,31 @@ export default function ProblemDetailSandbox({
   function handleShare() {
     // @ts-ignore
     setContent(editorRef.current.getValue());
+  }
+
+  async function handleSave() {
+    if (!solution?.title) {
+      throw new Error("solution not found");
+    }
+    // @ts-ignore
+    const content = editorRef.current.getValue();
+    const formData = new FormData();
+    formData.set("id", solution.id);
+    formData.set("title", solution.title);
+    formData.set("content", content);
+    const res = await updateSolution(initialState, formData);
+    console.log(res);
+    if (res.status === "success") {
+      toast({
+        description: "Save Success",
+        variant: "success",
+      });
+    } else if (res.status === "error") {
+      toast({
+        description: "Save Failed",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -236,7 +264,11 @@ export default function ProblemDetailSandbox({
                       <Button variant="destructive" className="flex gap-2">
                         <TrashIcon /> Delete
                       </Button>
-                      <Button variant="secondary" className="flex gap-2">
+                      <Button
+                        variant="secondary"
+                        className="flex gap-2"
+                        onClick={handleSave}
+                      >
                         <BookmarkIcon /> Save
                       </Button>
                     </>
