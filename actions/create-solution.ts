@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { problems, solutions } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { uuidv7 } from "uuidv7";
 import z from "zod";
 
 const CreateSolutionSchema = z.object({
@@ -54,7 +55,7 @@ export default async function createSolution(
     return { message: "problem not found" };
   }
 
-  const id = crypto.randomUUID();
+  const id = uuidv7();
   await db.insert(solutions).values({
     id: id,
     user_id: session.user?.id!,
