@@ -36,6 +36,7 @@ import createSolution, { CreateSolutionState } from "@/actions/create-solution";
 import { useFormState } from "react-dom";
 import updateSolution from "@/actions/update-solution";
 import { useToast } from "@/components/ui/use-toast";
+import deleteSolution from "@/actions/delete-solution";
 
 export default function ProblemDetailSandbox({
   problem,
@@ -140,8 +141,7 @@ export default function ProblemDetailSandbox({
     formData.set("id", solution.id);
     formData.set("title", solution.title);
     formData.set("content", content);
-    const res = await updateSolution(initialState, formData);
-    console.log(res);
+    const res = await updateSolution({}, formData);
     if (res.status === "success") {
       toast({
         description: "Save Success",
@@ -153,6 +153,15 @@ export default function ProblemDetailSandbox({
         variant: "destructive",
       });
     }
+  }
+
+  async function handleDelete() {
+    if (!solution) {
+      throw new Error("solution not found");
+    }
+    const formData = new FormData();
+    formData.set("id", solution.id);
+    await deleteSolution({}, formData);
   }
 
   return (
@@ -261,7 +270,11 @@ export default function ProblemDetailSandbox({
                 {session.status === "authenticated" &&
                   session.data.user?.id === solution?.user_id && (
                     <>
-                      <Button variant="destructive" className="flex gap-2">
+                      <Button
+                        variant="destructive"
+                        className="flex gap-2"
+                        onClick={handleDelete}
+                      >
                         <TrashIcon /> Delete
                       </Button>
                       <Button
