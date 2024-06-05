@@ -9,12 +9,13 @@ import {
   primaryKey,
 } from "drizzle-orm/mysql-core";
 import type { AdapterAccountType } from "next-auth/adapters";
+import { uuidv7 } from "uuidv7";
 
 export const problems = mysqlTable("problem", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => uuidv7()),
   category_id: varchar("category_id", { length: 255 }).references(
     () => category.id
   ),
@@ -36,7 +37,7 @@ export const category = mysqlTable("category", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => uuidv7()),
   name: varchar("name", { length: 255 }),
   slug: varchar("slug", { length: 255 }).unique(),
   position: int("position"),
@@ -48,7 +49,7 @@ export const problem_list = mysqlTable("problem_list", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => uuidv7()),
   name: varchar("name", { length: 255 }),
   slug: varchar("slug", { length: 255 }).unique(),
   created_at: timestamp("created_at").notNull().defaultNow(),
@@ -76,7 +77,7 @@ export const sync_log = mysqlTable("sync_log", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => uuidv7()),
   started_at: timestamp("started_at").notNull().defaultNow(),
   completed_at: timestamp("completed_at"),
 });
@@ -84,7 +85,7 @@ export const sync_log = mysqlTable("sync_log", {
 export const users = mysqlTable("user", {
   id: varchar("id", { length: 255 })
     .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => uuidv7()),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
   emailVerified: timestamp("emailVerified", {
@@ -171,7 +172,7 @@ export const solutions = mysqlTable("solution", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .notNull()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => uuidv7()),
   problem_id: varchar("problem_id", { length: 255 })
     .notNull()
     .references(() => problems.id),
