@@ -30,7 +30,7 @@ export default async function Layout({
 
   return (
     <section className="flex flex-col h-full">
-      <div className="flex items-center mx-5 gap-5">
+      <div className="flex items-center mx-5 gap-5 border-b border-b-gray-400 dark:border-b-gray-600">
         <h1 className="font-sans font-bold text-xl">{problem.name}</h1>
         <div>{category.name}</div>
         <div>

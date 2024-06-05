@@ -11,7 +11,7 @@ export default function ProblemNav({ problem }: { problem: ProblemDB }) {
   const { slug } = problem;
 
   return (
-    <nav className="flex gap-5 mx-5 border-b border-gray-400 dark:border-gray-600">
+    <nav className="flex gap-5 mx-5">
       <div className="flex gap-2">
         <Link
           className={cn(
