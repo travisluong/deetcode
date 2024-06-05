@@ -1,6 +1,6 @@
 "use client";
 
-import { PlaygroundProblem, ProblemDB } from "@/lib/types";
+import { PlaygroundProblem, ProblemDB, SolutionDB } from "@/lib/types";
 import { Editor } from "@monaco-editor/react";
 import { useEffect, useRef, useState } from "react";
 import { DirectionMode, RenderMode, LabelMode } from "@/lib/deetcode";
@@ -14,10 +14,12 @@ import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
 import _ from "lodash";
 import {
+  BookmarkIcon,
   Pencil2Icon,
   PlayIcon,
   PlusIcon,
   ResetIcon,
+  TrashIcon,
 } from "@radix-ui/react-icons";
 import {
   Dialog,
@@ -35,8 +37,10 @@ import { useFormState } from "react-dom";
 
 export default function ProblemDetailSandbox({
   problem,
+  solution,
 }: {
   problem: ProblemDB | PlaygroundProblem;
+  solution?: SolutionDB;
 }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
@@ -112,7 +116,7 @@ export default function ProblemDetailSandbox({
     setIsNew(true);
   }
 
-  function reset() {
+  function example() {
     // @ts-ignore
     editorRef.current.setValue(problem.solution);
     setIsNew(false);
@@ -145,7 +149,7 @@ export default function ProblemDetailSandbox({
           <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
             <div className="flex flex-col gap-2 h-full w-full flex-grow">
               <div className="flex px-5 pt-2 justify-end gap-2">
-                {session.status === "unauthenticated" && isNew && (
+                {session.status === "unauthenticated" && isNew && !solution && (
                   <Dialog>
                     <DialogTrigger className="flex gap-2 items-center">
                       <Pencil2Icon /> Share
@@ -163,10 +167,10 @@ export default function ProblemDetailSandbox({
                     </DialogContent>
                   </Dialog>
                 )}
-                {session.status === "authenticated" && isNew && (
+                {!solution && session.status === "authenticated" && isNew && (
                   <Dialog>
                     <DialogTrigger
-                      className="flex gap-2 items-center"
+                      className="flex gap-2 items-center text-primary"
                       onClick={handleShare}
                     >
                       <Pencil2Icon /> Share Solution
@@ -226,20 +230,37 @@ export default function ProblemDetailSandbox({
                     </DialogContent>
                   </Dialog>
                 )}
-                <Button
-                  variant="secondary"
-                  className="flex gap-2"
-                  onClick={reset}
-                >
-                  <ResetIcon /> Reset
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="flex gap-2"
-                  onClick={plus}
-                >
-                  <PlusIcon /> New
-                </Button>
+                {session.status === "authenticated" &&
+                  session.data.user?.id === solution?.user_id && (
+                    <>
+                      <Button variant="destructive" className="flex gap-2">
+                        <TrashIcon /> Delete
+                      </Button>
+                      <Button variant="secondary" className="flex gap-2">
+                        <BookmarkIcon /> Save
+                      </Button>
+                    </>
+                  )}
+
+                {!solution && (
+                  <Button
+                    variant="secondary"
+                    className="flex gap-2"
+                    onClick={plus}
+                  >
+                    <PlusIcon /> New
+                  </Button>
+                )}
+
+                {!solution && (
+                  <Button
+                    variant="secondary"
+                    className="flex gap-2"
+                    onClick={example}
+                  >
+                    <ResetIcon /> Example
+                  </Button>
+                )}
 
                 <Button className="flex gap-2" onClick={evaluate}>
                   <PlayIcon /> Run
@@ -249,7 +270,9 @@ export default function ProblemDetailSandbox({
                 height="100%"
                 width="100%"
                 defaultLanguage="javascript"
-                defaultValue={problem.solution ?? undefined}
+                defaultValue={
+                  solution?.content ?? problem.solution ?? undefined
+                }
                 onMount={handleEditorDidMount}
                 theme={theme === "light" ? "vs-light" : "vs-dark"}
                 options={{ minimap: { enabled: false } }}

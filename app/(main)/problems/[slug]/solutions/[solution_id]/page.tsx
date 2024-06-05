@@ -38,8 +38,6 @@ export default async function Page({
     notFound();
   }
 
-  problem.solution = solution.content;
-
   return (
     <div className="flex flex-col p-2 h-full">
       <div className="px-5 mb-2 flex justify-between">
@@ -62,7 +60,7 @@ export default async function Page({
         </div>
       </div>
       <Toolbar />
-      <ProblemDetailSandbox problem={problem} />
+      <ProblemDetailSandbox problem={problem} solution={solution} />
     </div>
   );
 }
