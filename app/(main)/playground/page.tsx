@@ -1,4 +1,3 @@
-import ProblemDetail from "@/components/problem-detail";
 import ProblemDetailSandbox from "@/components/problem-detail-sandbox";
 import Toolbar from "@/components/toolbar";
 import { readFileAsString } from "@/lib/read-file-as-string";

@@ -33,10 +33,11 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { useSession } from "next-auth/react";
 import createSolution, { CreateSolutionState } from "@/actions/create-solution";
-import { useFormState } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import updateSolution from "@/actions/update-solution";
 import { useToast } from "@/components/ui/use-toast";
 import deleteSolution from "@/actions/delete-solution";
+import { SubmitButton } from "./submit-button";
 
 export default function ProblemDetailSandbox({
   problem,
@@ -56,6 +57,7 @@ export default function ProblemDetailSandbox({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const { toast } = useToast();
+  const { pending } = useFormStatus();
 
   useEffect(() => {
     document.addEventListener("clearCode", handleClearCodeEvent);
@@ -255,7 +257,7 @@ export default function ProblemDetailSandbox({
                           value={problem.id}
                         />
                         <div>
-                          <Button type="submit">Submit</Button>
+                          <SubmitButton />
                         </div>
                         {state.message && (
                           <p className="text-red-500">{state.message}</p>
