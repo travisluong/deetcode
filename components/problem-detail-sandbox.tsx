@@ -41,9 +41,11 @@ import deleteSolution from "@/actions/delete-solution";
 export default function ProblemDetailSandbox({
   problem,
   solution,
+  isPlayground = false,
 }: {
   problem: ProblemDB | PlaygroundProblem;
   solution?: SolutionDB;
+  isPlayground?: boolean;
 }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
@@ -287,7 +289,7 @@ export default function ProblemDetailSandbox({
                     </>
                   )}
 
-                {!solution && (
+                {!solution && !isPlayground && (
                   <Button
                     variant="secondary"
                     className="flex gap-2"
@@ -297,7 +299,7 @@ export default function ProblemDetailSandbox({
                   </Button>
                 )}
 
-                {!solution && (
+                {!solution && !isPlayground && (
                   <Button
                     variant="secondary"
                     className="flex gap-2"

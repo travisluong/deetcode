@@ -10,6 +10,7 @@ export default async function Page() {
   const code = removeFirstLine(content);
 
   const problem: PlaygroundProblem = {
+    id: "",
     solution: code,
     default_code: "",
   };
@@ -20,7 +21,7 @@ export default async function Page() {
       <Toolbar />
       <div className="px-5 h-full">
         {/* <ProblemDetail problem={problem} /> */}
-        <ProblemDetailSandbox problem={problem} />
+        <ProblemDetailSandbox problem={problem} isPlayground={true} />
       </div>
     </div>
   );
