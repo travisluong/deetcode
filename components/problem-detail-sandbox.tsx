@@ -195,13 +195,11 @@ export default function ProblemDetailSandbox({
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Share your solution</DialogTitle>
+                        <DialogTitle>Share Solution</DialogTitle>
                         <DialogDescription></DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
-                        <div>
-                          Please sign in to save and share your solution.
-                        </div>
+                        <div>Sign in to share your solution.</div>
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -209,10 +207,10 @@ export default function ProblemDetailSandbox({
                 {!solution && session.status === "authenticated" && isNew && (
                   <Dialog>
                     <DialogTrigger
-                      className="flex gap-2 items-center text-primary"
+                      className="flex gap-2 items-center"
                       onClick={handleShare}
                     >
-                      <Pencil2Icon /> Share Solution
+                      <Pencil2Icon /> Share
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
