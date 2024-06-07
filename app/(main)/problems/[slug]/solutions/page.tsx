@@ -3,7 +3,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { problems, solutions, users } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 export default async function Page({ params }: { params: { slug: string } }) {
@@ -19,7 +19,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
     .select()
     .from(problems)
     .innerJoin(solutions, eq(problems.id, solutions.problem_id))
-    .innerJoin(users, eq(solutions.user_id, users.id));
+    .innerJoin(users, eq(solutions.user_id, users.id))
+    .where(eq(problems.id, problem.id));
 
   let mySolutions;
   if (session) {
@@ -28,7 +29,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
       .from(problems)
       .innerJoin(solutions, eq(problems.id, solutions.problem_id))
       .innerJoin(users, eq(solutions.user_id, users.id))
-      .where(eq(users.id, session.user?.id!));
+      .where(and(eq(users.id, session.user?.id!), eq(problems.id, problem.id)));
   }
 
   return (
