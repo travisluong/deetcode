@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users } from "@/lib/schema";
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export default async function Page() {
   const session = await auth();
@@ -15,6 +15,10 @@ export default async function Page() {
   const user = await db.query.users.findFirst({
     where: eq(users.id, session?.user?.id!),
   });
+
+  if (!user) {
+    notFound();
+  }
 
   return (
     <div className="p-5 m-auto max-w-md">
