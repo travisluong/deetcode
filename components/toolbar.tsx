@@ -7,6 +7,7 @@ import DirectionModeToggle from "./direction-mode-toggle";
 import LabelModeToggle from "./label-mode-toggle";
 import { SolutionDB, UserDB } from "@/lib/types";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Toolbar({
   solution,
@@ -68,15 +69,20 @@ export default function Toolbar({
       </div>
       {solution && user && (
         <div className="px-5 mb-2 flex justify-between gap-2 items-center">
-          <div className="flex gap-2 items-center">
-            <Image
-              src={user.image!}
-              alt="avatar"
-              width={30}
-              height={30}
-              className="rounded-full"
-            />
-            {user.username}
+          <div>
+            <Link
+              className="flex gap-2 items-center"
+              href={`/users/${user.username}`}
+            >
+              <Image
+                src={user.image!}
+                alt="avatar"
+                width={30}
+                height={30}
+                className="rounded-full"
+              />
+              {user.username}
+            </Link>
           </div>
           <div>&bull;</div>
           <div>{solution.title}</div>

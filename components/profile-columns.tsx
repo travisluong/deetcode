@@ -9,34 +9,14 @@ import Image from "next/image";
 
 export const columns: ColumnDef<ProblemSolutionUserRow>[] = [
   {
-    accessorKey: "user.image",
-    header: ({ column }) => {
-      return <div></div>;
-    },
-    cell: ({ row }) => {
-      const data = row.original;
-      return (
-        <div>
-          <Image
-            src={data.user.image!}
-            width={30}
-            height={30}
-            alt="avatar"
-            className="rounded-full"
-          />
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "user.name",
+    accessorKey: "problem.name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Username
+          Problem
           <CaretSortIcon className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -44,14 +24,12 @@ export const columns: ColumnDef<ProblemSolutionUserRow>[] = [
     cell: ({ row }) => {
       const data = row.original;
       return (
-        <div>
-          <Link
-            className="hover:text-primary"
-            href={`/users/${data.user.username}`}
-          >
-            {data.user.username}
-          </Link>
-        </div>
+        <Link
+          className="hover:text-primary"
+          href={`/problems/${data.problem.slug}`}
+        >
+          {data.problem.name}
+        </Link>
       );
     },
   },

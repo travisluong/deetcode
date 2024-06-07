@@ -1,6 +1,11 @@
 "use client";
 
-import { ExitIcon, LightningBoltIcon } from "@radix-ui/react-icons";
+import {
+  ExitIcon,
+  LightningBoltIcon,
+  Pencil2Icon,
+  PersonIcon,
+} from "@radix-ui/react-icons";
 import { ModeToggle } from "./mode-toggle";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,8 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { UserDB } from "@/lib/types";
 
-export default function Header() {
+export default function Header({ user }: { user?: UserDB }) {
   const session = useSession();
   const pathname = usePathname();
   return (
@@ -72,7 +78,17 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem>
-                  <Link href="/profile">Profile</Link>
+                  <Link
+                    className="flex gap-2"
+                    href={`/users/${user?.username}`}
+                  >
+                    <PersonIcon /> Public Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link className="flex gap-2" href="/profile">
+                    <Pencil2Icon /> Edit Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => signOut()}>
                   <ExitIcon className="mr-2" /> Sign Out
