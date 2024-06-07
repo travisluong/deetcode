@@ -7,6 +7,7 @@ import type { Provider } from "next-auth/providers";
 import { eq } from "drizzle-orm";
 import { users } from "./schema";
 import { uuidv7 } from "uuidv7";
+import { nanoid } from "nanoid";
 
 const providers: Provider[] = [GitHub, Google];
 
@@ -37,13 +38,15 @@ function CustomDrizzleAdapter(db) {
       return user;
     }
 
+    const randomUsername = "user_" + nanoid(12);
+
     const newUser = {
       id: uuidv7(),
       email: data.email,
       name: data.name,
       image: data.image,
       emailVerified: data.emailVerified,
-      username: uuidv7(),
+      username: randomUsername,
     };
 
     await db.insert(users).values(newUser);

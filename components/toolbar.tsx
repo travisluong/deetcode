@@ -76,7 +76,7 @@ export default function Toolbar({
               height={30}
               className="rounded-full"
             />
-            {user.name}
+            {user.username}
           </div>
           <div>&bull;</div>
           <div>{solution.title}</div>
