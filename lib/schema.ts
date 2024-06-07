@@ -93,6 +93,10 @@ export const users = mysqlTable("user", {
     fsp: 3,
   }),
   image: varchar("image", { length: 255 }),
+  username: varchar("username", { length: 255 })
+    .notNull()
+    .unique()
+    .$defaultFn(() => uuidv7()),
 });
 
 export const accounts = mysqlTable(

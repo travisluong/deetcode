@@ -36,6 +36,20 @@
       "when": 1717488905098,
       "tag": "0004_neat_nextwave",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1717734044967,
+      "tag": "0005_aberrant_talon",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1717734133181,
+      "tag": "0006_purple_skin",
+      "breakpoints": true
     }
   ]
 }

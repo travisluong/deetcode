@@ -4,6 +4,9 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { db } from "./db";
 import type { Provider } from "next-auth/providers";
+import { eq } from "drizzle-orm";
+import { users } from "./schema";
+import { uuidv7 } from "uuidv7";
 
 const providers: Provider[] = [GitHub, Google];
 
@@ -16,9 +19,42 @@ export const providerMap = providers.map((provider) => {
   }
 });
 
+/**
+ * this custom drizzle adapter is needed to create a random username on signup
+ * https://github.com/nextauthjs/next-auth/discussions/562#discussioncomment-6589689
+ * @param db
+ * @returns
+ */
+// @ts-ignore
+function CustomDrizzleAdapter(db) {
+  const adapter = DrizzleAdapter(db);
+  adapter.createUser = async (data) => {
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, data.email),
+    });
+
+    if (user) {
+      return user;
+    }
+
+    const newUser = {
+      id: uuidv7(),
+      email: data.email,
+      name: data.name,
+      image: data.image,
+      emailVerified: data.emailVerified,
+      username: uuidv7(),
+    };
+
+    await db.insert(users).values(newUser);
+    return newUser;
+  };
+  return adapter;
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // @ts-ignore
-  adapter: DrizzleAdapter(db),
+  adapter: CustomDrizzleAdapter(db),
   providers,
   pages: {
     signIn: "/signin",
