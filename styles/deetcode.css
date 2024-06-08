@@ -150,3 +150,16 @@ tree node
 .dark .deetcode-treenode .link {
   stroke: lightgray;
 }
+
+/**
+graph
+*/
+
+.deetcode-graph text {
+  fill: black;
+  font-size: medium;
+}
+
+.deetcode-graph line {
+  stroke: darkgray;
+}

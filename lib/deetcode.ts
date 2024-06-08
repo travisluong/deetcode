@@ -24,6 +24,7 @@ declare global {
     DeetListNode: typeof DeetListNode;
     ListNode: typeof DeetListNode;
     TreeNode: typeof DeetTreeNode;
+    _Node: typeof DeetNode;
     DeetTest: DeetTest;
     DeetCode: DeetCode;
   }
@@ -97,6 +98,10 @@ interface DeetBitwiseOptions extends DeetOptions {
 interface DeetTreeOptions extends DeetOptions {
   data: DeetTreeNode;
   copiedData?: D3TreeNode | null;
+}
+
+interface DeetGraphOptions extends DeetOptions {
+  data: DeetNode;
 }
 
 interface DeetTrie {
@@ -1059,6 +1064,139 @@ class DeetTrieEngine extends DeetBaseEngine {
   }
 }
 
+class DeetGraphEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Graph";
+  renderContent(opts: DeetGraphOptions): HTMLElement {
+    const data = this.copyData(opts);
+    const div = document.createElement("div");
+    div.classList.add("deetcode-graph");
+    const { nodes, links } = data;
+
+    // Convert nodes to D3.js format with circular layout positions
+    const numNodes = nodes.length;
+    const radius = 100; // radius of the circle
+    const centerX = 200; // center of the SVG canvas
+    const centerY = 150;
+
+    const d3Nodes = nodes.map((node, i) => ({
+      id: node.val,
+      x: centerX + radius * Math.cos((2 * Math.PI * i) / numNodes),
+      y: centerY + radius * Math.sin((2 * Math.PI * i) / numNodes),
+      color: node.color,
+    }));
+
+    const d3Links = links.map((link) => ({
+      source: link.source,
+      target: link.target,
+    }));
+
+    // D3.js visualization code
+    const svg = d3.create("svg").attr("width", 400).attr("height", 300);
+    const width = +svg.attr("width");
+    const height = +svg.attr("height");
+
+    const link = svg
+      .append("g")
+      .attr("class", "links")
+      .selectAll("line")
+      .data(d3Links)
+      .enter()
+      .append("line")
+      .attr("class", "link");
+
+    const node = svg
+      .append("g")
+      .attr("class", "nodes")
+      .selectAll("circle")
+      .data(d3Nodes)
+      .enter()
+      .append("circle")
+      .attr("class", "node")
+      .attr("r", 10)
+      .attr("fill", (d) => d.color ?? "lightgray");
+
+    node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+
+    const label = svg
+      .append("g")
+      .attr("class", "labels")
+      .selectAll("text")
+      .data(d3Nodes)
+      .enter()
+      .append("text")
+      .attr("class", "label")
+      .attr("dy", 0) // Adjust this value to position the label relative to the node
+      .text((d) => d.id);
+
+    label.attr("x", (d) => d.x - 5).attr("y", (d) => d.y + 5);
+
+    // node
+    //   .append("text")
+    //   .text((d) => d.id)
+    //   .attr("stroke-width", "1px")
+    //   .attr("stroke", "black");
+
+    // Set positions for links and nodes
+    link
+      .attr("x1", (d) => d3Nodes.find((n) => n.id === d.source).x)
+      .attr("y1", (d) => d3Nodes.find((n) => n.id === d.source).y)
+      .attr("x2", (d) => d3Nodes.find((n) => n.id === d.target).x)
+      .attr("y2", (d) => d3Nodes.find((n) => n.id === d.target).y);
+
+    const svgnode = svg.node();
+    if (svgnode) {
+      div.appendChild(svgnode);
+    }
+    return div;
+  }
+
+  copyData(opts: DeetGraphOptions) {
+    return this.buildGraphFromRoot(opts.data);
+  }
+  buildGraph(adjList: number[][]) {
+    const nodes: { [key: number]: DeetNode } = {};
+
+    // Create all nodes
+    for (let i = 0; i < adjList.length; i++) {
+      nodes[i + 1] = new DeetNode(i + 1);
+    }
+
+    // Add neighbors to each node
+    for (let i = 0; i < adjList.length; i++) {
+      const node = nodes[i + 1];
+      for (const neighbor of adjList[i]) {
+        node.neighbors.push(nodes[neighbor]);
+      }
+    }
+
+    // Return an array of all nodes
+    return Object.values(nodes);
+  }
+  // Helper function to build graph from root
+  buildGraphFromRoot(root: DeetNode): {
+    nodes: DeetNode[];
+    links: { source: number; target: number }[];
+  } {
+    const visited = new Set<DeetNode>();
+    const nodes: DeetNode[] = [];
+    const links: { source: number; target: number; value: number }[] = [];
+
+    function traverse(node: DeetNode) {
+      if (visited.has(node)) return;
+      visited.add(node);
+      nodes.push(node);
+      node.id = node.val;
+      for (const neighbor of node.neighbors) {
+        links.push({ source: node.val, target: neighbor.val, value: 2 });
+        traverse(neighbor);
+      }
+    }
+
+    traverse(root);
+    return { nodes, links };
+  }
+}
+
 /**
  * common rendering functions used anywhere
  */
@@ -1669,6 +1807,18 @@ export class DeetTrieNode {
   color?: string;
 }
 
+export class DeetNode {
+  id?: number;
+  val: number;
+  neighbors: DeetNode[];
+  color?: string;
+
+  constructor(val?: number, neighbors?: DeetNode[]) {
+    this.val = val === undefined ? 0 : val;
+    this.neighbors = neighbors === undefined ? [] : neighbors;
+  }
+}
+
 export class DeetEngine {
   el: Element;
   renderQueue: Array<() => void>;
@@ -1685,6 +1835,7 @@ export class DeetEngine {
   deetBitwiseEngine: DeetBitwiseEngine;
   deetTreeNodeEngine: DeetTreeNodeEngine;
   deetTrieEngine: DeetTrieEngine;
+  deetGraphEngine: DeetGraphEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
   animationDelay: number;
@@ -1709,6 +1860,7 @@ export class DeetEngine {
     this.deetBitwiseEngine = new DeetBitwiseEngine();
     this.deetTreeNodeEngine = new DeetTreeNodeEngine();
     this.deetTrieEngine = new DeetTrieEngine();
+    this.deetGraphEngine = new DeetGraphEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -1876,6 +2028,7 @@ export class DeetEngine {
     window._ = _;
     window.ListNode = DeetListNode;
     window.TreeNode = DeetTreeNode;
+    window._Node = DeetNode;
     if (this.isAutoVisEnabled) {
       this.monkeyPatchAll();
     }
@@ -2292,5 +2445,15 @@ export class DeetCode {
 
   linkedListToArray(listNode: DeetListNode) {
     return this.deetEngine.deetListNodeEngine.linkedListToArray(listNode);
+  }
+
+  buildGraph(adjList: number[][]) {
+    return this.deetEngine.deetGraphEngine.buildGraph(adjList);
+  }
+
+  graph(opts: DeetGraphOptions) {
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetGraphEngine.renderContainer(opts);
+    this.deetEngine.deetGraphEngine.renderFork(opts);
   }
 }
