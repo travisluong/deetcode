@@ -1070,6 +1070,9 @@ class DeetGraphEngine extends DeetBaseEngine {
     const data = this.copyData(opts);
     const div = document.createElement("div");
     div.classList.add("deetcode-graph");
+    const lab = this.renderLabel(opts);
+    div.appendChild(lab);
+
     const { nodes, links } = data;
 
     // Convert nodes to D3.js format with circular layout positions
@@ -1151,7 +1154,11 @@ class DeetGraphEngine extends DeetBaseEngine {
   }
 
   copyData(opts: DeetGraphOptions) {
-    return this.buildGraphFromRoot(opts.data);
+    if (opts.copiedData) {
+      return opts.copiedData;
+    }
+    opts.copiedData = this.buildGraphFromRoot(opts.data);
+    return opts.copiedData;
   }
   buildGraph(adjList: number[][]) {
     const nodes: { [key: number]: DeetNode } = {};
@@ -1184,7 +1191,9 @@ class DeetGraphEngine extends DeetBaseEngine {
     function traverse(node: DeetNode) {
       if (visited.has(node)) return;
       visited.add(node);
-      nodes.push(node);
+      const copy = new DeetNode(node.val);
+      copy.color = node.color;
+      nodes.push(copy);
       node.id = node.val;
       for (const neighbor of node.neighbors) {
         links.push({ source: node.val, target: neighbor.val, value: 2 });
@@ -1944,6 +1953,7 @@ export class DeetEngine {
     this.deetMaxPriorityQueueEngine.emptyContainerRegistry();
     this.deetPriorityQueueEngine.emptyContainerRegistry();
     this.deetTrieEngine.emptyContainerRegistry();
+    this.deetGraphEngine.emptyContainerRegistry();
   }
 
   takeSnapshot() {
