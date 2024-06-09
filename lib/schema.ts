@@ -8,6 +8,7 @@ import {
   boolean,
   primaryKey,
 } from "drizzle-orm/mysql-core";
+import { nanoid } from "nanoid";
 import type { AdapterAccountType } from "next-auth/adapters";
 import { uuidv7 } from "uuidv7";
 
@@ -96,7 +97,7 @@ export const users = mysqlTable("user", {
   username: varchar("username", { length: 255 })
     .notNull()
     .unique()
-    .$defaultFn(() => uuidv7()),
+    .$defaultFn(() => "user_" + nanoid(12)),
 });
 
 export const accounts = mysqlTable(
