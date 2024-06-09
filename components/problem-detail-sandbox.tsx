@@ -58,6 +58,11 @@ export default function ProblemDetailSandbox({
   const [content, setContent] = useState("");
   const { toast } = useToast();
   const { pending } = useFormStatus();
+  const [sandboxId, setSandboxId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSandboxId(crypto.randomUUID());
+  }, []);
 
   useEffect(() => {
     document.addEventListener("clearCode", handleClearCodeEvent);
@@ -83,9 +88,10 @@ export default function ProblemDetailSandbox({
   }
 
   function evaluate() {
+    console.log(sandboxId);
     // @ts-ignore
     const code = editorRef.current.getValue();
-    const frame = document.getElementById("sandboxed");
+    const frame = document.getElementById(sandboxId!);
     if (!frame) {
       return;
     }
@@ -172,14 +178,14 @@ export default function ProblemDetailSandbox({
     <div className="h-full w-full">
       <ResizablePanelGroup
         direction="horizontal"
-        className="min-h-[200px] rounded-lg border"
+        className="min-h-[400px] rounded-lg border"
       >
         <ResizablePanel defaultSize={50}>
           <div className="flex h-full items-center justify-center">
             <iframe
               sandbox="allow-scripts allow-same-origin allow-modals"
               src="http://localhost:3000/runner"
-              id="sandboxed"
+              id={sandboxId!}
               width="100%"
               height="100%"
             ></iframe>
