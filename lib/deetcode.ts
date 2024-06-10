@@ -104,6 +104,13 @@ interface DeetGraphOptions extends DeetOptions {
   data: DeetNode;
 }
 
+interface DeetDirectedGraphOptions extends DeetOptions {
+  data: {
+    adj: Map<string | number, Array<string | number>>;
+    color: Map<string | number, string>;
+  };
+}
+
 interface DeetTrie {
   root: DeetTrieNode;
 }
@@ -1206,6 +1213,134 @@ class DeetGraphEngine extends DeetBaseEngine {
   }
 }
 
+class DeetDirectedGraphEngine extends DeetBaseEngine {
+  dataTypeLabel: string = "Directed Graph";
+  renderContent(opts: DeetDirectedGraphOptions): HTMLElement {
+    const data = this.copyData(opts);
+    const div = document.createElement("div");
+    div.classList.add("deetcode-directed-graph");
+    const { adj: adjacencyList, color: colorMap } = data;
+    const nodes = adjacencyList
+      .keys()
+      .toArray()
+      .map((id) => ({ id }));
+    const links = [];
+
+    // Object.keys(adjacencyList).forEach((source) => {
+    //   adjacencyList[source].forEach((target) => {
+    //     links.push({ source, target });
+    //   });
+    // });
+
+    for (const [key, value] of adjacencyList.entries()) {
+      value.forEach((target) => {
+        links.push({ source: key, target: target });
+      });
+    }
+
+    const width = 400;
+    const height = 300;
+    const radius = 100;
+    const circleRadius = 10; // Radius of the node circles
+
+    // Generate positions in a circle
+    const positions = {};
+    nodes.forEach((node, i) => {
+      const angle = (i / nodes.length) * 2 * Math.PI;
+      positions[node.id] = {
+        x: width / 2 + radius * Math.cos(angle),
+        y: height / 2 + radius * Math.sin(angle),
+      };
+    });
+
+    const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+    svg
+      .append("defs")
+      .append("marker")
+      .attr("id", "end-arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 10) // Adjust this value to position the arrow correctly
+      .attr("refY", 0)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M0,-5L10,0L0,5")
+      .attr("fill", "#666");
+
+    const link = svg
+      .append("g")
+      .attr("class", "links")
+      .selectAll("line")
+      .data(links)
+      .enter()
+      .append("line")
+      .attr("class", "link")
+      .attr("x1", (d) => positions[d.source].x)
+      .attr("y1", (d) => positions[d.source].y)
+      .attr("x2", (d) => positions[d.target].x)
+      .attr("y2", (d) => positions[d.target].y);
+
+    const node = svg
+      .append("g")
+      .attr("class", "nodes")
+      .selectAll("g")
+      .data(nodes)
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .attr(
+        "transform",
+        (d) => `translate(${positions[d.id].x},${positions[d.id].y})`
+      );
+
+    node
+      .append("circle")
+      .attr("r", circleRadius)
+      .attr("fill", (d) => colorMap.get(d.id));
+
+    node
+      .append("text")
+      .attr("dy", ".35em") // Center text vertically
+      .text((d) => d.id);
+
+    // Adjust the positions of the arrow markers
+    link
+      .attr("marker-end", "url(#end-arrow)")
+      .attr("x1", (d) => getEndPoint(d.source, d.target, true).x)
+      .attr("y1", (d) => getEndPoint(d.source, d.target, true).y)
+      .attr("x2", (d) => getEndPoint(d.source, d.target, false).x)
+      .attr("y2", (d) => getEndPoint(d.source, d.target, false).y);
+
+    function getEndPoint(source, target, isSource) {
+      const sourcePos = positions[source];
+      const targetPos = positions[target];
+      const dx = targetPos.x - sourcePos.x;
+      const dy = targetPos.y - sourcePos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const offsetX = (dx * circleRadius) / dist;
+      const offsetY = (dy * circleRadius) / dist;
+      return isSource
+        ? { x: sourcePos.x + offsetX, y: sourcePos.y + offsetY }
+        : { x: targetPos.x - offsetX, y: targetPos.y - offsetY };
+    }
+
+    const svgnode = svg.node();
+    if (svgnode) {
+      div.appendChild(svgnode);
+    }
+    return div;
+  }
+  copyData(opts: DeetDirectedGraphOptions) {
+    if (opts.copiedData) {
+      return opts.copiedData;
+    }
+    opts.copiedData = _.cloneDeep(opts.data);
+    return opts.copiedData;
+  }
+}
+
 /**
  * common rendering functions used anywhere
  */
@@ -1845,6 +1980,7 @@ export class DeetEngine {
   deetTreeNodeEngine: DeetTreeNodeEngine;
   deetTrieEngine: DeetTrieEngine;
   deetGraphEngine: DeetGraphEngine;
+  deetDirectedGraphEngine: DeetDirectedGraphEngine;
   directionMode: DirectionMode;
   labelMode: boolean;
   animationDelay: number;
@@ -1870,6 +2006,7 @@ export class DeetEngine {
     this.deetTreeNodeEngine = new DeetTreeNodeEngine();
     this.deetTrieEngine = new DeetTrieEngine();
     this.deetGraphEngine = new DeetGraphEngine();
+    this.deetDirectedGraphEngine = new DeetDirectedGraphEngine();
     this.directionMode = config.directionMode || "row";
     this.labelMode = config.labelMode || false;
     this.animationDelay = config.animationDelay || 1000;
@@ -1954,6 +2091,7 @@ export class DeetEngine {
     this.deetPriorityQueueEngine.emptyContainerRegistry();
     this.deetTrieEngine.emptyContainerRegistry();
     this.deetGraphEngine.emptyContainerRegistry();
+    this.deetDirectedGraphEngine.emptyContainerRegistry();
   }
 
   takeSnapshot() {
@@ -2465,5 +2603,11 @@ export class DeetCode {
     opts.deetEngine = this.deetEngine;
     this.deetEngine.deetGraphEngine.renderContainer(opts);
     this.deetEngine.deetGraphEngine.renderFork(opts);
+  }
+
+  directedGraph(opts: DeetDirectedGraphOptions) {
+    opts.deetEngine = this.deetEngine;
+    this.deetEngine.deetDirectedGraphEngine.renderContainer(opts);
+    this.deetEngine.deetDirectedGraphEngine.renderFork(opts);
   }
 }
