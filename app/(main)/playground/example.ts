@@ -1,36 +1,12 @@
 // @ts-nocheck
 
-/**
- * DeetCode supports visualizations for data structures
- * commonly used in LeetCode problems:
- * Set, Map, Array, MinPriorityQueue, MaxPriorityQueue, PriorityQueue,
- * Linked List, Binary Tree.
- * DeetCode also provides various visualization utilities such as:
- * Indexes on an array and Bitwise.
- */
+DeetCode.string("str", "deetcode", { pointers: { i: 1, j: 2 } });
 
-/**
- * String
- */
-
-DeetCode.string({ id: "string", data: "deetcode", pointers: { i: 0, j: 3 } });
-
-/**
- * String Shorthand
- */
-DeetCode.string("shorthand string", "deetcode", { pointers: { i: 1, j: 2 } });
-
-/**
- * Set
- */
 const set1 = new Set([1, 2, 3]);
 set1.delete(3);
 set1.add(3);
-DeetCode.set({ id: "set1", data: set1 });
+DeetCode.set("set1", set1);
 
-/**
- * Auto Vis Set
- */
 DeetCode.enableAutoVis();
 const set2 = new Set([4, 5, 6]);
 set2.has(1);
@@ -38,9 +14,6 @@ set2.delete(3);
 set2.add(3);
 DeetCode.disableAutoVis();
 
-/**
- * Map
- */
 const map1 = new Map([
   [1, 1],
   [2, 2],
@@ -48,11 +21,8 @@ const map1 = new Map([
 ]);
 map1.delete(3);
 map1.set(3, 3);
-DeetCode.map({ id: "map1", data: map1 });
+DeetCode.map("map1", map1);
 
-/**
- * Auto Vis Map
- */
 DeetCode.enableAutoVis();
 const map2 = new Map([
   [1, 1],
@@ -65,30 +35,19 @@ map2.delete(3);
 map2.set(3, 3);
 DeetCode.disableAutoVis();
 
-/**
- * Array
- */
 const arr1 = [1, 2, 3];
-DeetCode.array({ id: "arr1", data: arr1, pointers: { i: 0, j: 2 } });
+DeetCode.array("arr1", arr1, { pointers: { i: 0, j: 2 } });
 
 arr1.push(4);
-DeetCode.array({ id: "arr1", data: arr1, pointers: { i: 1, j: 1 } });
+DeetCode.array("arr1", arr1, { pointers: { i: 1, j: 1 } });
 
 const arr2 = [
   [1, 2, 3],
   [4, 5, 6],
   [7, 8, 9],
 ];
-DeetCode.array({ id: "arr2", data: arr2 });
+DeetCode.array("arr2", arr2);
 
-/**
- * Array shorthand
- */
-DeetCode.array("arr1", arr1, { pointers: { i: 0, j: 1 } });
-
-/**
- * Native Array
- */
 DeetCode.enableAutoVis();
 const arr3 = new Array();
 arr3.push(1);
@@ -106,85 +65,56 @@ arr4.push([7, 8, 9]);
 arr4[1][1] = 88;
 DeetCode.disableAutoVis();
 
-/**
- * MinPriorityQueue
- */
 const minpq = new MinPriorityQueue();
 minpq.enqueue(1);
-DeetCode.minPriorityQueue({ id: "minpq", data: minpq });
+DeetCode.minPriorityQueue("minpq", minpq);
 minpq.enqueue(2);
-DeetCode.minPriorityQueue({ id: "minpq", data: minpq });
+DeetCode.minPriorityQueue("minpq", minpq);
 minpq.enqueue(3);
-DeetCode.minPriorityQueue({ id: "minpq", data: minpq });
+DeetCode.minPriorityQueue("minpq", minpq);
 minpq.dequeue();
-DeetCode.minPriorityQueue({ id: "minpq", data: minpq });
+DeetCode.minPriorityQueue("minpq", minpq);
 minpq.front();
 
-/**
- * MaxPriorityQueue
- */
 const maxpq = new MaxPriorityQueue();
 maxpq.enqueue(1);
-DeetCode.maxPriorityQueue({ id: "maxpq", data: maxpq });
+DeetCode.maxPriorityQueue("maxpq", maxpq);
 maxpq.enqueue(2);
-DeetCode.maxPriorityQueue({ id: "maxpq", data: maxpq });
+DeetCode.maxPriorityQueue("maxpq", maxpq);
 maxpq.enqueue(3);
-DeetCode.maxPriorityQueue({ id: "maxpq", data: maxpq });
+DeetCode.maxPriorityQueue("maxpq", maxpq);
 maxpq.dequeue();
-DeetCode.maxPriorityQueue({ id: "maxpq", data: maxpq });
+DeetCode.maxPriorityQueue("maxpq", maxpq);
 maxpq.front();
 
-/**
- * PriorityQueue
- */
 const pq = new PriorityQueue((a, b) => b.rank - a.rank);
 pq.enqueue({ name: "foo", rank: 1 });
-DeetCode.priorityQueue({ id: "pq", data: pq });
+DeetCode.priorityQueue("pq", pq);
 pq.enqueue({ name: "bar", rank: 2 });
-DeetCode.priorityQueue({ id: "pq", data: pq });
+DeetCode.priorityQueue("pq", pq);
 pq.enqueue({ name: "baz", rank: 3 });
-DeetCode.priorityQueue({ id: "pq", data: pq });
+DeetCode.priorityQueue("pq", pq);
 pq.dequeue();
-DeetCode.priorityQueue({ id: "pq", data: pq });
+DeetCode.priorityQueue("pq", pq);
 pq.front();
 
-/**
- * Linked List
- */
 const linkedList = new ListNode(1);
 linkedList.next = new ListNode(2);
 linkedList.next.next = new ListNode(3);
 linkedList.next.next.next = new ListNode(4);
 const prev = linkedList;
 const cur = linkedList.next;
-DeetCode.linkedList({ id: "linked list", data: linkedList });
+DeetCode.linkedList("linked list", linkedList);
 
-/**
- * Linked List Pointers
- */
-DeetCode.linkedList({
-  id: "with pointers",
-  data: linkedList,
+DeetCode.linkedList("with pointers", linkedList, {
   pointers: { prev: prev, cur: cur },
 });
 
-/**
- * Linked List Cycle
- */
 linkedList.next.next.next.next = linkedList.next;
-DeetCode.linkedList({ id: "with cycle", data: linkedList });
+DeetCode.linkedList("with cycle", linkedList);
 
-/**
- * Bitwise
- */
-DeetCode.bitwise({
-  id: "binary",
-  data: 123,
-});
+DeetCode.bitwise("binary", 123);
 
-/**
- * Binary Tree
- */
 const rootNode = new TreeNode(6);
 rootNode.left = new TreeNode(2);
 rootNode.left.left = new TreeNode(0);
@@ -195,36 +125,47 @@ rootNode.right = new TreeNode(8);
 rootNode.right.left = new TreeNode(7);
 rootNode.right.right = new TreeNode(9);
 rootNode.color = "green";
-DeetCode.tree({ id: "tree", data: rootNode });
+DeetCode.tree("tree", rootNode);
 
-/**
- * LeetCode style array to binary tree syntax is supported
- */
 const treeFromArray = DeetCode.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
-DeetCode.tree({ id: "tree from array", data: treeFromArray });
+DeetCode.tree("tree from array", treeFromArray);
 
-/**
- * DeetCode supports auto visualizations of native JavaScript
- * data structures. This allows you to create visualizations without
- * having to call DeetCode. This experimental feature can be enabled
- * with DeetCode.enableAutoVis().
- */
+const adjList = [
+  [2, 4],
+  [1, 3],
+  [2, 4],
+  [1, 3],
+];
+const nodes = DeetCode.buildGraph(adjList);
+const root = nodes[0];
+root.color = "green";
+DeetCode.graph("root", root);
+
+const prerequisites = [
+  [0, 10],
+  [3, 18],
+  [5, 5],
+  [6, 11],
+  [11, 14],
+  [13, 1],
+  [15, 1],
+  [17, 4],
+];
+const adj = new Map();
+const color = new Map();
+for (let i = 0; i < 20; i++) {
+  adj.set(i, []);
+  color.set(i, "white");
+}
+for (const [a, b] of prerequisites) {
+  adj.get(b).push(a);
+}
+DeetCode.directedGraph("directed graph", { adj: adj });
+
+color.set(1, "green");
+DeetCode.directedGraph("directed graph with color", { adj: adj, color: color });
+
 DeetCode.enableAutoVis();
-
-// const map2 = new Map([
-//   [1, 1],
-//   [2, 2],
-//   [3, 3],
-// ]);
-// map2.has(1);
-// map2.get(1);
-// map2.delete(3);
-// map2.set(3, 3);
-
-/**
- * DeetCode still works even with Auto Native Visualization enabled
- */
-DeetCode.set({ id: "set2", data: set2 });
 
 const minpq2 = new MinPriorityQueue();
 minpq2.enqueue(1);
@@ -247,16 +188,7 @@ pq2.enqueue({ name: "baz", rank: 3 });
 pq2.dequeue();
 pq2.front();
 
-/**
- * Auto native visualization can be disabled DeetCode.disableAutoVis().
- */
 DeetCode.disableAutoVis();
 
-// This set will not be rendered in the visualization.
-const set3 = new Set([2, 3, 4]);
-
-/**
- * Assertions
- */
 DeetTest.equal(true, true);
 DeetTest.equal(1, 2);
