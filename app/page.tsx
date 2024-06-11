@@ -48,7 +48,7 @@ export default async function Home() {
   return (
     <div className="h-full">
       <Header user={user} />
-      <main className="flex flex-col h-full p-5 gap-5">
+      <main className="flex flex-col h-full gap-5">
         <h1 className="font-bold text-5xl text-center text-primary font-brand mt-10">
           DeetCode
         </h1>
@@ -142,24 +142,24 @@ export default async function Home() {
             Switch between different rendering modes and display options with
             the toolbar.
           </p>
-          <div className="m-auto">
+          <div className="bg-muted pt-2">
             <Toolbar />
           </div>
         </div>
-        <div>
+        <div className="p-5">
           <h3 className="text-2xl font-bold">{problem1.name}</h3>
           <ProblemDetailSandbox problem={problem1} isPlayground={true} />
         </div>
-        <div>
+        <div className="p-5">
           <h3 className="text-2xl font-bold">{problem2.name}</h3>
           <ProblemDetailSandbox problem={problem2} isPlayground={true} />
         </div>
-        <div>
+        <div className="p-5">
           <h3 className="text-2xl font-bold">{problem3.name}</h3>
           <ProblemDetailSandbox problem={problem3} isPlayground={true} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10 p-5">
           <div className="flex flex-col gap-5">
             <h2 className="text-2xl text-center text-primary font-brand">
               Problems
@@ -197,12 +197,12 @@ export default async function Home() {
 
         <div className="mt-10 m-auto max-w-lg flex flex-col gap-5">
           <h2 className="text-2xl text-center text-primary font-brand">
-            The Next Step
+            FREE Download
           </h2>
           <p>
             If you're serious about becoming great at leetcoding, then you
             should download DeetCode's amazingly useful guide (written by the
-            creator of DeetCode). This download includes the following:
+            creator of DeetCode). Download includes:
           </p>
           <ul>
             <li className="flex gap-2 items-center">
@@ -223,9 +223,16 @@ export default async function Home() {
             </li>
             <li className="flex gap-2 items-center">
               <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
-              Invite to the exclusive Full Stack Book discord channel
+              Invite to the Full Stack Book discord channel
+            </li>
+            <li className="flex gap-2 items-center">
+              <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
+              Advanced TypeScript Tips
             </li>
           </ul>
+          <div className="flex justify-center mb-10">
+            <Button>Download</Button>
+          </div>
         </div>
       </main>
       <Footer />
