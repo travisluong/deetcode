@@ -859,16 +859,15 @@ class DeetTreeNodeEngine extends DeetBaseEngine {
     const label = this.renderLabel(opts);
     div.appendChild(label);
 
-    const width = 800;
-
     const tree = d3.tree().nodeSize([50, 40]);
 
     const root = d3.hierarchy(data);
 
     // dynamic height based on the height of tree
+    const width = root.height * 200 + 22;
     const height = root.height * 40 + 22;
     const svg = d3.create("svg").attr("width", width).attr("height", height);
-    const g = svg.append("g").attr("transform", "translate(400,10)");
+    const g = svg.append("g").attr("transform", "translate(200,10)");
 
     // @ts-ignore
     tree(root);
@@ -1219,6 +1218,8 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
     const data = this.copyData(opts);
     const div = document.createElement("div");
     div.classList.add("deetcode-directed-graph");
+    const label = this.renderLabel(opts);
+    div.appendChild(label);
     const { adj: adjacencyList, color: colorMap } = data;
     const nodes = adjacencyList
       .keys()

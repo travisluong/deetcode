@@ -34,7 +34,7 @@ export default async function Home() {
   if (!problem1) notFound();
 
   const problem2 = await db.query.problems.findFirst({
-    where: eq(problems.slug, "merge-two-sorted-lists"),
+    where: eq(problems.slug, "course-schedule"),
   });
 
   if (!problem2) notFound();
@@ -66,7 +66,7 @@ export default async function Home() {
           Visualize LeetCode algorithms with minimal code using DeetCode utility
           functions
         </p>
-        <ul className="grid grid-cols-3">
+        <ul className="grid grid-cols-3 max-w-5xl m-auto">
           <li className="flex gap-2 items-center">
             <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" /> Set
           </li>
