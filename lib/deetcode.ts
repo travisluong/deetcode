@@ -107,8 +107,8 @@ interface DeetGraphOptions extends DeetOptions {
 interface DeetDirectedGraphOptions extends DeetOptions {
   data: {
     adj: Map<string | number, Array<string | number>>;
+    color?: Map<string | number, string>;
   };
-  color?: Map<string | number, string>;
 }
 
 interface DeetTrie {
@@ -1215,13 +1215,12 @@ class DeetGraphEngine extends DeetBaseEngine {
 class DeetDirectedGraphEngine extends DeetBaseEngine {
   dataTypeLabel: string = "Directed Graph";
   renderContent(opts: DeetDirectedGraphOptions): HTMLElement {
-    const adjacencyList = this.copyData(opts);
+    const data = this.copyData(opts);
     const div = document.createElement("div");
     div.classList.add("deetcode-directed-graph");
     const label = this.renderLabel(opts);
     div.appendChild(label);
-
-    const { color: colorMap } = opts;
+    const { adj: adjacencyList, color: colorMap } = data;
     const nodes = adjacencyList
       .keys()
       .toArray()
@@ -2466,8 +2465,8 @@ export class DeetCode {
 
   directedGraph(
     id: string,
-    data: Map<string | number, Array<string | number>>,
-    opts?: {
+    data: {
+      adj: Map<string | number, Array<string | number>>;
       color?: Map<string | number, string>;
     }
   ) {
@@ -2476,7 +2475,6 @@ export class DeetCode {
       data,
       hideId: false,
       deetEngine: this.deetEngine,
-      color: opts?.color,
     };
     this.deetEngine.deetDirectedGraphEngine.renderContainer(options);
     this.deetEngine.deetDirectedGraphEngine.renderFork(options);
