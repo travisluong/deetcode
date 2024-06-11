@@ -864,10 +864,10 @@ class DeetTreeNodeEngine extends DeetBaseEngine {
     const root = d3.hierarchy(data);
 
     // dynamic height based on the height of tree
-    const width = root.height * 200 + 22;
+    const width = root.height * 300 + 22;
     const height = root.height * 40 + 22;
     const svg = d3.create("svg").attr("width", width).attr("height", height);
-    const g = svg.append("g").attr("transform", "translate(200,10)");
+    const g = svg.append("g").attr("transform", "translate(150,10)");
 
     // @ts-ignore
     tree(root);
