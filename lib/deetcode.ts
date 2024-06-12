@@ -104,11 +104,13 @@ interface DeetGraphOptions extends DeetOptions {
   data: DeetNode;
 }
 
+interface AdjacencyListOptions {
+  adj: Map<string | number, Array<string | number>>;
+  color?: Map<string | number, string>;
+}
+
 interface DeetDirectedGraphOptions extends DeetOptions {
-  data: {
-    adj: Map<string | number, Array<string | number>>;
-    color?: Map<string | number, string>;
-  };
+  data: AdjacencyListOptions;
 }
 
 interface DeetTrie {
@@ -2463,13 +2465,7 @@ export class DeetCode {
     this.deetEngine.deetGraphEngine.renderFork(options);
   }
 
-  directedGraph(
-    id: string,
-    data: {
-      adj: Map<string | number, Array<string | number>>;
-      color?: Map<string | number, string>;
-    }
-  ) {
+  directedGraph(id: string, data: AdjacencyListOptions) {
     const options = {
       id,
       data,
