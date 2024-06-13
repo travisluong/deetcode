@@ -1089,14 +1089,14 @@ class DeetGraphEngine extends DeetBaseEngine {
     const centerX = 200; // center of the SVG canvas
     const centerY = 150;
 
-    const d3Nodes = nodes.map((node, i) => ({
+    const d3Nodes = nodes.map((node: DeetNode, i: number) => ({
       id: node.val,
       x: centerX + radius * Math.cos((2 * Math.PI * i) / numNodes),
       y: centerY + radius * Math.sin((2 * Math.PI * i) / numNodes),
       color: node.color,
     }));
 
-    const d3Links = links.map((link) => ({
+    const d3Links = links.map((link: any) => ({
       source: link.source,
       target: link.target,
     }));
@@ -1124,9 +1124,9 @@ class DeetGraphEngine extends DeetBaseEngine {
       .append("circle")
       .attr("class", "node")
       .attr("r", 10)
-      .attr("fill", (d) => d.color ?? "lightgray");
+      .attr("fill", (d: any) => d.color ?? "lightgray");
 
-    node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
 
     const label = svg
       .append("g")
@@ -1137,9 +1137,9 @@ class DeetGraphEngine extends DeetBaseEngine {
       .append("text")
       .attr("class", "label")
       .attr("dy", 0) // Adjust this value to position the label relative to the node
-      .text((d) => d.id);
+      .text((d: any) => d.id);
 
-    label.attr("x", (d) => d.x - 5).attr("y", (d) => d.y + 5);
+    label.attr("x", (d: any) => d.x - 5).attr("y", (d: any) => d.y + 5);
 
     // node
     //   .append("text")
@@ -1149,10 +1149,10 @@ class DeetGraphEngine extends DeetBaseEngine {
 
     // Set positions for links and nodes
     link
-      .attr("x1", (d) => d3Nodes.find((n) => n.id === d.source).x)
-      .attr("y1", (d) => d3Nodes.find((n) => n.id === d.source).y)
-      .attr("x2", (d) => d3Nodes.find((n) => n.id === d.target).x)
-      .attr("y2", (d) => d3Nodes.find((n) => n.id === d.target).y);
+      .attr("x1", (d: any) => d3Nodes.find((n: any) => n.id === d.source).x)
+      .attr("y1", (d: any) => d3Nodes.find((n: any) => n.id === d.source).y)
+      .attr("x2", (d: any) => d3Nodes.find((n: any) => n.id === d.target).x)
+      .attr("y2", (d: any) => d3Nodes.find((n: any) => n.id === d.target).y);
 
     const svgnode = svg.node();
     if (svgnode) {
@@ -1226,8 +1226,8 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
     const nodes = adjacencyList
       .keys()
       .toArray()
-      .map((id) => ({ id }));
-    const links = [];
+      .map((id: any) => ({ id }));
+    const links: any[] = [];
 
     // Object.keys(adjacencyList).forEach((source) => {
     //   adjacencyList[source].forEach((target) => {
@@ -1236,7 +1236,7 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
     // });
 
     for (const [key, value] of adjacencyList.entries()) {
-      value.forEach((target) => {
+      value.forEach((target: any) => {
         links.push({ source: key, target: target });
       });
     }
@@ -1247,8 +1247,8 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
     const circleRadius = 10; // Radius of the node circles
 
     // Generate positions in a circle
-    const positions = {};
-    nodes.forEach((node, i) => {
+    const positions: { [key: number]: any } = {};
+    nodes.forEach((node: any, i: number) => {
       const angle = (i / nodes.length) * 2 * Math.PI;
       positions[node.id] = {
         x: width / 2 + radius * Math.cos(angle),
@@ -1295,18 +1295,18 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
       .attr("class", "node")
       .attr(
         "transform",
-        (d) => `translate(${positions[d.id].x},${positions[d.id].y})`
+        (d: any) => `translate(${positions[d.id].x},${positions[d.id].y})`
       );
 
     node
       .append("circle")
       .attr("r", circleRadius)
-      .attr("fill", (d) => (colorMap ? colorMap.get(d.id) : "gray"));
+      .attr("fill", (d: any) => (colorMap ? colorMap.get(d.id) : "gray"));
 
     node
       .append("text")
       .attr("dy", ".35em") // Center text vertically
-      .text((d) => d.id);
+      .text((d: any) => d.id);
 
     // Adjust the positions of the arrow markers
     link
@@ -1316,7 +1316,7 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
       .attr("x2", (d) => getEndPoint(d.source, d.target, false).x)
       .attr("y2", (d) => getEndPoint(d.source, d.target, false).y);
 
-    function getEndPoint(source, target, isSource) {
+    function getEndPoint(source: number, target: number, isSource: boolean) {
       const sourcePos = positions[source];
       const targetPos = positions[target];
       const dx = targetPos.x - sourcePos.x;
