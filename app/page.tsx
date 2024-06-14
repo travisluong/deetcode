@@ -201,8 +201,8 @@ export default async function Home() {
           </h2>
           <p>
             If you're serious about becoming great at leetcoding, then you
-            should download DeetCode's amazingly useful guide (written by the
-            creator of DeetCode). Download includes:
+            should download DeetCode's amazingly useful guide. Download
+            includes:
           </p>
           <ul>
             <li className="flex gap-2 items-center">
@@ -210,28 +210,24 @@ export default async function Home() {
               DeetCode's Guide To LeetCoding
             </li>
             <li className="flex gap-2 items-center">
-              <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />A free
-              coupon for the best selling course at www.fullstackbook.com
-            </li>
-            <li className="flex gap-2 items-center">
-              <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />A
-              JavaScript leetcode cheat sheet
-            </li>
-            <li className="flex gap-2 items-center">
-              <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />A
-              DeetCode cheat sheet
+              <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
+              JavaScript Cheat Sheet For LeetCoding
             </li>
             <li className="flex gap-2 items-center">
               <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
-              Invite to the Full Stack Book discord channel
+              Exclusive Deals
             </li>
             <li className="flex gap-2 items-center">
               <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
-              Advanced TypeScript Tips
+              Invite to Discord channel
             </li>
           </ul>
           <div className="flex justify-center mb-10">
-            <Button>Download</Button>
+            <Button>
+              <Link href="https://fullstackbook.ck.page/8f266b99cd">
+                Download
+              </Link>
+            </Button>
           </div>
         </div>
       </main>
