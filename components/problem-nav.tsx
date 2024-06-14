@@ -44,16 +44,6 @@ export default function ProblemNav({ problem }: { problem: ProblemDB }) {
         </Link>
         <Link
           className={cn(
-            "border border-gray-400 dark:border-gray-600 p-1 border-b-0 rounded-t min-w-24 text-center",
-            pathname === `/problems/${slug}/notes` &&
-              "bg-slate-200 dark:bg-slate-800"
-          )}
-          href={`/problems/${slug}/notes`}
-        >
-          Notes
-        </Link>
-        <Link
-          className={cn(
             "border border-gray-400 dark:border-gray-600 p-1 border-b-0 rounded-t min-w-24 text-center flex gap-2 items-center"
           )}
           href={problem.leetcode_url ?? ""}
