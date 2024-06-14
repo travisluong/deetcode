@@ -234,14 +234,13 @@ export default async function Home() {
             </li>
           </ul>
           <div className="flex justify-center mb-10">
-            <Button>
-              <a
-                data-formkit-toggle="af437c0185"
-                href="https://deetcode.ck.page/af437c0185"
-              >
-                Download
-              </a>
-            </Button>
+            <a
+              data-formkit-toggle="af437c0185"
+              href="https://deetcode.ck.page/af437c0185"
+              className="bg-primary text-primary-foreground rounded-2xl p-3 font-bold hover:bg-primary/85"
+            >
+              Subscribe &amp; Download
+            </a>
             <Script
               async
               data-uid="af437c0185"

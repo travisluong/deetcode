@@ -1,7 +1,7 @@
 import {
   DiscordLogoIcon,
+  LayersIcon,
   LinkedInLogoIcon,
-  RocketIcon,
   TwitterLogoIcon,
   VideoIcon,
 } from "@radix-ui/react-icons";
@@ -14,7 +14,7 @@ export default function Footer() {
         <ul className="flex gap-5 items-center">
           <li>
             <a href="https://www.fullstackbook.com">
-              <RocketIcon className="w-6 h-6" />
+              <LayersIcon className="w-6 h-6" />
             </a>
           </li>
           <li>
