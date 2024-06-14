@@ -45,6 +45,12 @@ export default async function Home() {
 
   if (!problem3) notFound();
 
+  const problem4 = await db.query.problems.findFirst({
+    where: eq(problems.slug, "word-search-ii"),
+  });
+
+  if (!problem4) notFound();
+
   return (
     <div className="h-full">
       <Header user={user} />
@@ -157,6 +163,10 @@ export default async function Home() {
         <div className="p-5">
           <h3 className="text-2xl font-bold">{problem3.name}</h3>
           <ProblemDetailSandbox problem={problem3} isPlayground={true} />
+        </div>
+        <div className="p-5">
+          <h3 className="text-2xl font-bold">{problem4.name}</h3>
+          <ProblemDetailSandbox problem={problem4} isPlayground={true} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10 p-5">

@@ -1217,13 +1217,13 @@ class DeetGraphEngine extends DeetBaseEngine {
 class DeetDirectedGraphEngine extends DeetBaseEngine {
   dataTypeLabel: string = "Directed Graph";
   renderContent(opts: DeetDirectedGraphOptions): HTMLElement {
-    const adjacencyList = this.copyData(opts);
+    const data = this.copyData(opts);
+    const { adj: adjacencyList, color: colorMap } = data;
     const div = document.createElement("div");
     div.classList.add("deetcode-directed-graph");
     const label = this.renderLabel(opts);
     div.appendChild(label);
 
-    const { color: colorMap } = opts;
     const nodes = adjacencyList
       .keys()
       .toArray()
@@ -2472,7 +2472,6 @@ export class DeetCode {
       data,
       hideId: false,
       deetEngine: this.deetEngine,
-      color: opts?.color,
     };
     this.deetEngine.deetDirectedGraphEngine.renderContainer(options);
     this.deetEngine.deetDirectedGraphEngine.renderFork(options);
