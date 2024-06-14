@@ -16,6 +16,7 @@ import {
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 
 export default async function Home() {
   const session = await auth();
@@ -227,13 +228,26 @@ export default async function Home() {
               <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
               Exclusive Deals
             </li>
+            <li className="flex gap-2 items-center">
+              <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
+              Latest News
+            </li>
           </ul>
           <div className="flex justify-center mb-10">
             <Button>
-              <Link href="https://fullstackbook.ck.page/8f266b99cd">
+              <a
+                data-formkit-toggle="af437c0185"
+                href="https://deetcode.ck.page/af437c0185"
+              >
                 Download
-              </Link>
+              </a>
             </Button>
+            <Script
+              async
+              data-uid="af437c0185"
+              src="https://deetcode.ck.page/af437c0185/index.js"
+              strategy="afterInteractive"
+            />
           </div>
         </div>
       </main>
