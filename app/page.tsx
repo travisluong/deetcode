@@ -227,10 +227,6 @@ export default async function Home() {
               <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
               Exclusive Deals
             </li>
-            <li className="flex gap-2 items-center">
-              <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
-              Invite to Discord channel
-            </li>
           </ul>
           <div className="flex justify-center mb-10">
             <Button>
