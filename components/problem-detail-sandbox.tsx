@@ -126,7 +126,7 @@ export default function ProblemDetailSandbox({
 
   function plus() {
     // @ts-ignore
-    editorRef.current.setValue(problem.default_code);
+    editorRef.current.setValue(problem.default_code ?? "");
     setIsNew(true);
   }
 
