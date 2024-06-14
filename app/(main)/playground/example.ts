@@ -145,11 +145,11 @@ for (const [a, b] of prerequisites) {
   adj.get(b).push(a);
 }
 // Visualize graph without color
-DeetCode.directedGraph("directed graph", adj, { color: color });
+DeetCode.directedGraph("directed graph", { adj: adj, color: color });
 // Set color
 color.set(1, "green");
 // Visualize graph with color
-DeetCode.directedGraph("directed graph with color", adj, { color: color });
+DeetCode.directedGraph("directed graph with color", { adj: adj, color: color });
 
 // Enable Auto Vis - Data structures are automatically visualized
 DeetCode.enableAutoVis();
