@@ -1323,8 +1323,12 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
       const dx = targetPos.x - sourcePos.x;
       const dy = targetPos.y - sourcePos.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const offsetX = (dx * circleRadius) / dist;
-      const offsetY = (dy * circleRadius) / dist;
+      let offsetX = (dx * circleRadius) / dist;
+      let offsetY = (dy * circleRadius) / dist;
+      if (_.isNaN(offsetX) || _.isNaN(offsetY)) {
+        offsetX = 0;
+        offsetY = 0;
+      }
       return isSource
         ? { x: sourcePos.x + offsetX, y: sourcePos.y + offsetY }
         : { x: targetPos.x - offsetX, y: targetPos.y - offsetY };
