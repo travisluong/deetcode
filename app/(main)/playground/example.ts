@@ -1,46 +1,31 @@
 // @ts-nocheck
 
+// String
 DeetCode.string("str", "deetcode", { pointers: { i: 1, j: 2 } });
 
-const set1 = new Set([1, 2, 3]);
-set1.delete(3);
-set1.add(3);
-DeetCode.set("set1", set1);
+// Set
+const set = new Set([1, 2, 3]);
+set.delete(3);
+set.add(3);
+DeetCode.set("set", set);
 
-DeetCode.enableAutoVis();
-const set2 = new Set([4, 5, 6]);
-set2.has(1);
-set2.delete(3);
-set2.add(3);
-DeetCode.disableAutoVis();
-
-const map1 = new Map([
+// Map
+const map = new Map([
   [1, 1],
   [2, 2],
   [3, 3],
 ]);
-map1.delete(3);
-map1.set(3, 3);
-DeetCode.map("map1", map1);
+map.delete(3);
+map.set(3, 3);
+DeetCode.map("map", map);
 
-DeetCode.enableAutoVis();
-const map2 = new Map([
-  [1, 1],
-  [2, 2],
-  [3, 3],
-]);
-map2.has(1);
-map2.get(1);
-map2.delete(3);
-map2.set(3, 3);
-DeetCode.disableAutoVis();
+// Array
+const arr = [1, 2, 3];
+DeetCode.array("arr", arr, { pointers: { i: 0, j: 2 } });
+arr.push(4);
+DeetCode.array("arr", arr, { pointers: { i: 1, j: 1 } });
 
-const arr1 = [1, 2, 3];
-DeetCode.array("arr1", arr1, { pointers: { i: 0, j: 2 } });
-
-arr1.push(4);
-DeetCode.array("arr1", arr1, { pointers: { i: 1, j: 1 } });
-
+// 2D Array
 const arr2 = [
   [1, 2, 3],
   [4, 5, 6],
@@ -48,23 +33,7 @@ const arr2 = [
 ];
 DeetCode.array("arr2", arr2);
 
-DeetCode.enableAutoVis();
-const arr3 = new Array();
-arr3.push(1);
-arr3.push(2);
-arr3.push(3);
-arr3.pop();
-arr3.shift();
-arr3.push(3);
-arr3.unshift(1);
-arr3[0] = 8;
-const arr4 = new Array();
-arr4.push([1, 2, 3]);
-arr4.push([4, 5, 6]);
-arr4.push([7, 8, 9]);
-arr4[1][1] = 88;
-DeetCode.disableAutoVis();
-
+// Min Priority Queue
 const minpq = new MinPriorityQueue();
 minpq.enqueue(1);
 DeetCode.minPriorityQueue("minpq", minpq);
@@ -76,6 +45,7 @@ minpq.dequeue();
 DeetCode.minPriorityQueue("minpq", minpq);
 minpq.front();
 
+// Max Priority Queue
 const maxpq = new MaxPriorityQueue();
 maxpq.enqueue(1);
 DeetCode.maxPriorityQueue("maxpq", maxpq);
@@ -87,6 +57,7 @@ maxpq.dequeue();
 DeetCode.maxPriorityQueue("maxpq", maxpq);
 maxpq.front();
 
+// Priority Queue
 const pq = new PriorityQueue((a, b) => b.rank - a.rank);
 pq.enqueue({ name: "foo", rank: 1 });
 DeetCode.priorityQueue("pq", pq);
@@ -98,6 +69,7 @@ pq.dequeue();
 DeetCode.priorityQueue("pq", pq);
 pq.front();
 
+// Linked List
 const linkedList = new ListNode(1);
 linkedList.next = new ListNode(2);
 linkedList.next.next = new ListNode(3);
@@ -113,8 +85,10 @@ DeetCode.linkedList("with pointers", linkedList, {
 linkedList.next.next.next.next = linkedList.next;
 DeetCode.linkedList("with cycle", linkedList);
 
+// Bitwise
 DeetCode.bitwise("binary", 123);
 
+// Tree
 const rootNode = new TreeNode(6);
 rootNode.left = new TreeNode(2);
 rootNode.left.left = new TreeNode(0);
@@ -130,17 +104,23 @@ DeetCode.tree("tree", rootNode);
 const treeFromArray = DeetCode.arrayToBinaryTree([4, 2, 7, 1, 3, 6, 9]);
 DeetCode.tree("tree from array", treeFromArray);
 
+// Undirected Graph
 const adjList = [
   [2, 4],
   [1, 3],
   [2, 4],
   [1, 3],
 ];
+// Build graph of Nodes from adjacency list
 const nodes = DeetCode.buildGraph(adjList);
-const root = nodes[0];
-root.color = "green";
-DeetCode.graph("root", root);
+// Get the first node (index 0 of adjList)
+const node = nodes[0];
+// Change the node color
+node.color = "green";
+// Visualize graph
+DeetCode.graph("node", node);
 
+// Directed Graph
 const prerequisites = [
   [0, 10],
   [3, 18],
@@ -151,44 +131,91 @@ const prerequisites = [
   [15, 1],
   [17, 4],
 ];
+// Declare adjacency list as map
 const adj = new Map();
+// Declare color map
 const color = new Map();
+// Build the initial adjacency list and color map
 for (let i = 0; i < 20; i++) {
   adj.set(i, []);
   color.set(i, "white");
 }
+// Build the adjacency list from prerequisites array b -> a
 for (const [a, b] of prerequisites) {
   adj.get(b).push(a);
 }
-DeetCode.directedGraph("directed graph", { adj: adj });
-
+// Visualize graph without color
+DeetCode.directedGraph("directed graph", adj, { color: color });
+// Set color
 color.set(1, "green");
-DeetCode.directedGraph("directed graph with color", { adj: adj, color: color });
+// Visualize graph with color
+DeetCode.directedGraph("directed graph with color", adj, { color: color });
 
+// Enable Auto Vis - Data structures are automatically visualized
 DeetCode.enableAutoVis();
 
-const minpq2 = new MinPriorityQueue();
-minpq2.enqueue(1);
-minpq2.enqueue(2);
-minpq2.enqueue(3);
-minpq2.dequeue();
-minpq2.front();
+// Auto Set
+const setA = new Set([4, 5, 6]);
+setA.has(1);
+setA.delete(3);
+setA.add(3);
 
-const maxpq2 = new MaxPriorityQueue();
-maxpq2.enqueue(1);
-maxpq2.enqueue(2);
-maxpq2.enqueue(3);
-maxpq2.dequeue();
-maxpq2.front();
+// Auto Map
+const mapA = new Map([
+  [1, 1],
+  [2, 2],
+  [3, 3],
+]);
+mapA.has(1);
+mapA.get(1);
+mapA.delete(3);
+mapA.set(3, 3);
 
-const pq2 = new PriorityQueue((a, b) => b.rank - a.rank);
-pq2.enqueue({ name: "foo", rank: 1 });
-pq2.enqueue({ name: "bar", rank: 2 });
-pq2.enqueue({ name: "baz", rank: 3 });
-pq2.dequeue();
-pq2.front();
+// Auto Array
+const arrA = new Array();
+arrA.push(1);
+arrA.push(2);
+arrA.push(3);
+arrA.pop();
+arrA.shift();
+arrA.push(3);
+arrA.unshift(1);
+arrA[0] = 8;
 
+// Auto 2D Array
+const arrA2 = new Array();
+arrA2.push([1, 2, 3]);
+arrA2.push([4, 5, 6]);
+arrA2.push([7, 8, 9]);
+arrA2[1][1] = 88;
+
+// Auto Min Priority Queue
+const minpqA = new MinPriorityQueue();
+minpqA.enqueue(1);
+minpqA.enqueue(2);
+minpqA.enqueue(3);
+minpqA.dequeue();
+minpqA.front();
+
+// Auto Max Priority Queue
+const maxpqA = new MaxPriorityQueue();
+maxpqA.enqueue(1);
+maxpqA.enqueue(2);
+maxpqA.enqueue(3);
+maxpqA.dequeue();
+maxpqA.front();
+
+// Auto Priority Queue
+const pqA = new PriorityQueue((a, b) => b.rank - a.rank);
+pqA.enqueue({ name: "foo", rank: 1 });
+pqA.enqueue({ name: "bar", rank: 2 });
+pqA.enqueue({ name: "baz", rank: 3 });
+pqA.dequeue();
+pqA.front();
+
+// Disable Auto Vis - Stop automatic visualizations of data structures
 DeetCode.disableAutoVis();
 
+// Assertions
 DeetTest.equal(true, true);
 DeetTest.equal(1, 2);
