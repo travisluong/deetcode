@@ -211,14 +211,14 @@ export default async function Home() {
             FREE Download
           </h2>
           <p>
-            If you're serious about becoming great at leetcoding, then you
-            should download DeetCode's amazingly useful guide. Download
+            If you&apos;re serious about becoming great at leetcoding, then you
+            should download DeetCode&apos;s amazingly useful guide. Download
             includes:
           </p>
           <ul>
             <li className="flex gap-2 items-center">
               <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
-              DeetCode's Guide To LeetCoding
+              DeetCode&apos;s Guide To LeetCoding
             </li>
             <li className="flex gap-2 items-center">
               <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" />
