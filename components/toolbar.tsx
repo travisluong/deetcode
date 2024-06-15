@@ -14,7 +14,7 @@ export default function Toolbar({
   user,
 }: {
   solution?: SolutionDB;
-  user?: UserDB;
+  user?: Partial<UserDB>;
 }) {
   const ref = useRef<HTMLElement | null>(null);
 

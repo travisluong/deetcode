@@ -16,7 +16,21 @@ export default async function Page({ params }: { params: { slug: string } }) {
     notFound();
   }
   const data = await db
-    .select()
+    .select({
+      user: {
+        id: users.id,
+        username: users.username,
+        image: users.image,
+      },
+      solution: {
+        id: solutions.id,
+        title: solutions.title,
+        created_at: solutions.created_at,
+      },
+      problem: {
+        id: problems.id,
+      },
+    })
     .from(problems)
     .innerJoin(solutions, eq(problems.id, solutions.problem_id))
     .innerJoin(users, eq(solutions.user_id, users.id))
@@ -25,7 +39,23 @@ export default async function Page({ params }: { params: { slug: string } }) {
   let mySolutions;
   if (session) {
     mySolutions = await db
-      .select()
+      .select({
+        user: {
+          id: users.id,
+          username: users.username,
+          image: users.image,
+        },
+        solution: {
+          id: solutions.id,
+          title: solutions.title,
+          created_at: solutions.created_at,
+        },
+        problem: {
+          id: problems.id,
+          name: problems.name,
+          slug: problems.slug,
+        },
+      })
       .from(problems)
       .innerJoin(solutions, eq(problems.id, solutions.problem_id))
       .innerJoin(users, eq(solutions.user_id, users.id))

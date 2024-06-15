@@ -31,6 +31,11 @@ export default async function Page({
   }
 
   const user = await db.query.users.findFirst({
+    columns: {
+      id: true,
+      username: true,
+      image: true,
+    },
     where: eq(users.id, solution.user_id),
   });
 

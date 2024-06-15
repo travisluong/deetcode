@@ -11,9 +11,9 @@ export type ProblemCategoryRow = {
 };
 
 export type ProblemSolutionUserRow = {
-  problem: ProblemDB;
-  solution: SolutionDB;
-  user: UserDB;
+  problem: Partial<ProblemDB>;
+  solution: Partial<SolutionDB>;
+  user: Partial<UserDB>;
 };
 
 export type PlaygroundProblem = {

@@ -15,6 +15,11 @@ export default async function Page({
   const { username } = params;
 
   const user = await db.query.users.findFirst({
+    columns: {
+      id: true,
+      image: true,
+      username: true,
+    },
     where: eq(users.username, username),
   });
 
@@ -23,7 +28,23 @@ export default async function Page({
   }
 
   const solutionsRes = await db
-    .select()
+    .select({
+      user: {
+        id: users.id,
+        username: users.username,
+        image: users.image,
+      },
+      solution: {
+        id: solutions.id,
+        title: solutions.title,
+        created_at: solutions.created_at,
+      },
+      problem: {
+        id: problems.id,
+        name: problems.name,
+        slug: problems.slug,
+      },
+    })
     .from(solutions)
     .innerJoin(problems, eq(solutions.problem_id, problems.id))
     .innerJoin(users, eq(users.id, solutions.user_id))

@@ -29,7 +29,7 @@ export const columns: ColumnDef<ProblemSolutionUserRow>[] = [
     },
   },
   {
-    accessorKey: "user.name",
+    accessorKey: "user.username",
     header: ({ column }) => {
       return (
         <Button
@@ -95,7 +95,7 @@ export const columns: ColumnDef<ProblemSolutionUserRow>[] = [
     },
     cell: ({ row }) => {
       const data = row.original;
-      return <div>{data.solution.created_at.toLocaleDateString()}</div>;
+      return <div>{data.solution?.created_at?.toLocaleDateString()}</div>;
     },
   },
 ];
