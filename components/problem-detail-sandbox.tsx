@@ -38,6 +38,7 @@ import updateSolution from "@/actions/update-solution";
 import { useToast } from "@/components/ui/use-toast";
 import deleteSolution from "@/actions/delete-solution";
 import { SubmitButton } from "./submit-button";
+import { config } from "@/lib/config";
 
 export default function ProblemDetailSandbox({
   problem,
@@ -183,7 +184,7 @@ export default function ProblemDetailSandbox({
           <div className="flex h-full items-center justify-center">
             <iframe
               sandbox="allow-scripts allow-same-origin allow-modals"
-              src="http://localhost:3000/runner"
+              src={config.RUNNER_URL}
               id={sandboxId!}
               width="100%"
               height="100%"
