@@ -11,7 +11,7 @@ import {
 } from "./ui/dropdown-menu";
 
 export default function LabelModeToggle() {
-  const [mode, setMode] = useState<boolean>(false);
+  const [mode, setMode] = useState<boolean>(true);
 
   useEffect(() => {
     const labelMode = localStorage.getItem("deetcode-label-mode");

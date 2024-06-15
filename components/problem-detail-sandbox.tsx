@@ -97,17 +97,19 @@ export default function ProblemDetailSandbox({
     }
 
     const renderMode =
-      (localStorage.getItem("deetcode-render-mode") as RenderMode) || "debug";
+      (localStorage.getItem("deetcode-render-mode") as RenderMode) || "animate";
     const directionMode =
       (localStorage.getItem("deetcode-direction-mode") as DirectionMode) ||
       "row";
-    const labelMode =
-      (localStorage.getItem("deetcode-label-mode") as LabelMode) === "true"
-        ? true
-        : false;
+    let labelMode = true;
+    if (
+      (localStorage.getItem("deetcode-label-mode") as LabelMode) === "false"
+    ) {
+      labelMode = false;
+    }
 
     const animationDelayStr = localStorage.getItem("deetcode-animation-delay");
-    const animationDelay = parseInt(animationDelayStr || "1000");
+    const animationDelay = parseInt(animationDelayStr || "500");
 
     const deetConfig = {
       renderMode,
