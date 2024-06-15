@@ -4,6 +4,7 @@ import ProblemDetailSandbox from "@/components/problem-detail-sandbox";
 import Toolbar from "@/components/toolbar";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
+import { config } from "@/lib/config";
 import { db } from "@/lib/db";
 import { problems, users } from "@/lib/schema";
 import {
@@ -15,10 +16,13 @@ import {
 } from "@radix-ui/react-icons";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Script from "next/script";
 
 export default async function Home() {
+  if (config.APP_MODE === "runner") {
+    redirect("/runner");
+  }
   const session = await auth();
 
   let user;

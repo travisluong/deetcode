@@ -123,7 +123,7 @@ export default function ProblemDetailSandbox({
       deetConfig,
     };
     // @ts-ignore
-    frame.contentWindow.postMessage(message, "https://www.veetcode.com");
+    frame.contentWindow.postMessage(message, config.NEXT_PUBLIC_RUNNER_DOMAIN);
   }
 
   function plus() {
