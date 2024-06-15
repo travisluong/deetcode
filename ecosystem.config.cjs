@@ -19,7 +19,7 @@ module.exports = {
       path: "/home/deetcode/deetcode.com",
       "pre-deploy-local": "",
       "post-deploy":
-        "source ~/.nvm/nvm.sh && nvm use 20 && npm install && npm run build && pm2 reload ecosystem.config.js --env production",
+        "source ~/.nvm/nvm.sh && nvm use 20 && npm install && npm run build && pm2 reload ecosystem.config.cjs --env production",
       "pre-setup": "",
       ssh_options: "ForwardAgent=yes",
     },
