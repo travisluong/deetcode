@@ -186,7 +186,7 @@ export default function ProblemDetailSandbox({
           <div className="flex h-full items-center justify-center">
             <iframe
               sandbox="allow-scripts allow-same-origin allow-modals"
-              src={config.RUNNER_URL}
+              src={config.NEXT_PUBLIC_RUNNER_URL}
               id={sandboxId!}
               width="100%"
               height="100%"
