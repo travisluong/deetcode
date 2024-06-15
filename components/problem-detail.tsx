@@ -85,7 +85,7 @@ export default function ProblemDetail({
     }
     // @ts-ignore
     const code = editorRef.current.getValue();
-    console.log(code);
+
     try {
       getInstance().init();
       eval(code);

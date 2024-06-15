@@ -19,8 +19,6 @@ export default function Toolbar({
   const ref = useRef<HTMLElement | null>(null);
 
   function handleScroll() {
-    console.log("handle scroll");
-
     if (!ref) {
       return;
     }

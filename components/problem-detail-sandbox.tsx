@@ -74,7 +74,7 @@ export default function ProblemDetailSandbox({
 
   useEffect(() => {
     window.addEventListener("message", function (e) {
-      console.log("message in sandbox", e.data);
+      // console.log("message in sandbox", e.data);
     });
   }, []);
 
@@ -88,7 +88,6 @@ export default function ProblemDetailSandbox({
   }
 
   function evaluate() {
-    console.log(sandboxId);
     // @ts-ignore
     const code = editorRef.current.getValue();
     const frame = document.getElementById(sandboxId!);

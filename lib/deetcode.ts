@@ -2074,7 +2074,6 @@ export class DeetEngine {
   }
 
   changeLabelMode(mode: boolean) {
-    console.log("mode", mode);
     if (mode) {
       this.el.classList.remove("deetcode-hide-labels");
     } else {

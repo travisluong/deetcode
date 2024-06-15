@@ -32,8 +32,6 @@ export default async function createSolution(
     return { message: "not authenticated" };
   }
 
-  console.log(formData);
-
   const validatedFields = CreateSolutionSchema.safeParse({
     problem_id: formData.get("problem_id"),
     title: formData.get("title"),

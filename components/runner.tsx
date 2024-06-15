@@ -28,7 +28,7 @@ export default function Runner() {
       var result = "";
       const deetConfig = e.data.deetConfig;
       const code = e.data.code;
-      console.log("message in runner", deetConfig);
+
       try {
         getInstance().init(deetConfig);
         result = eval(code);
