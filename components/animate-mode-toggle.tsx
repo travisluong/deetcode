@@ -62,9 +62,6 @@ export default function AnimateModeToggle() {
         <DropdownMenuItem onClick={() => handleClick("animate")}>
           <PlayIcon className="h-[1.2rem] w-[1.2rem] mr-2" /> Animate Mode
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleClick("debug")}>
-          <Crosshair2Icon className="h-[1.2rem] w-[1.2rem] mr-2" /> Debug Mode
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleClick("snapshot")}>
           <CameraIcon className="h-[1.2rem] w-[1.2rem] mr-2" /> Snapshot Mode
         </DropdownMenuItem>
