@@ -684,16 +684,8 @@ class DeetListNodeEngine extends DeetBaseEngine {
   }
   clearAllPointers(opts: DeetListNodeOptions) {
     let cur: DeetListNode | null = opts.data;
-    // TODO: this needs to be rewritten if monkey patching
-    // becomes an optional feature.
-    // since it is always on, we can assume the Set
-    // constructor has been monkey patched
-    DeetSet.undoMonkeyPatch();
-    const set = new Set();
-    // redo monkey patch if auto vis enabled
-    if (opts.deetEngine.isAutoVisEnabled) {
-      DeetSet.monkeyPatch();
-    }
+    const originalSet = DeetSet.getOriginalConstructor();
+    const set = new originalSet();
     while (cur && !set.has(cur)) {
       for (const val of cur.pointers) {
         cur.pointers.delete(val);
@@ -712,7 +704,10 @@ class DeetListNodeEngine extends DeetBaseEngine {
       }
     }
   }
-  copyData(opts: DeetOptions) {
+  copyData(opts: DeetListNodeOptions) {
+    if (opts.copiedData) {
+      return opts.copiedData;
+    }
     const res = [];
     let cur: DeetListNode | null = opts.data;
     const originalMap = DeetMap.getOriginalConstructor();
@@ -733,7 +728,7 @@ class DeetListNodeEngine extends DeetBaseEngine {
       }
       index++;
     }
-
+    opts.copiedData = res;
     return res;
   }
   arrayToLinkedList(array: number[]): DeetListNode {
