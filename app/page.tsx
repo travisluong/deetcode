@@ -10,7 +10,6 @@ import { problems, users } from "@/lib/schema";
 import {
   CameraIcon,
   CheckIcon,
-  Crosshair2Icon,
   LoopIcon,
   PlayIcon,
 } from "@radix-ui/react-icons";
@@ -64,7 +63,7 @@ export default async function Home() {
           DeetCode
         </h1>
         <h2 className="text-3xl text-center font-bold">
-          Debug And Visualize LeetCode Problems
+          Visualize LeetCode Problems
         </h2>
         <p className="text-center mb-10">
           A new way to train for technical interviews.
@@ -74,8 +73,8 @@ export default async function Home() {
           Data Structures
         </h2>
         <p className="text-center">
-          Visualize LeetCode algorithms with minimal code using DeetCode utility
-          functions
+          Visualize LeetCode algorithms and data structures with minimal code
+          using DeetCode utility functions
         </p>
         <ul className="grid grid-cols-3 max-w-5xl m-auto">
           <li className="flex gap-2 items-center">
