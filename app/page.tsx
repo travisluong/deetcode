@@ -129,6 +129,11 @@ export default async function Home() {
             - Visualize the algorithm one time.
           </li>
           <li className="flex gap-2 items-center">
+            <Crosshair2Icon className="text-primary w-8 h-8 flex-shrink-0" />{" "}
+            Debug - Visualize the algorithm as you step through the code using a
+            debugger and browser dev tool.
+          </li>
+          <li className="flex gap-2 items-center">
             <CameraIcon className="text-primary w-8 h-8 flex-shrink-0" />{" "}
             Snapshot - View snapshots of your algorithm going backward or
             forward.
