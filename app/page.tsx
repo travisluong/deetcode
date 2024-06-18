@@ -10,6 +10,7 @@ import { problems, users } from "@/lib/schema";
 import {
   CameraIcon,
   CheckIcon,
+  Crosshair2Icon,
   LoopIcon,
   PlayIcon,
 } from "@radix-ui/react-icons";
