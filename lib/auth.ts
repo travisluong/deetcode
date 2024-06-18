@@ -62,12 +62,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/signin",
   },
-  callbacks: {
-    async session({ session, user, token }: any) {
-      session.username = user.username;
-      return session;
-    },
-  },
+  // callbacks: {
+  //   async session({ session, user, token }: any) {
+  //     session.username = user.username;
+  //     return session;
+  //   },
+  // },
   cookies: {
     pkceCodeVerifier: {
       name: "next-auth.pkce.code_verifier",
@@ -78,5 +78,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         secure: true,
       },
     },
+  },
+  session: {
+    strategy: "jwt",
   },
 });
