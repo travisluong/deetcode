@@ -35,7 +35,7 @@ export default function Header({ user }: { user?: UserDB }) {
       </Link>
 
       <div className="flex gap-5 items-center">
-        <nav className="flex gap-5">
+        <nav className="flex gap-5 items-center">
           <Link
             href="/problems"
             className={cn(

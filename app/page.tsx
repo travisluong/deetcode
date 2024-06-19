@@ -64,7 +64,7 @@ export default async function Home() {
           DeetCode
         </h1>
         <h2 className="text-3xl text-center font-bold">
-          Visualize LeetCode Problems
+          Debug and Visualize LeetCode Problems
         </h2>
         <p className="text-center mb-10">
           A new way to train for technical interviews.
@@ -125,21 +125,21 @@ export default async function Home() {
           Rendering Modes
         </h2>
         <ul className="flex flex-col m-auto max-w-lg gap-5">
-          <li className="flex gap-2 items-center">
+          <li className="flex gap-5 items-center">
             <PlayIcon className="text-primary w-8 h-8 flex-shrink-0" /> Animate
             - Visualize the algorithm one time.
           </li>
-          <li className="flex gap-2 items-center">
+          <li className="flex gap-5 items-center">
             <Crosshair2Icon className="text-primary w-8 h-8 flex-shrink-0" />{" "}
             Debug - Visualize the algorithm as you step through the code using a
             debugger and browser dev tool.
           </li>
-          <li className="flex gap-2 items-center">
+          <li className="flex gap-5 items-center">
             <CameraIcon className="text-primary w-8 h-8 flex-shrink-0" />{" "}
             Snapshot - View snapshots of your algorithm going backward or
             forward.
           </li>
-          <li className="flex gap-2 items-center">
+          <li className="flex gap-5 items-center">
             <LoopIcon className="text-primary w-8 h-8 flex-shrink-0" /> Loop -
             Continuously loop through your algorithm animation.
           </li>
@@ -179,8 +179,10 @@ export default async function Home() {
             <h2 className="text-2xl text-center text-primary font-brand">
               Problems
             </h2>
-            <p>View all the problems currently on DeetCode</p>
-            <div>
+            <p className="text-center">
+              View all the problems currently on DeetCode
+            </p>
+            <div className="text-center">
               <Link href="/problems">
                 <Button>All Problems</Button>
               </Link>
@@ -190,8 +192,10 @@ export default async function Home() {
             <h2 className="text-2xl text-center text-primary font-brand">
               Blind 75
             </h2>
-            <p>Get started with the popular Blind 75 curated list</p>
-            <div>
+            <p className="text-center">
+              Get started with the popular Blind 75 curated list
+            </p>
+            <div className="text-center">
               <Link href="/problem-list/blind-75">
                 <Button>Blind 75 List</Button>
               </Link>
@@ -201,8 +205,10 @@ export default async function Home() {
             <h2 className="text-2xl text-center text-primary font-brand">
               Playground
             </h2>
-            <p>Try the different DeetCode utilities at the Playground</p>
-            <div>
+            <p className="text-center">
+              Try the different DeetCode utilities at the Playground
+            </p>
+            <div className="text-center">
               <Link href="/playground">
                 <Button>Try Now</Button>
               </Link>

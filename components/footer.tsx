@@ -1,5 +1,6 @@
 import {
   DiscordLogoIcon,
+  EnvelopeClosedIcon,
   LayersIcon,
   LinkedInLogoIcon,
   TwitterLogoIcon,
@@ -38,7 +39,9 @@ export default function Footer() {
             </a>
           </li>
           <li>
-            <a href="mailto:support@deetcode.com">support@deetcode.com</a>
+            <a href="mail&#116;o&#58;s%75p&#112;o%72&#116;&#64;deet&#99;o&#100;e&#46;&#37;&#54;&#51;om">
+              <EnvelopeClosedIcon className="w-6 h-6" />
+            </a>
           </li>
         </ul>
       </div>
