@@ -31,7 +31,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
     .orderBy(asc(problems.difficulty), asc(category.position));
 
   return (
-    <div className="max-w-3xl m-auto flex flex-col gap-5">
+    <div className="max-w-3xl m-auto flex flex-col gap-0 pb-10">
       <h1 className="font-brand text-center">{problemList.name}</h1>
       <DataTable columns={columns} data={data} />
     </div>

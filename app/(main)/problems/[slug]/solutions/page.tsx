@@ -29,6 +29,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
       },
       problem: {
         id: problems.id,
+        name: problems.name,
+        slug: problems.slug,
       },
     })
     .from(problems)

@@ -51,7 +51,7 @@ export default async function Page({
     .where(eq(solutions.user_id, user.id));
 
   return (
-    <div className="m-auto max-w-md flex flex-col gap-5 justify-center items-center">
+    <div className="m-auto max-w-md flex flex-col gap-5 justify-center items-center p-5">
       <Image
         src={user.image!}
         width={50}

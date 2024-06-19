@@ -12,7 +12,7 @@ export default async function Page() {
     .orderBy(asc(problems.difficulty), asc(category.position));
 
   return (
-    <div className="max-w-3xl m-auto flex flex-col gap-5">
+    <div className="max-w-3xl m-auto flex flex-col gap-0 pb-10">
       <h1 className="font-brand text-center">All Problems</h1>
       <DataTable columns={columns} data={data} />
     </div>

@@ -25,7 +25,7 @@ export default function Header({ user }: { user?: UserDB }) {
   const session = useSession();
   const pathname = usePathname();
   return (
-    <header className="p-3 flex justify-between border-b border-gray-400 dark:border-gray-800">
+    <header className="flex justify-between border-b border-gray-400 dark:border-gray-800 bg-muted p-1">
       <Link
         href="/"
         className="font-brand text-primary flex gap-2 items-center text-xl"

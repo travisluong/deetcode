@@ -49,9 +49,9 @@ export default function Toolbar({
     <div
       // @ts-ignore
       ref={ref}
-      className="flex gap-2 justify-between items-center px-5 mb-2"
+      className="flex justify-between items-center"
     >
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center py-2">
         <div>
           <LabelModeToggle />
         </div>
@@ -66,7 +66,7 @@ export default function Toolbar({
         </div>
       </div>
       {solution && user && (
-        <div className="px-5 mb-2 flex justify-between gap-2 items-center">
+        <div className="px-5 flex justify-between gap-2 items-center">
           <div>
             <Link
               className="flex gap-2 items-center"

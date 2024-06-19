@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="flex flex-col p-2 h-full">
+    <div className="flex flex-col px-2 h-full">
       <Toolbar />
       <ProblemDetailSandbox problem={data} />
     </div>

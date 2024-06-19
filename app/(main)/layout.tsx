@@ -18,10 +18,9 @@ export default async function Layout({
     });
   }
   return (
-    <section className="flex flex-col gap-5 h-[100vh]">
+    <section className="flex flex-col gap-0 h-[100vh]">
       <Header user={user} />
       <main className="flex-grow">{children}</main>
-      <Footer />
     </section>
   );
 }
