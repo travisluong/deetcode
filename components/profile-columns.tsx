@@ -25,7 +25,7 @@ export const columns: ColumnDef<ProblemSolutionUserRow>[] = [
       const data = row.original;
       return (
         <Link
-          className="hover:text-primary"
+          className="hover:text-primary block"
           href={`/problems/${data.problem.slug}`}
         >
           {data.problem.name}
@@ -50,7 +50,7 @@ export const columns: ColumnDef<ProblemSolutionUserRow>[] = [
       const data = row.original;
       return (
         <Link
-          className="hover:text-primary"
+          className="hover:text-primary block"
           href={`/problems/${data.problem.slug}/solutions/${data.solution.id}`}
         >
           {data.solution.title}

@@ -25,7 +25,7 @@ export const columns: ColumnDef<ProblemCategoryRow>[] = [
       const problemCategory = row.original;
       return (
         <Link
-          className="hover:text-primary"
+          className="hover:text-primary block"
           href={`/problems/${problemCategory.problem.slug}`}
         >
           {problemCategory.problem.name}
