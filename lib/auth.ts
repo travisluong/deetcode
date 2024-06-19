@@ -9,7 +9,10 @@ import { users } from "./schema";
 import { uuidv7 } from "uuidv7";
 import { nanoid } from "nanoid";
 
-const providers: Provider[] = [GitHub, Google];
+const providers: Provider[] = [
+  GitHub({ checks: ["none"] }),
+  Google({ checks: ["none"] }),
+];
 
 export const providerMap = providers.map((provider) => {
   if (typeof provider === "function") {
