@@ -3,8 +3,6 @@ import { Inter, Rubik_Mono_One } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/lib/auth";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
 
@@ -26,7 +24,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -45,17 +42,15 @@ export default async function RootLayout({
         </Script>
       </head>
       <body className={cn(inter.variable, rubik.variable, "font-sans")}>
-        <SessionProvider session={session}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </SessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

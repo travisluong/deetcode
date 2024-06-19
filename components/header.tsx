@@ -11,7 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -22,7 +22,6 @@ import {
 import { UserDB } from "@/lib/types";
 
 export default function Header({ user }: { user?: UserDB }) {
-  const session = useSession();
   const pathname = usePathname();
   return (
     <header className="flex justify-between border-b border-gray-400 dark:border-gray-800 bg-muted p-1">
@@ -63,7 +62,7 @@ export default function Header({ user }: { user?: UserDB }) {
           >
             Playground
           </Link>
-          {session.status === "authenticated" ? (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost">
@@ -71,7 +70,7 @@ export default function Header({ user }: { user?: UserDB }) {
                     width={30}
                     height={230}
                     alt="avatar"
-                    src={session.data?.user?.image!}
+                    src={user.image!}
                     className="rounded-full"
                   />
                 </Button>

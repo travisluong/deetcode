@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { useSession } from "next-auth/react";
 import createSolution, { CreateSolutionState } from "@/actions/create-solution";
 import { useFormState, useFormStatus } from "react-dom";
 import updateSolution from "@/actions/update-solution";
@@ -39,20 +38,22 @@ import { useToast } from "@/components/ui/use-toast";
 import deleteSolution from "@/actions/delete-solution";
 import { SubmitButton } from "./submit-button";
 import { config } from "@/lib/config";
+import { Session } from "next-auth";
 
 export default function ProblemDetailSandbox({
   problem,
   solution,
   isPlayground = false,
+  session,
 }: {
   problem: ProblemDB | PlaygroundProblem;
   solution?: SolutionDB;
   isPlayground?: boolean;
+  session?: Session | null;
 }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
   const [isNew, setIsNew] = useState(false);
-  const session = useSession();
   const initialState: CreateSolutionState = { errors: {} };
   const [state, dispatch] = useFormState(createSolution, initialState);
   const [title, setTitle] = useState("");
@@ -198,7 +199,7 @@ export default function ProblemDetailSandbox({
           <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
             <div className="flex flex-col gap-2 h-full w-full flex-grow">
               <div className="flex px-5 pt-2 justify-end gap-2">
-                {session.status === "unauthenticated" && isNew && !solution && (
+                {!session && isNew && !solution && (
                   <Dialog>
                     <DialogTrigger className="flex gap-2 items-center">
                       <Pencil2Icon /> Share
@@ -214,7 +215,7 @@ export default function ProblemDetailSandbox({
                     </DialogContent>
                   </Dialog>
                 )}
-                {!solution && session.status === "authenticated" && isNew && (
+                {!solution && session && isNew && (
                   <Dialog>
                     <DialogTrigger
                       className="flex gap-2 items-center"
@@ -277,25 +278,24 @@ export default function ProblemDetailSandbox({
                     </DialogContent>
                   </Dialog>
                 )}
-                {session.status === "authenticated" &&
-                  session.data.user?.id === solution?.user_id && (
-                    <>
-                      <Button
-                        variant="destructive"
-                        className="flex gap-2"
-                        onClick={handleDelete}
-                      >
-                        <TrashIcon /> Delete
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        className="flex gap-2"
-                        onClick={handleSave}
-                      >
-                        <BookmarkIcon /> Save
-                      </Button>
-                    </>
-                  )}
+                {session && session.user?.id === solution?.user_id && (
+                  <>
+                    <Button
+                      variant="destructive"
+                      className="flex gap-2"
+                      onClick={handleDelete}
+                    >
+                      <TrashIcon /> Delete
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="flex gap-2"
+                      onClick={handleSave}
+                    >
+                      <BookmarkIcon /> Save
+                    </Button>
+                  </>
+                )}
 
                 {!solution && !isPlayground && (
                   <Button

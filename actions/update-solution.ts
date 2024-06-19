@@ -2,8 +2,9 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { solutions } from "@/lib/schema";
+import { problems, solutions } from "@/lib/schema";
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const UpdateSolutionSchema = z.object({
@@ -60,6 +61,18 @@ export default async function updateSolution(
     };
   }
 
+  // get problem
+  const problem = await db.query.problems.findFirst({
+    where: eq(problems.id, solution.problem_id),
+  });
+
+  if (!problem) {
+    return {
+      message: "problem not found",
+      status: "error",
+    };
+  }
+
   await db
     .update(solutions)
     .set({
@@ -67,6 +80,9 @@ export default async function updateSolution(
       content: validatedFields.data.content,
     })
     .where(eq(solutions.id, solution.id));
+
+  revalidatePath(`/problems/${problem.slug}/solutions`);
+  revalidatePath(`/problems/${problem.slug}/solutions/${solution.id}`);
 
   return {
     status: "success",
