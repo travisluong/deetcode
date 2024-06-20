@@ -15,7 +15,6 @@ export default function ToolbarSticky() {
     const div = ref.current;
     sticky.current = div!.offsetTop;
     stickyMax.current = Math.max(stickyMax.current, sticky.current);
-    console.log(window.scrollY, sticky.current, stickyMax.current);
     if (window.scrollY < stickyMax.current) {
       div!.classList.remove("fixed", "bg-muted", "z-10", "top-0", "w-full");
     } else if (window.scrollY > sticky.current) {
