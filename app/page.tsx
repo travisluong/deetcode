@@ -77,7 +77,7 @@ export default async function Home() {
           Visualize LeetCode algorithms and data structures with minimal code
           using DeetCode utility functions
         </p>
-        <ul className="grid grid-cols-3 max-w-5xl m-auto">
+        <ul className="grid grid-cols-3 max-w-5xl m-auto p-5">
           <li className="flex gap-2 items-center">
             <CheckIcon className="text-primary w-8 h-8 flex-shrink-0" /> Set
           </li>
@@ -124,7 +124,7 @@ export default async function Home() {
         <h2 className="text-2xl text-center text-primary font-brand mt-10">
           Rendering Modes
         </h2>
-        <ul className="flex flex-col m-auto max-w-lg gap-5">
+        <ul className="flex flex-col m-auto max-w-lg gap-5 p-5">
           <li className="flex gap-5 items-center">
             <PlayIcon className="text-primary w-8 h-8 flex-shrink-0" /> Animate
             - Visualize the algorithm one time.
@@ -216,7 +216,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="mt-10 m-auto max-w-lg flex flex-col gap-5">
+        <div className="mt-10 m-auto max-w-lg flex flex-col gap-5 p-5">
           <h2 className="text-2xl text-center text-primary font-brand">
             FREE Download
           </h2>

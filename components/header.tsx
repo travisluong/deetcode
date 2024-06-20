@@ -24,16 +24,16 @@ import { UserDB } from "@/lib/types";
 export default function Header({ user }: { user?: UserDB }) {
   const pathname = usePathname();
   return (
-    <header className="flex justify-between border-b border-gray-400 dark:border-gray-800 bg-muted p-1">
+    <header className="flex flex-col md:flex-row justify-between border-b border-gray-400 dark:border-gray-800 bg-muted p-1 gap-5">
       <Link
         href="/"
-        className="font-brand text-primary flex gap-2 items-center text-xl"
+        className="font-brand text-primary flex gap-2 items-center text-xl m-auto"
       >
         <LightningBoltIcon className="text-primary w-7 h-7 hover:text-yellow-300" />{" "}
         DeetCode
       </Link>
 
-      <div className="flex gap-5 items-center">
+      <div className="flex flex-col md:flex-row gap-5 items-center">
         <nav className="flex gap-5 items-center">
           <Link
             href="/problems"
@@ -62,6 +62,8 @@ export default function Header({ user }: { user?: UserDB }) {
           >
             Playground
           </Link>
+        </nav>
+        <nav className="flex">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -97,8 +99,8 @@ export default function Header({ user }: { user?: UserDB }) {
           ) : (
             <Button onClick={() => signIn()}>Sign In</Button>
           )}
+          <ModeToggle />
         </nav>
-        <ModeToggle />
       </div>
     </header>
   );
