@@ -19,7 +19,7 @@ export default function Footer() {
             </a>
           </li>
           <li>
-            <a href="https://www.youtube.com/@fullstackbook">
+            <a href="https://www.youtube.com/@deetcode">
               <VideoIcon className="w-6 h-6" />
             </a>
           </li>
