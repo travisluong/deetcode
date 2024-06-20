@@ -1,7 +1,7 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import ProblemDetailSandbox from "@/components/problem-detail-sandbox";
-import Toolbar from "@/components/toolbar";
+import ToolbarSticky from "@/components/toolbar-sticky";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { config } from "@/lib/config";
@@ -154,7 +154,7 @@ export default async function Home() {
             the toolbar.
           </p>
           <div className="bg-muted pt-2">
-            <Toolbar />
+            <ToolbarSticky />
           </div>
         </div>
         <div className="p-5">

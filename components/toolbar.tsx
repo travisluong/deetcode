@@ -16,41 +16,8 @@ export default function Toolbar({
   solution?: SolutionDB;
   user?: Partial<UserDB>;
 }) {
-  const ref = useRef<HTMLElement | null>(null);
-
-  function handleScroll() {
-    if (!ref) {
-      return;
-    }
-    const div = ref.current;
-    const sticky = div!.offsetTop;
-    if (window.scrollY > sticky) {
-      div!.classList.add("fixed", "bg-muted", "z-10", "top-0", "w-full", "p-2");
-    } else {
-      div!.classList.remove(
-        "fixed",
-        "bg-muted",
-        "z-10",
-        "top-0",
-        "w-full",
-        "p-2"
-      );
-    }
-  }
-
-  useEffect(() => {
-    window.onscroll = handleScroll;
-    return () => {
-      window.onscroll = null;
-    };
-  }, []);
-
   return (
-    <div
-      // @ts-ignore
-      ref={ref}
-      className="flex justify-between items-center"
-    >
+    <div className="flex justify-between items-center">
       <div className="flex gap-2 items-center py-2">
         <div>
           <LabelModeToggle />
