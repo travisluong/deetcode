@@ -73,7 +73,7 @@ export default async function Home() {
         <h2 className="text-2xl text-center text-primary font-brand">
           Data Structures
         </h2>
-        <p className="text-center">
+        <p className="text-center p-5">
           Visualize LeetCode algorithms and data structures with minimal code
           using DeetCode utility functions
         </p>
@@ -149,7 +149,7 @@ export default async function Home() {
           Try DeetCode
         </h2>
         <div className="flex flex-col justify-center text-center gap-5">
-          <p>
+          <p className="p-5">
             Switch between different rendering modes and display options with
             the toolbar.
           </p>

@@ -27,7 +27,7 @@ export default function Header({ user }: { user?: UserDB }) {
     <header className="flex flex-col md:flex-row justify-between border-b border-gray-400 dark:border-gray-800 bg-muted p-1 gap-5">
       <Link
         href="/"
-        className="font-brand text-primary flex gap-2 items-center text-xl m-auto"
+        className="font-brand text-primary flex gap-2 items-center text-xl m-auto md:m-0"
       >
         <LightningBoltIcon className="text-primary w-7 h-7 hover:text-yellow-300" />{" "}
         DeetCode
