@@ -1218,11 +1218,7 @@ class DeetDirectedGraphEngine extends DeetBaseEngine {
     div.classList.add("deetcode-directed-graph");
     const label = this.renderLabel(opts);
     div.appendChild(label);
-
-    const nodes = adjacencyList
-      .keys()
-      .toArray()
-      .map((id: any) => ({ id }));
+    const nodes = [...adjacencyList.keys()].map((id: any) => ({ id }));
     const links: any[] = [];
 
     // Object.keys(adjacencyList).forEach((source) => {
