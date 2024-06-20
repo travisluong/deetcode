@@ -29,7 +29,7 @@ export default function Runner() {
       const deetConfig = e.data.deetConfig;
       const code = e.data.code;
       let instance = getInstance();
-      let errMsg = "";
+      let errMsg = null;
 
       try {
         instance.init(deetConfig);
@@ -41,7 +41,9 @@ export default function Runner() {
         errMsg = e.message;
       } finally {
         instance.end();
-        instance.renderError("Error: " + errMsg);
+        if (errMsg) {
+          instance.renderError("Error: " + errMsg);
+        }
       }
       // @ts-ignore
       mainWindow.postMessage(result, event.origin);
