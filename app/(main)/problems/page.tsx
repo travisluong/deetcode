@@ -4,6 +4,8 @@ import { columns } from "@/components/problem-columns";
 import { category, problems } from "@/lib/schema";
 import { asc, eq } from "drizzle-orm";
 
+export const metadata = { title: "Problems | DeetCode" };
+
 export default async function Page() {
   const data = await db
     .select()

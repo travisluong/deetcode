@@ -5,6 +5,8 @@ import { users } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 
+export const metadata = { title: "Profile | DeetCode" };
+
 export default async function Page() {
   const session = await auth();
 

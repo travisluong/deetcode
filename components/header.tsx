@@ -97,7 +97,9 @@ export default function Header({ user }: { user?: UserDB }) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button onClick={() => signIn()}>Sign In</Button>
+            <Button onClick={() => signIn()} className="mr-5">
+              Sign In
+            </Button>
           )}
           <ModeToggle />
         </nav>

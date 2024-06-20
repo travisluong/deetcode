@@ -1,11 +1,27 @@
 import { columns } from "@/components/profile-columns";
 import { DataTable } from "@/components/ui/data-table";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { problems, solutions, users } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { username: string };
+}) {
+  const { username } = params;
+  const user = await db.query.users.findFirst({
+    where: eq(users.username, username),
+  });
+  if (!user) {
+    notFound();
+  }
+  return {
+    title: user.username + " Profile | " + "DeetCode",
+  };
+}
 
 export default async function Page({
   params,

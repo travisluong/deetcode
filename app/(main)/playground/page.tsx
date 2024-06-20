@@ -4,6 +4,8 @@ import { readFileAsString } from "@/lib/read-file-as-string";
 import { PlaygroundProblem } from "@/lib/types";
 import { removeFirstLine } from "@/lib/utils";
 
+export const metadata = { title: "Playground | DeetCode" };
+
 export default async function Page() {
   const content = await readFileAsString("app/(main)/playground/example.ts");
   const code = removeFirstLine(content);

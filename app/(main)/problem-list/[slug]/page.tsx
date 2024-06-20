@@ -10,6 +10,23 @@ import {
 import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = params;
+  const data = await db.query.problem_list.findFirst({
+    where: eq(problem_list.slug, slug),
+  });
+  if (!data) {
+    notFound();
+  }
+  return {
+    title: data.name + " List | DeetCode",
+  };
+}
+
 export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
 

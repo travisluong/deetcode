@@ -6,6 +6,23 @@ import { problems, solutions, users } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = params;
+  const data = await db.query.problems.findFirst({
+    where: eq(problems.slug, slug),
+  });
+  if (!data) {
+    notFound();
+  }
+  return {
+    title: data.name + " Solution | DeetCode",
+  };
+}
+
 export default async function Page({
   params,
 }: {

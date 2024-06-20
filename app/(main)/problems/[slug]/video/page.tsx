@@ -1,6 +1,27 @@
 import { Button } from "@/components/ui/button";
+import { db } from "@/lib/db";
+import { problems } from "@/lib/schema";
 import { VideoIcon } from "@radix-ui/react-icons";
+import { eq } from "drizzle-orm";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = params;
+  const data = await db.query.problems.findFirst({
+    where: eq(problems.slug, slug),
+  });
+  if (!data) {
+    notFound();
+  }
+  return {
+    title: data.name + " Video | DeetCode",
+  };
+}
 
 export default function Page() {
   return (

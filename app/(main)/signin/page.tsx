@@ -6,9 +6,12 @@ import { redirect } from "next/navigation";
 
 const SIGNIN_ERROR_URL = "/";
 
+export const metadata = { title: "Sign In | DeetCode" };
+
 export default async function SignInPage() {
   return (
-    <div className="flex flex-col gap-2 justify-center items-center">
+    <div className="flex flex-col gap-2 justify-center items-center mt-5">
+      <h1 className="font-brand">Sign In</h1>
       {Object.values(providerMap).map((provider) => (
         <form
           key={provider.id}
