@@ -19,7 +19,7 @@ export default function Footer() {
             </a>
           </li>
           <li>
-            <a href="https://www.youtube.com/@deetcode">
+            <a href="https://www.youtube.com/@fullstackbook">
               <VideoIcon className="w-6 h-6" />
             </a>
           </li>
@@ -31,11 +31,6 @@ export default function Footer() {
           <li>
             <a href="https://twitter.com/TravisLuong">
               <TwitterLogoIcon className="w-6 h-6" />
-            </a>
-          </li>
-          <li>
-            <a href="https://discord.gg/yfntMbzR">
-              <DiscordLogoIcon className="w-6 h-6" />
             </a>
           </li>
           <li>
