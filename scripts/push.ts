@@ -23,7 +23,11 @@ await prodDb
   .insert(problems)
   .values(problemsRes)
   .onDuplicateKeyUpdate({
-    set: { id: sql`id`, solution: sql`VALUES(solution)` },
+    set: {
+      id: sql`id`,
+      solution: sql`VALUES(solution)`,
+      difficulty: sql`VALUES(difficulty)`,
+    },
   });
 
 prodConn.end();
