@@ -1437,6 +1437,13 @@ const DeetRender = {
         break;
     }
   },
+  renderError({ deetEngine, msg }: { deetEngine: DeetEngine; msg: string }) {
+    const div = document.createElement("div");
+    div.classList.add("deet-error-msg");
+    div.innerHTML = msg;
+    deetEngine.el.appendChild(div);
+    return div;
+  },
 };
 
 export type RenderMode = "animate" | "debug" | "snapshot" | "loop";
@@ -2236,6 +2243,10 @@ export class DeetEngine {
 
   static getInstance() {
     return this.instance;
+  }
+
+  renderError(msg: string) {
+    DeetRender.renderError({ deetEngine: this, msg: msg });
   }
 }
 

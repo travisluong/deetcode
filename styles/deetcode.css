@@ -82,6 +82,16 @@
   border: 2px solid red;
 }
 
+.deet-error-msg {
+  border: 2px solid red;
+  background: lightpink;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+
 /*
 d3 list node styles
 */

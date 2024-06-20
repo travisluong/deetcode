@@ -28,15 +28,20 @@ export default function Runner() {
       var result = "";
       const deetConfig = e.data.deetConfig;
       const code = e.data.code;
+      let instance = getInstance();
+      let errMsg = "";
 
       try {
-        getInstance().init(deetConfig);
+        instance.init(deetConfig);
         result = eval(code);
         document.dispatchEvent(new CustomEvent("deetcodeEvalCompleted"));
       } catch (e) {
         result = "eval() threw an exception.";
+        // @ts-ignore
+        errMsg = e.message;
       } finally {
-        getInstance().end();
+        instance.end();
+        instance.renderError("Error: " + errMsg);
       }
       // @ts-ignore
       mainWindow.postMessage(result, event.origin);
