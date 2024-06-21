@@ -31,15 +31,17 @@ export default async function Layout({
 
   return (
     <section className="flex flex-col h-full py-2">
-      <div className="flex items-center px-2 gap-5 border-b border-b-gray-400 dark:border-b-gray-600">
-        <h1 className="font-sans font-bold text-xl">{problem.name}</h1>
-        <div>
-          <Badge variant="outline">{category.name}</Badge>
-        </div>
-        <div>
-          {problem.difficulty && (
-            <DifficultyBadge difficulty={problem.difficulty} />
-          )}
+      <div className="flex flex-col lg:flex-row items-center px-2 gap-5 border-b border-b-gray-400 dark:border-b-gray-600">
+        <div className="flex flex-row gap-2 items-center">
+          <h1 className="font-sans font-bold text-xl">{problem.name}</h1>
+          <div>
+            <Badge variant="outline">{category.name}</Badge>
+          </div>
+          <div>
+            {problem.difficulty && (
+              <DifficultyBadge difficulty={problem.difficulty} />
+            )}
+          </div>
         </div>
         <ProblemNav problem={problem} />
       </div>
