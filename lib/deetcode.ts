@@ -519,7 +519,11 @@ class DeetMinPriorityQueueEngine extends DeetBaseEngine {
     const ul = document.createElement("ul");
     for (const item of arr) {
       const li = document.createElement("li");
-      li.innerHTML = item.toString();
+      if (typeof item === "object") {
+        li.innerHTML = item.val;
+      } else {
+        li.innerHTML = item.toString();
+      }
       ul.appendChild(li);
     }
     const label = this.renderLabel(opts);
@@ -545,7 +549,11 @@ class DeetMaxPriorityQueueEngine extends DeetBaseEngine {
     const ul = document.createElement("ul");
     for (const item of arr) {
       const li = document.createElement("li");
-      li.innerHTML = item.toString();
+      if (typeof item === "object") {
+        li.innerHTML = item.val;
+      } else {
+        li.innerHTML = item.toString();
+      }
       ul.appendChild(li);
     }
     const label = this.renderLabel(opts);
