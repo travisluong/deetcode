@@ -25,7 +25,6 @@ declare global {
     ListNode: typeof DeetListNode;
     TreeNode: typeof DeetTreeNode;
     _Node: typeof DeetNode;
-    DeetTest: DeetTest;
     DeetCode: DeetCode;
   }
 }
@@ -2185,7 +2184,6 @@ export class DeetEngine {
     window.MaxPriorityQueue = MaxPriorityQueue;
     window.PriorityQueue = PriorityQueue;
     window.DeetEngine = DeetEngine;
-    window.DeetTest = new DeetTest(this);
     window._ = _;
     window.ListNode = DeetListNode;
     window.TreeNode = DeetTreeNode;
@@ -2255,42 +2253,6 @@ export class DeetEngine {
 
   renderError(msg: string) {
     DeetRender.renderError({ deetEngine: this, msg: msg });
-  }
-}
-
-class DeetTest {
-  deetEngine: DeetEngine;
-  constructor(deetEngine: DeetEngine) {
-    this.deetEngine = deetEngine;
-  }
-  equal(actual: any, expected: any) {
-    const deetEngine = this.deetEngine;
-    const fn = () => {
-      const div = document.createElement("div");
-      div.classList.add("deet-assert");
-      if (_.isEqual(actual, expected)) {
-        div.classList.add("deet-assert-pass");
-        div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
-          actual
-        )}<br>Expected: ${JSON.stringify(expected)}`;
-        deetEngine.el.appendChild(div);
-      } else {
-        div.classList.add("deet-assert-fail");
-        div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
-          actual
-        )}<br>Expected: ${JSON.stringify(expected)}`;
-        deetEngine.el.appendChild(div);
-      }
-    };
-    DeetRender.renderFork({
-      deetEngine: deetEngine,
-      delayedCallback() {
-        deetEngine.enqueue(fn);
-      },
-      nowCallback() {
-        fn();
-      },
-    });
   }
 }
 
@@ -2488,5 +2450,35 @@ export class DeetCode {
     };
     this.deetEngine.deetDirectedGraphEngine.renderContainer(options);
     this.deetEngine.deetDirectedGraphEngine.renderFork(options);
+  }
+
+  equal(actual: any, expected: any) {
+    const deetEngine = this.deetEngine;
+    const fn = () => {
+      const div = document.createElement("div");
+      div.classList.add("deet-assert");
+      if (_.isEqual(actual, expected)) {
+        div.classList.add("deet-assert-pass");
+        div.innerHTML = `Assertion passed<br>Actual: ${JSON.stringify(
+          actual
+        )}<br>Expected: ${JSON.stringify(expected)}`;
+        deetEngine.el.appendChild(div);
+      } else {
+        div.classList.add("deet-assert-fail");
+        div.innerHTML = `Assertion failed<br>Actual: ${JSON.stringify(
+          actual
+        )}<br>Expected: ${JSON.stringify(expected)}`;
+        deetEngine.el.appendChild(div);
+      }
+    };
+    DeetRender.renderFork({
+      deetEngine: deetEngine,
+      delayedCallback() {
+        deetEngine.enqueue(fn);
+      },
+      nowCallback() {
+        fn();
+      },
+    });
   }
 }
