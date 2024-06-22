@@ -45,7 +45,11 @@ export default async function Page({ params }: { params: { slug: string } }) {
     .innerJoin(problem_to_list, eq(problems.id, problem_to_list.problem_id))
     .innerJoin(problem_list, eq(problem_to_list.list_id, problem_list.id))
     .where(eq(problem_list.id, problemList.id))
-    .orderBy(asc(problems.difficulty), asc(category.position));
+    .orderBy(
+      asc(problems.difficulty),
+      asc(category.position),
+      asc(problems.id)
+    );
 
   return (
     <div className="max-w-3xl m-auto flex flex-col gap-0 pb-10">

@@ -11,7 +11,11 @@ export default async function Page() {
     .select()
     .from(problems)
     .innerJoin(category, eq(problems.category_id, category.id))
-    .orderBy(asc(problems.difficulty), asc(category.position));
+    .orderBy(
+      asc(problems.difficulty),
+      asc(category.position),
+      asc(problems.id)
+    );
 
   return (
     <div className="max-w-3xl m-auto flex flex-col gap-0 pb-10">
