@@ -2104,6 +2104,7 @@ export class DeetEngine {
     this.deetTrieEngine.emptyContainerRegistry();
     this.deetGraphEngine.emptyContainerRegistry();
     this.deetDirectedGraphEngine.emptyContainerRegistry();
+    this.deetObjectEngine.emptyContainerRegistry();
   }
 
   takeSnapshot() {
