@@ -217,5 +217,5 @@ pqA.front();
 DeetCode.disableAutoVis();
 
 // Assertions
-DeetTest.equal(true, true);
-DeetTest.equal(1, 2);
+DeetCode.equal(true, true);
+DeetCode.equal(1, 2);
