@@ -23,16 +23,39 @@ export async function generateMetadata({
   };
 }
 
-export default function Page() {
+export default async function Page({ params }: { params: { slug: string } }) {
+  const { slug } = params;
+  const data = await db.query.problems.findFirst({
+    where: eq(problems.slug, slug),
+  });
+  if (!data) {
+    notFound();
+  }
+
   return (
     <div className="m-auto max-w-lg p-5 flex flex-col gap-5">
-      <p>🚧 Video is under construction. 🚧</p>
-      <Link href="https://www.youtube.com/@fullstackbook">
-        <Button>
-          <VideoIcon className="h-4 w-4 mr-2" /> Subscribe at YouTube for
-          updates
-        </Button>
-      </Link>
+      {data.youtube_url ? (
+        <iframe
+          className="aspect-video w-full mb-5"
+          // width="560"
+          // height="315"
+          src={data.youtube_url}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        ></iframe>
+      ) : (
+        <>
+          <p>🚧 Video is under construction. 🚧</p>
+          <Link href="https://www.youtube.com/@fullstackbook">
+            <Button>
+              <VideoIcon className="h-4 w-4 mr-2" /> Subscribe at YouTube for
+              updates
+            </Button>
+          </Link>
+        </>
+      )}
     </div>
   );
 }
