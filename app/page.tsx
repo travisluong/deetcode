@@ -66,9 +66,7 @@ export default async function Home() {
         <h2 className="text-3xl text-center font-bold">
           Debug and Visualize LeetCode Problems
         </h2>
-        <p className="text-center mb-10">
-          A new way to train for technical interviews.
-        </p>
+        <p className="text-center mb-10">Algorithm Visualizer for JavaScript</p>
 
         <h2 className="text-2xl text-center text-primary font-brand">
           Data Structures
