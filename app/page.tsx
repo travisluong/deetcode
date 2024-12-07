@@ -214,7 +214,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="mt-10 m-auto max-w-lg flex flex-col gap-5 p-5">
+        {/* <div className="mt-10 m-auto max-w-lg flex flex-col gap-5 p-5">
           <h2 className="text-2xl text-center text-primary font-brand">
             FREE Download
           </h2>
@@ -256,7 +256,7 @@ export default async function Home() {
               strategy="afterInteractive"
             />
           </div>
-        </div>
+        </div> */}
       </main>
       <Footer />
     </div>
