@@ -64,7 +64,7 @@ export default function Header({ user }: { user?: UserDB }) {
           </Link>
         </nav>
         <nav className="flex">
-          {user ? (
+          {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost">
@@ -96,10 +96,6 @@ export default function Header({ user }: { user?: UserDB }) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Button onClick={() => signIn()} className="mr-5">
-              Sign In
-            </Button>
           )}
           <ModeToggle />
         </nav>

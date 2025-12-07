@@ -1,9 +1,18 @@
-import { category, problems, solutions, users } from "./schema";
+import {
+  category,
+  problems,
+  solutions,
+  users,
+  problem_list,
+  problem_to_list,
+} from "./schema";
 
 export type ProblemDB = typeof problems.$inferSelect;
 export type CategoryDB = typeof category.$inferSelect;
 export type UserDB = typeof users.$inferSelect;
 export type SolutionDB = typeof solutions.$inferSelect;
+export type ProblemListDB = typeof problem_list.$inferSelect;
+export type ProblemToListDB = typeof problem_to_list.$inferSelect;
 
 export type ProblemCategoryRow = {
   problem: ProblemDB;

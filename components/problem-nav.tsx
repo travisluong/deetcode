@@ -25,26 +25,6 @@ export default function ProblemNav({ problem }: { problem: ProblemDB }) {
         </Link>
         <Link
           className={cn(
-            "border border-gray-400 dark:border-gray-600 px-3 border-b-0 rounded-t min-w-24 text-center",
-            pathname === `/problems/${slug}/solutions` &&
-              "bg-slate-200 dark:bg-background relative top-[2px]"
-          )}
-          href={`/problems/${slug}/solutions`}
-        >
-          Solutions
-        </Link>
-        <Link
-          className={cn(
-            "border border-gray-400 dark:border-gray-600 px-3 border-b-0 rounded-t min-w-24 text-center",
-            pathname === `/problems/${slug}/video` &&
-              "bg-slate-200 dark:bg-background relative top-[2px]"
-          )}
-          href={`/problems/${slug}/video`}
-        >
-          Video
-        </Link>
-        <Link
-          className={cn(
             "border border-gray-400 dark:border-gray-600 px-3 border-b-0 rounded-t min-w-24 text-center flex gap-2 items-center"
           )}
           href={problem.leetcode_url ?? ""}
