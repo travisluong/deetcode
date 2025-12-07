@@ -91,7 +91,7 @@ export default function ProblemDetailSandbox({
       deetConfig,
     };
     // @ts-ignore
-    frame.contentWindow.postMessage(message, config.NEXT_PUBLIC_RUNNER_DOMAIN);
+    frame.contentWindow.postMessage(message, "runner");
   }
 
   function plus() {
