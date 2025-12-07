@@ -3,10 +3,7 @@ import Header from "@/components/header";
 import ProblemDetailSandbox from "@/components/problem-detail-sandbox";
 import ToolbarSticky from "@/components/toolbar-sticky";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
 import { config } from "@/lib/config";
-import { db } from "@/lib/db";
-import { problems, users } from "@/lib/schema";
 import {
   CameraIcon,
   CheckIcon,
@@ -14,51 +11,35 @@ import {
   LoopIcon,
   PlayIcon,
 } from "@radix-ui/react-icons";
-import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import Script from "next/script";
+import { getStaticProblem } from "@/lib/static-data";
 
 export default async function Home() {
   if (config.APP_MODE === "runner") {
     redirect("/runner");
   }
-  const session = await auth();
 
-  let user;
-  if (session) {
-    user = await db.query.users.findFirst({
-      where: eq(users.id, session.user?.id!),
-    });
-  }
-
-  const problem1 = await db.query.problems.findFirst({
-    where: eq(problems.slug, "invert-binary-tree"),
-  });
+  const problem1 = getStaticProblem("invert-binary-tree");
 
   if (!problem1) notFound();
 
-  const problem2 = await db.query.problems.findFirst({
-    where: eq(problems.slug, "course-schedule"),
-  });
+  const problem2 = getStaticProblem("course-schedule");
 
   if (!problem2) notFound();
 
-  const problem3 = await db.query.problems.findFirst({
-    where: eq(problems.slug, "number-of-islands"),
-  });
+  const problem3 = getStaticProblem("number-of-islands");
 
   if (!problem3) notFound();
 
-  const problem4 = await db.query.problems.findFirst({
-    where: eq(problems.slug, "word-search-ii"),
-  });
+  const problem4 = getStaticProblem("word-search-ii");
 
   if (!problem4) notFound();
 
   return (
     <div className="h-full">
-      <Header user={user} />
+      <Header />
       <main className="flex flex-col h-full gap-5">
         <h1 className="font-bold text-5xl text-center text-primary font-brand mt-10">
           DeetCode
@@ -172,7 +153,7 @@ export default async function Home() {
           <ProblemDetailSandbox problem={problem4} isPlayground={true} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10 p-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-10 p-5">
           <div className="flex flex-col gap-5">
             <h2 className="text-2xl text-center text-primary font-brand">
               Problems
@@ -183,19 +164,6 @@ export default async function Home() {
             <div className="text-center">
               <Link href="/problems">
                 <Button>All Problems</Button>
-              </Link>
-            </div>
-          </div>
-          <div className="flex flex-col gap-5">
-            <h2 className="text-2xl text-center text-primary font-brand">
-              Blind 75
-            </h2>
-            <p className="text-center">
-              Get started with the popular Blind 75 curated list
-            </p>
-            <div className="text-center">
-              <Link href="/problem-list/blind-75">
-                <Button>Blind 75 List</Button>
               </Link>
             </div>
           </div>

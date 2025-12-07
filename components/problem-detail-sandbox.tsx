@@ -13,53 +13,20 @@ import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import "@/styles/deetcode.css";
 import _ from "lodash";
-import {
-  BookmarkIcon,
-  Pencil2Icon,
-  PlayIcon,
-  PlusIcon,
-  ResetIcon,
-  TrashIcon,
-} from "@radix-ui/react-icons";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import createSolution, { CreateSolutionState } from "@/actions/create-solution";
-import { useFormState, useFormStatus } from "react-dom";
-import updateSolution from "@/actions/update-solution";
-import { useToast } from "@/components/ui/use-toast";
-import deleteSolution from "@/actions/delete-solution";
-import { SubmitButton } from "./submit-button";
+import { PlayIcon, PlusIcon, ResetIcon } from "@radix-ui/react-icons";
 import { config } from "@/lib/config";
-import { Session } from "next-auth";
 
 export default function ProblemDetailSandbox({
   problem,
   solution,
   isPlayground = false,
-  session,
 }: {
   problem: ProblemDB | PlaygroundProblem;
   solution?: SolutionDB;
   isPlayground?: boolean;
-  session?: Session | null;
 }) {
   const editorRef = useRef(null);
   const { theme } = useTheme();
-  const [isNew, setIsNew] = useState(false);
-  const initialState: CreateSolutionState = { errors: {} };
-  const [state, dispatch] = useFormState(createSolution, initialState);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const { toast } = useToast();
-  const { pending } = useFormStatus();
   const [sandboxId, setSandboxId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -130,51 +97,11 @@ export default function ProblemDetailSandbox({
   function plus() {
     // @ts-ignore
     editorRef.current.setValue(problem.default_code ?? "");
-    setIsNew(true);
   }
 
   function example() {
     // @ts-ignore
     editorRef.current.setValue(problem.solution);
-    setIsNew(false);
-  }
-
-  function handleShare() {
-    // @ts-ignore
-    setContent(editorRef.current.getValue());
-  }
-
-  async function handleSave() {
-    if (!solution?.title) {
-      throw new Error("solution not found");
-    }
-    // @ts-ignore
-    const content = editorRef.current.getValue();
-    const formData = new FormData();
-    formData.set("id", solution.id);
-    formData.set("title", solution.title);
-    formData.set("content", content);
-    const res = await updateSolution({}, formData);
-    if (res.status === "success") {
-      toast({
-        description: "Save Success",
-        variant: "success",
-      });
-    } else if (res.status === "error") {
-      toast({
-        description: "Save Failed",
-        variant: "destructive",
-      });
-    }
-  }
-
-  async function handleDelete() {
-    if (!solution) {
-      throw new Error("solution not found");
-    }
-    const formData = new FormData();
-    formData.set("id", solution.id);
-    await deleteSolution({}, formData);
   }
 
   return (
@@ -199,104 +126,6 @@ export default function ProblemDetailSandbox({
           <div className="flex dark:bg-[#1E1E1E] h-full w-full flex-grow">
             <div className="flex flex-col gap-2 h-full w-full flex-grow">
               <div className="flex px-5 pt-2 justify-end gap-2">
-                {!session && isNew && !solution && (
-                  <Dialog>
-                    <DialogTrigger className="flex gap-2 items-center">
-                      <Pencil2Icon /> Share
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Share Solution</DialogTitle>
-                        <DialogDescription></DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div>Sign in to share your solution.</div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
-                {!solution && session && isNew && (
-                  <Dialog>
-                    <DialogTrigger
-                      className="flex gap-2 items-center"
-                      onClick={handleShare}
-                    >
-                      <Pencil2Icon /> Share
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Share Solution</DialogTitle>
-                        <DialogDescription></DialogDescription>
-                      </DialogHeader>
-                      <form action={dispatch} className="flex flex-col gap-2">
-                        <div className="flex flex-col gap-2">
-                          <Label htmlFor="title">Title</Label>
-                          <Input
-                            id="title"
-                            name="title"
-                            value={title}
-                            className="col-span-3"
-                            placeholder="Enter your title"
-                            onChange={(e) => setTitle(e.target.value)}
-                          />
-                          {state.errors?.title && (
-                            <div>
-                              {state.errors?.title?.map((error) => (
-                                <p key={error} className="text-red-500">
-                                  {error}
-                                </p>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <Input type="hidden" name="content" value={content} />
-                        {state.errors?.content && (
-                          <div>
-                            <Label htmlFor="content">Content</Label>
-                            {state.errors?.content?.map((error) => (
-                              <p key={error} className="text-red-500">
-                                {error}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-                        <Input
-                          type="hidden"
-                          name="problem_id"
-                          value={problem.id}
-                        />
-                        <div>
-                          <SubmitButton />
-                        </div>
-                        {state.message && (
-                          <p className="text-red-500">{state.message}</p>
-                        )}
-                        {!state.errors && !state.message && (
-                          <p className="text-green-500">Success</p>
-                        )}
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                )}
-                {session && session.user?.id === solution?.user_id && (
-                  <>
-                    <Button
-                      variant="destructive"
-                      className="flex gap-2"
-                      onClick={handleDelete}
-                    >
-                      <TrashIcon /> Delete
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      className="flex gap-2"
-                      onClick={handleSave}
-                    >
-                      <BookmarkIcon /> Save
-                    </Button>
-                  </>
-                )}
-
                 {!solution && !isPlayground && (
                   <Button
                     variant="secondary"

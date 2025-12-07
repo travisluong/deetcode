@@ -1,27 +1,12 @@
 "use client";
 
-import {
-  ExitIcon,
-  LightningBoltIcon,
-  Pencil2Icon,
-  PersonIcon,
-} from "@radix-ui/react-icons";
+import { LightningBoltIcon } from "@radix-ui/react-icons";
 import { ModeToggle } from "./mode-toggle";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import { signIn, signOut } from "next-auth/react";
-import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { UserDB } from "@/lib/types";
 
-export default function Header({ user }: { user?: UserDB }) {
+export default function Header() {
   const pathname = usePathname();
   return (
     <header className="flex flex-col md:flex-row justify-between border-b border-gray-400 dark:border-gray-800 bg-muted p-1 gap-5">
@@ -45,15 +30,6 @@ export default function Header({ user }: { user?: UserDB }) {
             Problems
           </Link>
           <Link
-            href="/problem-list/blind-75"
-            className={cn(
-              "hover:text-primary",
-              pathname === "/problem-list/blind-75" && "text-primary"
-            )}
-          >
-            Blind 75
-          </Link>
-          <Link
             href="/playground"
             className={cn(
               "hover:text-primary",
@@ -64,39 +40,6 @@ export default function Header({ user }: { user?: UserDB }) {
           </Link>
         </nav>
         <nav className="flex">
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost">
-                  <Image
-                    width={30}
-                    height={230}
-                    alt="avatar"
-                    src={user.image!}
-                    className="rounded-full"
-                  />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <Link
-                    className="flex gap-2"
-                    href={`/users/${user?.username}`}
-                  >
-                    <PersonIcon /> Public Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link className="flex gap-2" href="/profile">
-                    <Pencil2Icon /> Edit Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <ExitIcon className="mr-2" /> Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
           <ModeToggle />
         </nav>
       </div>
