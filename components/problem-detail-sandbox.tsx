@@ -91,7 +91,10 @@ export default function ProblemDetailSandbox({
       deetConfig,
     };
     // @ts-ignore
-    frame.contentWindow.postMessage(message, "runner");
+    frame.contentWindow.postMessage(
+      message,
+      config.NEXT_PUBLIC_RUNNER_DOMAIN + "/runner"
+    );
   }
 
   function plus() {
@@ -114,7 +117,7 @@ export default function ProblemDetailSandbox({
           <div className="flex h-full items-center justify-center">
             <iframe
               sandbox="allow-scripts allow-same-origin allow-modals"
-              src={"runner"}
+              src={config.NEXT_PUBLIC_RUNNER_URL}
               id={sandboxId!}
               width="100%"
               height="100%"

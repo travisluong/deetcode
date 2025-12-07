@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  basePath: "/deetcode", // Uncomment for GitHub Pages deployment
+  basePath: process.env.GITHUB_ACTIONS ? "/deetcode" : "",
   images: {
     unoptimized: true,
   },
