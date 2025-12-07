@@ -1,11 +1,4 @@
-import {
-  DiscordLogoIcon,
-  EnvelopeClosedIcon,
-  LayersIcon,
-  LinkedInLogoIcon,
-  TwitterLogoIcon,
-  VideoIcon,
-} from "@radix-ui/react-icons";
+import { TwitterLogoIcon } from "@radix-ui/react-icons";
 
 export default function Footer() {
   return (
